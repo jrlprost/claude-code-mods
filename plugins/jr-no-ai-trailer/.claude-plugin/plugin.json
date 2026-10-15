@@ -1,0 +1,24 @@
+{
+  "name": "jr-no-ai-trailer",
+  "version": "0.1.0",
+  "description": "Stops commits and pull requests that carry an AI co-author line or a 'Generated with' footer, so your history stays yours.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "git", "commit"],
+  "license": "MIT",
+  "userConfig": {
+    "allowTrailer": {
+      "type": "boolean",
+      "title": "Allow AI co-author lines",
+      "description": "Let Co-Authored-By lines that name an AI through.",
+      "default": false
+    },
+    "blockFooter": {
+      "type": "boolean",
+      "title": "Block 'Generated with' footers",
+      "description": "Also stop commits and pull requests whose message says it was generated with an AI tool.",
+      "default": true
+    }
+  }
+}
