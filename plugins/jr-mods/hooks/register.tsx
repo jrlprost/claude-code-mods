@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { JrModsApply } from '../types'
-import { changesOf, itemsOf, summary } from './plugins'
+import { changesOf, itemsOf, kindOf, summary } from './plugins'
 
 const PANE = 'jr-mods'
 const items = atom({ plugin: 'jr-mods', key: 'items' } as const, [])
@@ -12,6 +12,7 @@ async function loadItems($: EngineInterface) {
   if (exitCode !== 0) return false
   const listed = JSON.parse(stdout) as { id: string; enabled: boolean; installPath?: string }[]
   const descriptions: Record<string, string> = {}
+  const kinds: Record<string, 'mod' | 'plugin'> = {}
   for (const row of listed) {
     if (!row.installPath) continue
     try {
@@ -20,8 +21,13 @@ async function loadItems($: EngineInterface) {
     } catch {
       // A plugin without a readable manifest is listed by name alone.
     }
+    try {
+      kinds[row.id] = kindOf(await $.fs.read(`${row.installPath}/hooks/hooks.json`))
+    } catch {
+      kinds[row.id] = 'plugin'
+    }
   }
-  await update($, items, () => itemsOf(listed, descriptions))
+  await update($, items, () => itemsOf(listed, descriptions, kinds))
   return true
 }
 
@@ -33,7 +39,10 @@ export const register: Register = on => {
 
   on('command.run', { command: 'jrmods' }, async $ => {
     if (!(await loadItems($))) return { text: 'jr-mods: could not list plugins (claude plugin list failed).' }
-    await $.ui.open({ id: PANE, title: 'jr mods', focus: true, closeOnEscape: true, rows: Math.min((await read($, items)).length + 3, 40) })
+    // Tall enough for the longer tab, the tab line and the footer.
+    const list = await read($, items)
+    const longest = Math.max(...(['mod', 'plugin'] as const).map(kind => list.filter(i => i.kind === kind).length))
+    await $.ui.open({ id: PANE, title: 'jr mods', focus: true, closeOnEscape: true, rows: Math.min(longest + 3, 40) })
     // Hand the keys straight to the list, so no click is needed before space and arrows work.
     try {
       const focused = await $.ui.focus({ requestId: PANE, key: 'list' })
