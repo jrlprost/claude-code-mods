@@ -1,0 +1,36 @@
+{
+  "name": "jr-visitors",
+  "version": "0.1.0",
+  "description": "Live visitors from PostHog above the prompt (last 5 minutes and today), refreshed every 2 minutes; /jrvisitors adds today's top pages.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "posthog", "analytics"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "host": {
+      "type": "string",
+      "title": "PostHog host",
+      "description": "us, eu, or your own host (https://posthog.example.com).",
+      "default": "us"
+    },
+    "projectId": {
+      "type": "string",
+      "title": "Project id",
+      "description": "The number in your PostHog project URL (/project/12345)."
+    },
+    "apiKey": {
+      "type": "string",
+      "title": "Personal API key",
+      "description": "A personal API key (phx_…) with the Query Read scope.",
+      "sensitive": true
+    },
+    "showBand": {
+      "type": "boolean",
+      "title": "Show the band",
+      "description": "Visitors now and today above the prompt.",
+      "default": true
+    }
+  }
+}
