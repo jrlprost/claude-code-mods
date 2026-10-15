@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 
-import { isRiskyGitConfig, safeGit } from '../hooks/jr/git'
+import { parseConfigListing, riskyEntries, safeGit } from '../hooks/jr/git'
 
 test('git runs with the config that could run programs switched off', async () => {
   const argv = safeGit(['-C', '/repo', 'diff', '--numstat', 'HEAD'])
@@ -10,30 +10,36 @@ test('git runs with the config that could run programs switched off', async () =
   expect(argv.slice(-7)).toEqual(['-C', '/repo', 'diff', '--no-ext-diff', '--no-textconv', '--numstat', 'HEAD'])
 })
 
-const PLAIN = `[core]
-\trepositoryformatversion = 0
-\tbare = false
-[remote "origin"]
-\turl = git@github.com:someone/app.git
-\tfetch = +refs/heads/*:refs/remotes/origin/*
-[branch "main"]
-\tremote = origin
-`
+// What `git config --list --show-origin -z` prints: origin NUL key LF value NUL.
+const listing = (...rows: [string, string, string][]) => rows.map(([o, k, v]) => `${o}\0${k}\n${v}\0`).join('')
+const GLOBAL = 'file:/home/me/.gitconfig'
+const TRUSTED = new Set([GLOBAL, 'file:/etc/gitconfig'])
 
-test('a plain repo config is safe', async () => {
-  expect(isRiskyGitConfig(PLAIN, '*.png binary\n')).toBe(false)
+test('the listing is read the way git prints it', async () => {
+  expect(parseConfigListing(listing(['file:.git/config', 'core.bare', 'false'], [GLOBAL, 'user.name', 'Me']))).toEqual([
+    { origin: 'file:.git/config', key: 'core.bare', value: 'false' },
+    { origin: GLOBAL, key: 'user.name', value: 'Me' },
+  ])
 })
 
-test('config that can run a program is risky', async () => {
-  expect(isRiskyGitConfig(PLAIN + '[core]\n\tfsmonitor = ./pwn.sh\n')).toBe(true)
-  expect(isRiskyGitConfig(PLAIN + '[core]\n\tsshCommand = sh -c evil\n')).toBe(true)
-  expect(isRiskyGitConfig(PLAIN + '[filter "x"]\n\tclean = ./pwn.sh\n')).toBe(true)
-  expect(isRiskyGitConfig(PLAIN + '[include]\n\tpath = ../other.cfg\n')).toBe(true)
-  expect(isRiskyGitConfig(PLAIN + '[includeIf "gitdir:/x/"]\n\tpath = y\n')).toBe(true)
-  expect(isRiskyGitConfig(PLAIN + '[diff "pdf"]\n\ttextconv = pdftotext\n')).toBe(true)
+test('a plain repository is safe, and the person\'s own filters (git-lfs) are trusted', async () => {
+  const entries = parseConfigListing(
+    listing(['file:.git/config', 'core.bare', 'false'], ['file:.git/config', 'remote.origin.url', 'git@x:y.git'], [GLOBAL, 'filter.lfs.clean', 'git-lfs clean -- %f']),
+  )
+  expect(riskyEntries(entries, TRUSTED)).toEqual([])
 })
 
-test('attributes naming a filter or diff driver are risky', async () => {
-  expect(isRiskyGitConfig(PLAIN, '*.txt filter=x\n')).toBe(true)
-  expect(isRiskyGitConfig(PLAIN, '*.pdf diff=pdf\n')).toBe(true)
+test('anything able to run a program from the repository, or from a file it includes, is risky', async () => {
+  for (const [origin, key] of [
+    ['file:.git/config', 'core.fsmonitor'],
+    ['file:.git/config', 'core.sshcommand'],
+    ['file:.git/config', 'filter.x.clean'],
+    ['file:.git/config', 'diff.pdf.textconv'],
+    ['file:.git/config', 'alias.st'],
+    ['file:.git/config', 'include.path'],
+    ['file:.git/config.worktree', 'core.pager'],
+    ['file:/tmp/pulled-in.cfg', 'credential.helper'],
+  ] as const) {
+    expect(riskyEntries(parseConfigListing(listing([origin, key, 'x'])), TRUSTED).length).toBe(1)
+  }
 })

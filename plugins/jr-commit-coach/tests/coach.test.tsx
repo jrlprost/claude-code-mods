@@ -20,8 +20,6 @@ test('the advice names the biggest groups', async () => {
 const machine = (on: On, numstat: string, toasts: string[]) => {
   on('session.root', () => ({ value: '/w' }) as never)
   on('turn.complete', () => ({ text: '' }) as never)
-  // A plain repository: nothing in its config or attributes can run a program.
-  on('fs.read', ($, e) => ({ value: (e as unknown as { path: string }).path.endsWith('.git/config') ? '[core]\n\tbare = false\n' : '' }) as never)
   on('process.run', ($, e) => {
     const argv = (e as unknown as { argv: string[] }).argv
     return { value: { exitCode: 0, stdout: argv.includes('ls-files') ? '' : numstat, stderr: '' } } as never
@@ -67,11 +65,14 @@ test('a repository whose config can run a program is left alone: git never runs'
   const ran: string[][] = []
   on('session.root', () => ({ value: '/w' }) as never)
   on('turn.complete', () => ({ text: '' }) as never)
-  on('fs.read', () => ({ value: '[core]\n\tfsmonitor = /tmp/pwn.sh\n' }) as never)
   on('process.run', ($, e) => {
-    ran.push((e as unknown as { argv: string[] }).argv)
-    return { value: { exitCode: 0, stdout: '', stderr: '' } } as never
+    const argv = (e as unknown as { argv: string[] }).argv
+    ran.push(argv)
+    // The repository's own config sets an fsmonitor program.
+    const stdout = argv.includes('config') && !argv.includes('/') ? 'file:.git/config\0core.fsmonitor\n/tmp/pwn.sh\0' : ''
+    return { value: { exitCode: 0, stdout, stderr: '' } } as never
   })
   await $.turn.complete({ answer: '', durationMs: 1, isAborted: false, turnId: 't', text: '', reason: 'answer' } as never)
-  expect(ran.length).toBe(0)
+  // Only config listings ran: never a diff or ls-files in that repository.
+  expect(ran.every(argv => argv.includes('config'))).toBe(true)
 })

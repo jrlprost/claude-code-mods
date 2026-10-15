@@ -1,8 +1,10 @@
-// git in a repository the mod does not trust. A repository's own config and attributes can make
-// git run programs: fsmonitor, external diff and textconv drivers, clean/smudge filters, ssh and
-// credential helpers, pagers, editors, or an include pulling any of these from elsewhere.
-// Two layers: config overrides on every call, and repoIsSafe() before any command that reads
-// the working tree (diff, ls-files), which refuses a repo that sets up any such mechanism.
+// git in a repository the mod does not trust. A repository's config can make git run programs:
+// fsmonitor, external diff and textconv drivers, clean/smudge filters, ssh and credential helpers,
+// pagers, editors, aliases, or an include pulling any of these from another file.
+// Two layers: config overrides on every call, and repoIsSafe() before any command that reads the
+// working tree. repoIsSafe asks git itself which config it would use there (so there is no parser
+// of ours to fool) and refuses when an entry able to run a program comes from anywhere but the
+// person's own setup (what git reads outside any repository).
 // Synced into each plugin's hooks/jr/ by scripts/sync-shared.sh.
 import type { EngineInterface } from 'claude-code'
 
@@ -28,37 +30,49 @@ export const safeGit = (args: readonly string[]) => {
   return ['git', ...SAFE_CONFIG, ...cwd, ...(rest.length ? [rest[0]!, ...extra, ...rest.slice(1)] : [])]
 }
 
-// Sections and keys through which a repository's config can make git run a program
-// (or pull in config that does, for include/includeIf).
-const RISKY_SECTION = /^\[\s*(include|includeif|filter|diff\s+"|merge\s+"|credential|alias|gpg)/
-const RISKY_KEY = /^(fsmonitor|sshcommand|askpass|editor|pager|hookspath|textconv|command|clean|smudge|process|helper|program|external|driver)\s*=/
-// .gitattributes naming a filter, diff or merge driver.
-const RISKY_ATTRIBUTE = /(^|\s)(filter|diff|merge)=/m
+export type GitConfigEntry = { origin: string; key: string; value: string }
 
-/** Whether git config text or .gitattributes text sets up anything that runs a program. */
-export const isRiskyGitConfig = (config: string, attributes = '') =>
-  config
-    .toLowerCase()
-    .split('\n')
-    .map(line => line.trim())
-    .some(line => RISKY_SECTION.test(line) || RISKY_KEY.test(line)) || RISKY_ATTRIBUTE.test(attributes)
+/** Parses `git config --list --show-origin -z`: records of origin NUL key LF value NUL. */
+export const parseConfigListing = (listing: string): GitConfigEntry[] => {
+  const parts = listing.split('\0')
+  const entries: GitConfigEntry[] = []
+  for (let i = 0; i + 1 < parts.length; i += 2) {
+    const origin = parts[i]!
+    const record = parts[i + 1]!
+    const nl = record.indexOf('\n')
+    entries.push({ origin, key: (nl < 0 ? record : record.slice(0, nl)).toLowerCase(), value: nl < 0 ? '' : record.slice(nl + 1) })
+  }
+  return entries
+}
 
-async function readText($: EngineInterface, file: string) {
+// The last part of a key (git keys are section[.subsection].name, already lower-cased by git
+// for section and name) that makes git run a program, plus whole sections that do.
+const RISKY_NAME = /\.(fsmonitor|sshcommand|askpass|editor|pager|hookspath|textconv|command|clean|smudge|process|driver|helper|program|external|packobjectshook|gitproxy)$/
+const RISKY_SECTION = /^(alias|include|includeif)\./
+
+/** Entries able to run a program that come from somewhere other than the trusted origins. */
+export const riskyEntries = (entries: readonly GitConfigEntry[], trustedOrigins: ReadonlySet<string>) =>
+  entries.filter(e => !trustedOrigins.has(e.origin) && !e.origin.startsWith('command line:') && (RISKY_NAME.test(e.key) || RISKY_SECTION.test(e.key)))
+
+async function listing($: EngineInterface, args: readonly string[]) {
   try {
-    return await $.fs.read(file)
+    const out = await $.process.run(args)
+    return out.exitCode === 0 ? out.stdout : null
   } catch {
-    return undefined
+    return null
   }
 }
 
 /**
- * True only when the repository at `root` has a plain .git directory whose config and whose
- * .gitattributes set up nothing that runs a program. Anything unreadable or unusual is unsafe.
+ * True only when the config git would use at `root` holds nothing able to run a program beyond
+ * what the person's own global and system config set up. Any failure counts as unsafe.
  */
 export async function repoIsSafe($: EngineInterface, root: string) {
-  const config = await readText($, `${root}/.git/config`)
-  if (config === undefined) return false
-  const attributes = (await readText($, `${root}/.gitattributes`)) ?? ''
-  const info = (await readText($, `${root}/.git/info/attributes`)) ?? ''
-  return !isRiskyGitConfig(config, `${attributes}\n${info}`)
+  const local = await listing($, safeGit(['-C', root, 'config', '--list', '--show-origin', '-z']))
+  if (local === null) return false
+  // What git reads outside any repository is the person's own setup: global, system, and the
+  // config the git build ships (Apple's git keeps it next to Xcode, not in /etc/gitconfig).
+  const own = await listing($, safeGit(['-C', '/', 'config', '--list', '--show-origin', '-z']))
+  const trusted = new Set(parseConfigListing(own ?? '').map(e => e.origin))
+  return riskyEntries(parseConfigListing(local), trusted).length === 0
 }
