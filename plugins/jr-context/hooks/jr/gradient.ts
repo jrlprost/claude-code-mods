@@ -64,7 +64,7 @@ export const bar = (ratio: number, width: number, stops: readonly string[]) => {
 }
 
 export const formatTokens = (n: number) =>
-  n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1000 ? `${Math.round(n / 1000)}k` : `${n}`
+  n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 10_000 ? `${Math.round(n / 1000)}k` : n >= 1000 ? `${(n / 1000).toFixed(1)}k` : `${n}`
 
 export const formatDuration = (ms: number) => {
   const minutes = Math.max(0, Math.round(ms / 60_000))
