@@ -4,23 +4,218 @@
     "name": "jrlprost"
   },
   "metadata": {
-    "description": "jr mods: Claude Code mods for solo builders. Context bar, plugin toggler, and more on the way."
+    "description": "jr mods: 42 Claude Code mods for solo builders. Context bar, plan limits, billable time, guards, dictation, business dashboards and more."
   },
   "plugins": [
     {
       "name": "jr-context",
       "source": "./plugins/jr-context",
-      "description": "A context bar above the prompt: what fills the window, category by category, with a legend and the compaction point."
+      "description": "A context bar above the prompt: what fills the window, category by category, in a stacked colour bar with a legend, free space and the compaction point."
     },
     {
-      "name": "jr-mods",
-      "source": "./plugins/jr-mods",
-      "description": "/jrmods: every installed plugin and mod in one list, in two tabs. Space ticks, Enter applies all changes at once."
+      "name": "jr-limits",
+      "source": "./plugins/jr-limits",
+      "description": "Plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges with reset countdowns, a toast at 80 % and 95 %, and /jrlimits for the detail."
+    },
+    {
+      "name": "jr-cache-clock",
+      "source": "./plugins/jr-cache-clock",
+      "description": "A prompt-cache countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, the last cache hit rate, and a toast 30 seconds before it goes cold."
+    },
+    {
+      "name": "jr-next-cost",
+      "source": "./plugins/jr-next-cost",
+      "description": "What the next prompt costs before you send it: the context it resends, at the current model's price, read from a warm cache or written to a cold one, at API rates."
+    },
+    {
+      "name": "jr-quota",
+      "source": "./plugins/jr-quota",
+      "description": "Balances of the other paid APIs you use (OpenRouter, Firecrawl, DeepSeek), checked every 10 minutes: /jrquota shows them all, a band and a toast appear only when one runs low."
+    },
+    {
+      "name": "jr-read-cap",
+      "source": "./plugins/jr-read-cap",
+      "description": "Stops Claude from reading a long file whole: a Read of a file over 1,000 lines without a range is refused with a hint to grep first and read only the lines it needs. Saves context and tokens."
     },
     {
       "name": "jr-time",
       "source": "./plugins/jr-time",
-      "description": "Billable time per project: session time sorted into categories, a ratio per category, an hourly rate and an amount. /jrtime, CSV and Markdown export."
+      "description": "Billable time per project: every minute of a session sorted into categories, a ratio per category, an hourly rate, and an amount. /jrtime to adjust, export to CSV or Markdown."
+    },
+    {
+      "name": "jr-week",
+      "source": "./plugins/jr-week",
+      "description": "/jrweek: your week with Claude Code, per day and per project: time Claude worked, prompts and cost, with gradient bars and a Markdown export."
+    },
+    {
+      "name": "jr-heatmap",
+      "source": "./plugins/jr-heatmap",
+      "description": "/jrheatmap: your last 26 weeks with Claude Code as a GitHub-style heatmap, with current and longest streak and your peak hours."
+    },
+    {
+      "name": "jr-wrapped",
+      "source": "./plugins/jr-wrapped",
+      "description": "/jrwrapped: your month with Claude Code, Wrapped-style: prompts, hours, streak, busiest hour, top tools and projects, a persona, and a share card saved as SVG and PNG."
+    },
+    {
+      "name": "jr-stripemrr",
+      "source": "./plugins/jr-stripemrr",
+      "description": "Your Stripe MRR and today's revenue above the prompt, refreshed every 15 minutes; /jrmrr adds the last 30 days as a sparkline."
+    },
+    {
+      "name": "jr-visitors",
+      "source": "./plugins/jr-visitors",
+      "description": "Live visitors from PostHog above the prompt (last 5 minutes and today), refreshed every 2 minutes; /jrvisitors adds today's top pages."
+    },
+    {
+      "name": "jr-uptime",
+      "source": "./plugins/jr-uptime",
+      "description": "Pings your sites every 2 minutes; a red band above the prompt the moment one goes down, and /jruptime with latency sparklines and the last incident."
+    },
+    {
+      "name": "jr-outage",
+      "source": "./plugins/jr-outage",
+      "description": "Is it them or is it me? The status of Claude, GitHub, npm and Vercel, checked every 10 minutes: /jroutage shows them all, a band and a toast appear only when one is degraded."
+    },
+    {
+      "name": "jr-done-check",
+      "source": "./plugins/jr-done-check",
+      "description": "Flags replies that claim something was tested or verified when nothing was run in the turn to check it: a warning under the message and a toast."
+    },
+    {
+      "name": "jr-no-promise",
+      "source": "./plugins/jr-no-promise",
+      "description": "When a reply ends by announcing work (\"I'll…\", \"Let me…\", \"je vais…\") and no tool ran in the turn, Claude is sent back once to actually do it."
+    },
+    {
+      "name": "jr-scope",
+      "source": "./plugins/jr-scope",
+      "description": "Warns when a turn writes sensitive files nobody asked for (lockfiles, manifests, CI, .env, migrations, infra) or too many files at once."
+    },
+    {
+      "name": "jr-commit-coach",
+      "source": "./plugins/jr-commit-coach",
+      "description": "Nudges you toward small atomic commits: when uncommitted changes pass a threshold, a band and a toast suggest a split by folder."
+    },
+    {
+      "name": "jr-nudges",
+      "source": "./plugins/jr-nudges",
+      "description": "At the end of a turn, one toast when the code Claude wrote added debug statements (console.log, print, debugger) or TODO/FIXME/HACK lines."
+    },
+    {
+      "name": "jr-pkg-guard",
+      "source": "./plugins/jr-pkg-guard",
+      "description": "Checks every package install against its registry first: names that do not exist (hallucinated or typosquatted) are refused, very new packages are held back or flagged, install scripts are flagged."
+    },
+    {
+      "name": "jr-mod-audit",
+      "source": "./plugins/jr-mod-audit",
+      "description": "/jrmodaudit owner/repo: clones a mod, runs the official validator on each plugin in it, reads its source, and shows what it can reach with a green, amber or red verdict before you install it."
+    },
+    {
+      "name": "jr-deploy-guard",
+      "source": "./plugins/jr-deploy-guard",
+      "description": "Production deploys and pushes to main always come to you for confirmation, even when your rules allow them. Optional: no deploys on Friday."
+    },
+    {
+      "name": "jr-explain",
+      "source": "./plugins/jr-explain",
+      "description": "Every shell command Claude asks permission for comes with a plain-English explanation and a risk level: low, medium or high."
+    },
+    {
+      "name": "jr-redact",
+      "source": "./plugins/jr-redact",
+      "description": "Replaces API keys, tokens, private keys and database passwords in tool results with placeholders before Claude reads them. Emails and IPs too, if you ask."
+    },
+    {
+      "name": "jr-record",
+      "source": "./plugins/jr-record",
+      "description": "Recording mode for demos and screen shares: /jrrec masks emails, money amounts, keys, phone numbers and IPs on screen. Claude still reads the real text."
+    },
+    {
+      "name": "jr-image-guard",
+      "source": "./plugins/jr-image-guard",
+      "description": "Keeps oversized images out of the conversation: an image over 7800 px is read through a resized copy, and browser viewports over the limit are refused."
+    },
+    {
+      "name": "jr-no-ai-trailer",
+      "source": "./plugins/jr-no-ai-trailer",
+      "description": "Stops commits and pull requests that carry an AI co-author line or a 'Generated with' footer, so your history stays yours."
+    },
+    {
+      "name": "jr-dictation",
+      "source": "./plugins/jr-dictation",
+      "description": "Fixes what dictation mishears (\"cloud code\" → Claude Code) before Claude reads your prompt, and shows each fix in your prompt row: red struck, green added."
+    },
+    {
+      "name": "jr-polish",
+      "source": "./plugins/jr-polish",
+      "description": "/jrpolish <rough prompt>: a small fast model rewrites it into a clear, structured prompt in the same language and puts it in your prompt box to edit and send."
+    },
+    {
+      "name": "jr-draft",
+      "source": "./plugins/jr-draft",
+      "description": "/jrdraft: a scratch pane to write your next prompt while Claude works, kept per project, sent to the prompt box when you are ready."
+    },
+    {
+      "name": "jr-deslop",
+      "source": "./plugins/jr-deslop",
+      "description": "Flags AI-writing tells (em dashes, \"delve\", \"not X, but Y\", stock openers...) in the prose files Claude writes. A toast after each file, /jrdeslop for the list. Never rewrites anything."
+    },
+    {
+      "name": "jr-vinci",
+      "source": "./plugins/jr-vinci",
+      "description": "An opt-in sparring partner: after each answer, one line above the prompt with the sharpest challenge to what was just decided. /jrvinci on, off, or the history."
+    },
+    {
+      "name": "jr-post",
+      "source": "./plugins/jr-post",
+      "description": "/jrpost: a short \"what I built today\" post drafted from this session, shown in a pane and copied to your clipboard."
+    },
+    {
+      "name": "jr-mods",
+      "source": "./plugins/jr-mods",
+      "description": "/jrmods: every installed plugin and mod in one list. Space ticks or unticks, Enter applies all the changes at once."
+    },
+    {
+      "name": "jr-goal",
+      "source": "./plugins/jr-goal",
+      "description": "A goal per project with steps you tick off, shown above the prompt with a progress gauge. /jrgoal to set it."
+    },
+    {
+      "name": "jr-decisions",
+      "source": "./plugins/jr-decisions",
+      "description": "A decision journal per project: /jrdecide or a prompt starting with \"decision:\" records one, /jrdecisions lists them and exports docs/decisions.md."
+    },
+    {
+      "name": "jr-todo",
+      "source": "./plugins/jr-todo",
+      "description": "/jrtodo <task>: capture a task instantly, with no model call, to TODO.md, Todoist, Linear, Notion, a GitHub issue, Things, Apple Reminders, or your own command."
+    },
+    {
+      "name": "jr-outputs",
+      "source": "./plugins/jr-outputs",
+      "description": "/jroutputs: every file this session created or changed, newest first, with + and - line counts from git."
+    },
+    {
+      "name": "jr-fleet",
+      "source": "./plugins/jr-fleet",
+      "description": "Every Claude Code session on this machine at a glance: which ones are working and which ones wait for you, in a band above the prompt and in /jrfleet."
+    },
+    {
+      "name": "jr-badge",
+      "source": "./plugins/jr-badge",
+      "description": "A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. A `badge: LABEL #hex` line in CLAUDE.md sets your own."
+    },
+    {
+      "name": "jr-done-ping",
+      "source": "./plugins/jr-done-ping",
+      "description": "A notification, and a sound on macOS, when a long turn finishes: work in another window and come back when Claude is done. Names the project and how long it took."
+    },
+    {
+      "name": "jr-awake",
+      "source": "./plugins/jr-awake",
+      "description": "Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep."
     }
   ]
 }
