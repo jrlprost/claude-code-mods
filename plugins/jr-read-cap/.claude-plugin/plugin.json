@@ -1,0 +1,24 @@
+{
+  "name": "jr-read-cap",
+  "version": "0.1.0",
+  "description": "Stops Claude from reading a long file whole: a Read of a file over 1,000 lines without a range is refused with a hint to grep first and read only the lines it needs. Saves context and tokens.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "tokens", "context"],
+  "license": "MIT",
+  "userConfig": {
+    "maxLines": {
+      "type": "number",
+      "title": "Line cap",
+      "description": "Whole-file reads of files longer than this are refused (minimum 50).",
+      "default": 1000
+    },
+    "respectAllowLarge": {
+      "type": "boolean",
+      "title": "Let explicit large reads through",
+      "description": "When Claude marks a Read as deliberately large (allow_large), let it pass.",
+      "default": true
+    }
+  }
+}
