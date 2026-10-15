@@ -1,0 +1,25 @@
+{
+  "name": "jr-pkg-guard",
+  "version": "0.1.0",
+  "description": "Checks every package install against its registry first: names that do not exist (hallucinated or typosquatted) are refused, very new packages are held back or flagged, install scripts are flagged.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "security", "supply-chain", "npm", "pypi"],
+  "license": "MIT",
+  "userConfig": {
+    "minAgeDays": {
+      "type": "number",
+      "title": "Minimum age (days)",
+      "description": "Packages first published more recently than this are held back or flagged.",
+      "default": 30
+    },
+    "newPackages": {
+      "type": "string",
+      "title": "New packages",
+      "description": "block: refuse the install. warn: install and show a toast.",
+      "options": ["block", "warn"],
+      "default": "block"
+    }
+  }
+}
