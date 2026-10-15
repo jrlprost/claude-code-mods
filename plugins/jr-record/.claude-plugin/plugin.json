@@ -1,0 +1,11 @@
+{
+  "name": "jr-record",
+  "version": "0.1.0",
+  "description": "Recording mode for demos and screen shares: /jrrec masks emails, money amounts, keys, phone numbers and IPs on screen. Claude still reads the real text.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "privacy", "recording", "screen-share"],
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}
