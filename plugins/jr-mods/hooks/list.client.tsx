@@ -26,9 +26,9 @@ const List: ClientModule<Props, State> = (props, surface) => {
     const item = items[state.cursor]
     if (key === 'up' || key === 'k') move(-1)
     else if (key === 'down' || key === 'j') move(1)
-    else if (key === ' ' && item) surface.setState({ ...state, wanted: { ...state.wanted, [item.id]: !isOn(item) } })
+    else if ((key === ' ' || key === 'space') && item) surface.setState({ ...state, wanted: { ...state.wanted, [item.id]: !isOn(item) } })
     else if (key === 'a' || key === 'n') surface.setState({ ...state, wanted: Object.fromEntries(items.map(i => [i.id, key === 'a'])) })
-    else if (key === 'return') surface.post({ type: 'apply', wanted: state.wanted })
+    else if (key === 'return' || key === 'enter') surface.post({ type: 'apply', wanted: state.wanted })
   })
 
   const width = Math.max(40, surface.columns)

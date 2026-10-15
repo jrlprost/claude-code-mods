@@ -71,3 +71,17 @@ test('a click on a row ticks it, a click on the last line applies', async ($, on
   await ui.pointer({ in: 'list', type: 'down', x: 4, y: rows + 1 })
   expect(ran.filter(a => a[2] === 'enable').map(a => a[3])).toEqual(['postiz@postiz'])
 })
+
+test('space and enter also arrive by name', async ($, on) => {
+  const ran: string[][] = []
+  machine(on, ran)
+  await $.command.run({ command: 'jrmods', args: '' } as never)
+  const ui = (await $.ui.mount({ plugin: 'jr-mods', surface: 'terminal', component: 'Pane', requestId: 'jr-mods', props: {} } as never)) as never as {
+    key: (k: object) => Promise<void>
+  }
+  await ui.key({ in: 'list', key: 'down' })
+  await ui.key({ in: 'list', key: 'down' })
+  await ui.key({ in: 'list', key: 'space' })
+  await ui.key({ in: 'list', key: 'enter' })
+  expect(ran.filter(a => a[2] === 'enable').map(a => a[3])).toEqual(['postiz@postiz'])
+})
