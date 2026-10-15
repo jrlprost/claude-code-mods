@@ -1,0 +1,26 @@
+{
+  "name": "jr-post",
+  "version": "0.1.0",
+  "description": "/jrpost: a short \"what I built today\" post drafted from this session, shown in a pane and copied to your clipboard.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "social", "build-in-public"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Default language of the post; /jrpost <language> overrides it once.",
+      "default": "English"
+    },
+    "platform": {
+      "type": "string",
+      "title": "Platform",
+      "description": "Where the post is for; it sets the tone and length.",
+      "options": ["LinkedIn", "X", "Bluesky", "Mastodon"],
+      "default": "LinkedIn"
+    }
+  }
+}
