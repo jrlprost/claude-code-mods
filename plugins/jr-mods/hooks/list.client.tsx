@@ -1,7 +1,7 @@
 // The /jrmods list, drawn on the surface itself so it reads raw keys:
 // up/down (or j/k) move, space ticks, enter applies, a/n tick all or none.
 // The terminal hands the keys to the list only after a click on it, so the list opens with a
-// focus zone: the first click lands there and ticks nothing. After it, a click on a row ticks it
+// focus zone at the bottom: the first click lands anywhere and ticks nothing. After it, a click on a row ticks it
 // and a click on the last line applies.
 import type { ClientModule } from 'claude-code'
 
@@ -66,15 +66,6 @@ const List: ClientModule<Props, State> = (props, surface) => {
         </Text>
         <Text color={DIM}>{`${onCount} on · ${items.length - onCount} off`}</Text>
       </Box>
-      {!state.ready && (
-        <Box borderStyle="round" borderColor={POINTER} height={ZONE_ROWS} justifyContent="center" alignItems="center">
-          <Text bold>
-            {[...'⌨  click here to use the keyboard'].map((c, i, all) => (
-              <Text color={BRAND[Math.floor((i / all.length) * BRAND.length)] ?? POINTER}>{c}</Text>
-            ))}
-          </Text>
-        </Box>
-      )}
       {visible.map((item, i) => {
         const isCursor = start + i === state.cursor
         const on = isOn(item)
@@ -100,6 +91,15 @@ const List: ClientModule<Props, State> = (props, surface) => {
         <Text color={KEY} bold>esc</Text>
         <Text color={DIM}>{' close'}</Text>
       </Text>
+      {!state.ready && (
+        <Box borderStyle="round" borderColor={POINTER} height={ZONE_ROWS} justifyContent="center" alignItems="center">
+          <Text bold>
+            {[...'⌨  click here to use the keyboard'].map((c, i, all) => (
+              <Text color={BRAND[Math.floor((i / all.length) * BRAND.length)] ?? POINTER}>{c}</Text>
+            ))}
+          </Text>
+        </Box>
+      )}
     </Box>
   )
 }
