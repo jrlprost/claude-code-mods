@@ -1,0 +1,25 @@
+{
+  "name": "jr-stripemrr",
+  "version": "0.1.0",
+  "description": "Your Stripe MRR and today's revenue above the prompt, refreshed every 15 minutes; /jrmrr adds the last 30 days as a sparkline.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "stripe", "mrr", "revenue"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "apiKey": {
+      "type": "string",
+      "title": "Stripe restricted key",
+      "description": "A restricted key (rk_live_… or rk_test_…) with read access to Charges and Subscriptions only.",
+      "sensitive": true
+    },
+    "showBand": {
+      "type": "boolean",
+      "title": "Show the band",
+      "description": "MRR and today's revenue above the prompt.",
+      "default": true
+    }
+  }
+}
