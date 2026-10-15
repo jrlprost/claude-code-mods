@@ -14,6 +14,6 @@ export type JrContextFill = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-context': { fill: JrContextFill | null }
+    'jr-context': { fill: JrContextFill | null; isHidden: boolean }
   }
 }

@@ -14,6 +14,14 @@ A context bar above the Claude Code prompt.
 - From the warning threshold on (80 % by default), the header says compaction is near.
 - The figures are the engine's own, the same breakdown as `/context`.
 
+## Commands
+
+| Command | |
+| --- | --- |
+| `/jrcontext` | Open the full bar, legend included, in a pane |
+| `/jrcontext hide` | Hide the band above the prompt |
+| `/jrcontext show` | Bring the band back |
+
 ## Install
 
 ```

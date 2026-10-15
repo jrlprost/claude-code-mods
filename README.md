@@ -30,7 +30,7 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 
 | Mod | What it does | Command |
 | --- | --- | --- |
-| [jr-context](plugins/jr-context) | A context bar above the prompt. Each kind of content (system prompt, tools, MCP, memory, skills, messages) gets its own colour in one stacked bar, with a legend, the free space, the compaction buffer and the point where compaction starts. | |
+| [jr-context](plugins/jr-context) | A context bar above the prompt. Each kind of content (system prompt, tools, MCP, memory, skills, messages) gets its own colour in one stacked bar, with a legend, the free space, the compaction buffer and the point where compaction starts. | `/jrcontext` |
 | [jr-time](plugins/jr-time) | Billable time per project. Every minute of a session is sorted into categories (prompt window, Claude working with you there or away, you between prompts, elsewhere, break); you set a ratio per category and an hourly rate, and get hours and an amount per project. Export to CSV or Markdown. | `/jrtime` |
 | [jr-mods](plugins/jr-mods) | Every installed plugin and mod in one list, split into a mods tab and a plugins tab. Space ticks, Enter applies every change in one go. | `/jrmods` |
 

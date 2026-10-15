@@ -11,6 +11,8 @@ const band = (maxRows: number) => ({
 // The engine beneath: the breakdown above, and something already drawn above the prompt.
 const engineWith = (on: On, percentage: number) => {
   mock.clock(on)
+  mock.store(on)
+  on('command.register', () => ({ value: undefined }) as never)
   on('session.usage', () => ({ value: { startedAt: 0, context: { tokens: 1, window: 1_000_000, breakdown: { ...BREAKDOWN, percentage } }, rateLimits: [] } }) as never)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
