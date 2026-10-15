@@ -1,4 +1,5 @@
 import type { JrOutageService } from '../types'
+import { printable } from './jr/text'
 
 // Public Statuspage endpoints (no key needed), checked October 2026.
 export const SERVICES = [
@@ -23,7 +24,7 @@ export const COLOR: Record<string, string> = {
 export const serviceOf = (name: string, body: string | null): JrOutageService => {
   try {
     const status = (JSON.parse(body ?? '') as { status?: { indicator?: string; description?: string } }).status
-    if (status?.indicator) return { name, indicator: status.indicator, description: status.description ?? status.indicator }
+    if (status?.indicator) return { name, indicator: printable(status.indicator, 20), description: printable(status.description ?? status.indicator, 120) }
   } catch {
     // An unreadable answer is reported as unknown below.
   }

@@ -1,3 +1,4 @@
+import { printable } from './jr/text'
 // HogQL queries and how their answers become numbers.
 
 export const QUERIES = {
@@ -27,5 +28,5 @@ export const countOf = (text: string) => {
 
 export const pagesOf = (text: string) => {
   const parsed = JSON.parse(text) as { results?: unknown[][] }
-  return (parsed.results ?? []).map(row => ({ page: String(row[0] ?? '(none)') || '/', views: Number(row[1] ?? 0) || 0 }))
+  return (parsed.results ?? []).map(row => ({ page: printable(String(row[0] ?? '(none)') || '/', 120), views: Number(row[1] ?? 0) || 0 }))
 }

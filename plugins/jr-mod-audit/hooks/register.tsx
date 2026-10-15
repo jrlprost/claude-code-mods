@@ -6,6 +6,7 @@ import { assess, parseCalls, parseTarget, RISK_LABEL, scanSource } from './audit
 import { gradientText } from './jr/draw'
 import { GRADIENTS } from './jr/gradient'
 import { safeGit } from './jr/git'
+import { printable } from './jr/text'
 
 const PANE = 'jr-mod-audit'
 const WORK = '/tmp/jr-mod-audit'
@@ -59,6 +60,14 @@ async function auditPlugin($: EngineInterface, dir: string): Promise<JrModAuditP
   return { name, dir, isValid, errors, calls, hosts, commands, risk, why }
 }
 
+/** Every string in the report made printable: names, errors and validator lines come from the audited repo. */
+const printableDeep = <T,>(value: T): T => {
+  if (typeof value === 'string') return printable(value, 300) as T
+  if (Array.isArray(value)) return value.map(printableDeep) as T
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, printableDeep(v)])) as T
+  return value
+}
+
 async function runAudit($: EngineInterface, arg: string): Promise<JrModAuditReport> {
   const target = parseTarget(arg, (await $.env.get('HOME')) ?? '')
   if (!target) return { target: arg, status: 'error', error: 'Give a GitHub owner/repo, a git URL or a local folder.', plugins: [] }
@@ -103,7 +112,8 @@ export const register: Register = on => {
   on('command.run', { command: 'jrmodaudit' }, async ($, e) => {
     await update($, report, (): JrModAuditReport => ({ target: e.args.trim(), status: 'running', plugins: [] }))
     await $.ui.open({ id: PANE, title: 'jr mod audit', rows: 24 })
-    const done = await runAudit($, e.args)
+    // Everything in the report comes from the audited repository: printable text only.
+    const done = printableDeep(await runAudit($, e.args))
     await update($, report, () => done)
     return { text: summaryText(done) }
   })
