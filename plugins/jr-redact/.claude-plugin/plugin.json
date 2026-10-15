@@ -1,0 +1,18 @@
+{
+  "name": "jr-redact",
+  "version": "0.1.0",
+  "description": "Replaces API keys, tokens, private keys and database passwords in tool results with placeholders before Claude reads them. Emails and IPs too, if you ask.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "security", "secrets", "privacy"],
+  "license": "MIT",
+  "userConfig": {
+    "personal": {
+      "type": "boolean",
+      "title": "Also hide emails and IP addresses",
+      "description": "Replace email addresses and IPv4 addresses too.",
+      "default": false
+    }
+  }
+}
