@@ -65,6 +65,8 @@ test('a click on a row ticks it, a click on the last line applies', async ($, on
     pointer: (p: object) => Promise<void>
     drawn: (s: object) => Promise<unknown>
   }
+  // The first click lands on the focus zone and ticks nothing.
+  await ui.pointer({ in: 'list', type: 'down', x: 4, y: 2 })
   const rows = (JSON.stringify(await ui.drawn({ in: 'list' })).match(/[◉○] /g) ?? []).length
   // Row 3 is postiz (header is row 0); the footer sits right under the last row.
   await ui.pointer({ in: 'list', type: 'down', x: 4, y: 3 })
