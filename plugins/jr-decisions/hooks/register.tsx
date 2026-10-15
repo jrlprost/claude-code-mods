@@ -30,30 +30,36 @@ async function add($: EngineInterface, text: string, source: JrDecision['source'
   return next.length
 }
 
-/** The real path of `path`, or null when it does not exist yet. */
-async function realPathOf($: EngineInterface, path: string) {
+/**
+ * The entry `name` in `dir` as it stands, a link not followed: 'missing' when absent, null when
+ * the folder cannot be listed (treated as unsafe by the caller).
+ */
+async function entryIn($: EngineInterface, dir: string, name: string) {
   try {
-    const stat = await $.fs.stat(path, { resolve: true })
-    return { isLink: stat.isLink, real: stat.realPath ?? path }
+    const entries = await $.fs.list(dir)
+    return entries.find(e => e.name === name) ?? 'missing'
   } catch {
     return null
   }
 }
 
 /**
- * Writes docs/decisions.md only where it really lies inside the project: a repository could
- * make docs/ or the file a symbolic link pointing anywhere on the machine, and the write would follow it.
+ * Writes docs/decisions.md only where it really lies inside the project. A repository could make
+ * docs/ or the file a symbolic link (even a dangling one) pointing anywhere on the machine, and the
+ * write would follow it: so both are checked without following links, and any doubt refuses.
  */
 async function exportJournal($: EngineInterface) {
   await ensureLoaded($)
   const list = await read($, decisions)
   const target = `${live.root}/docs/decisions.md`
-  const root = (await realPathOf($, live.root))?.real ?? live.root
-  for (const path of [`${live.root}/docs`, target]) {
-    const found = await realPathOf($, path)
-    if (found && (found.isLink || !found.real.startsWith(`${root}/`))) {
-      return { target, count: list.length, refused: `${path} is a link or lies outside the project` }
-    }
+  const refuse = (why: string) => ({ target, count: list.length, refused: why })
+  const docs = await entryIn($, live.root, 'docs')
+  if (docs === null) return refuse('the project folder could not be listed')
+  if (docs !== 'missing' && (docs.isLink || docs.kind !== 'dir')) return refuse('docs/ is a link or not a folder')
+  if (docs !== 'missing') {
+    const file = await entryIn($, `${live.root}/docs`, 'decisions.md')
+    if (file === null) return refuse('docs/ could not be listed')
+    if (file !== 'missing' && (file.isLink || file.kind !== 'file')) return refuse('docs/decisions.md is a link or not a file')
   }
   await $.fs.write(target, toMarkdown(await read($, project), list))
   return { target, count: list.length, refused: undefined }

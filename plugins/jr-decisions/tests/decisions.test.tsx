@@ -36,12 +36,12 @@ const machine = (on: On, written: Record<string, string>, toasts: string[], link
     return { value: undefined } as never
   })
   on('prompt.submit', ($, e) => ({ text: e.text }) as never)
-  // The project root exists; docs/ and the file exist only where a test plants a link.
-  on('fs.stat', ($, e) => {
-    const p = (e as unknown as { path: string }).path
-    if (p === '/work/shop') return { value: { kind: 'dir', size: 0, mtimeMs: 0, isLink: false, realPath: '/work/shop' } } as never
-    if (links[p]) return { value: { kind: 'dir', size: 0, mtimeMs: 0, isLink: true, realPath: links[p] } } as never
-    return { deny: 'no such file' } as never
+  // Folder listings, links not followed: the project holds docs/ only where a test plants a link.
+  on('fs.list', ($, e) => {
+    const dir = (e as unknown as { path?: string }).path ?? ''
+    if (dir === '/work/shop' && links['/work/shop/docs']) return { value: [{ name: 'docs', kind: 'other', size: 0, mtimeMs: 0, isLink: true }] } as never
+    if (dir === '/work/shop') return { value: [{ name: 'README.md', kind: 'file', size: 10, mtimeMs: 0, isLink: false }] } as never
+    return { value: [] } as never
   })
 }
 
