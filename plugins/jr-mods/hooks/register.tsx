@@ -33,7 +33,7 @@ export const register: Register = on => {
 
   on('command.run', { command: 'jrmods' }, async $ => {
     if (!(await loadItems($))) return { text: 'jr-mods: could not list plugins (claude plugin list failed).' }
-    await $.ui.open({ id: PANE, title: 'jr mods', focus: true, closeOnEscape: true })
+    await $.ui.open({ id: PANE, title: 'jr mods', focus: true, closeOnEscape: true, rows: Math.min((await read($, items)).length + 3, 40) })
     // Hand the keys straight to the list, so no click is needed before space and arrows work.
     try {
       const focused = await $.ui.focus({ requestId: PANE, key: 'list' })
@@ -64,6 +64,6 @@ export const register: Register = on => {
     const { Text } = $.ui.resolve(e)
     const list = await read($, items)
     if (!Client) return <Text>Open /jrmods in the terminal or the desktop app to toggle plugins.</Text>
-    return <Client key="list" module="./list.client.tsx" props={{ items: list }} flexGrow={1} />
+    return <Client key="list" module="./list.client.tsx" props={{ items: list }} height="100%" flexGrow={1} />
   })
 }

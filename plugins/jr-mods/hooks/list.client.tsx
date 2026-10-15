@@ -1,5 +1,6 @@
 // The /jrmods list, drawn on the surface itself so it reads raw keys:
 // up/down (or j/k) move, space ticks, enter applies, a/n tick all or none.
+// A click on a row ticks it (and gives the list the keys); a click on the last line applies.
 import type { ClientModule } from 'claude-code'
 
 import type { JrModsItem } from '../types'
@@ -32,10 +33,21 @@ const List: ClientModule<Props, State> = (props, surface) => {
 
   const width = Math.max(40, surface.columns)
   const nameWidth = Math.min(28, Math.max(...items.map(i => i.name.length), 8) + 2)
-  // Keep the cursor row in view.
-  const room = Math.max(3, (surface.rows || items.length + 4) - 4)
+  // Fill the pane: every row but the header and the footer lists plugins, the cursor kept in view.
+  const room = surface.rows > 0 ? Math.max(3, surface.rows - 2) : items.length
   const start = Math.min(Math.max(0, state.cursor - Math.floor(room / 2)), Math.max(0, items.length - room))
   const visible = items.slice(start, start + room)
+
+  surface.onPointer(event => {
+    if (event.type !== 'down') return
+    const row = event.y - 1
+    const item = visible[row]
+    if (item) {
+      surface.setState({ cursor: start + row, wanted: { ...state.wanted, [item.id]: !isOn(item) } })
+    } else if (event.y === visible.length + 1) {
+      surface.post({ type: 'apply', wanted: state.wanted })
+    }
+  })
   const onCount = items.filter(isOn).length
 
   return (
