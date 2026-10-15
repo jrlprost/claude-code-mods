@@ -1,6 +1,8 @@
 {
   "name": "claude-code-mods",
-  "owner": { "name": "jrlprost" },
+  "owner": {
+    "name": "jrlprost"
+  },
   "metadata": {
     "description": "jr mods: Claude Code mods for solo builders. Context bar, plugin toggler, and more on the way."
   },
@@ -14,6 +16,11 @@
       "name": "jr-mods",
       "source": "./plugins/jr-mods",
       "description": "/jrmods: every installed plugin and mod in one list, in two tabs. Space ticks, Enter applies all changes at once."
+    },
+    {
+      "name": "jr-time",
+      "source": "./plugins/jr-time",
+      "description": "Billable time per project: session time sorted into categories, a ratio per category, an hourly rate and an amount. /jrtime, CSV and Markdown export."
     }
   ]
 }
