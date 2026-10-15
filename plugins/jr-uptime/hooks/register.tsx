@@ -1,0 +1,135 @@
+import { atom, read, update } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
+
+import type { JrUptimeSite } from '../types'
+import { gradientText } from './jr/draw'
+import { GRADIENTS } from './jr/gradient'
+import { addCheck, ago, duration, emptySite, isUp, label, latencySpark, parseUrls } from './uptime'
+
+const PANE = 'jr-uptime'
+const EVERY_MS = 2 * 60_000
+const TIMEOUT_MS = 10_000
+const sites = atom({ plugin: 'jr-uptime', key: 'sites' } as const, [])
+const live = { isStarted: false, urls: [] as string[] }
+
+/** One request; a status, or null when it fails or takes longer than the timeout. */
+async function ping($: EngineInterface, url: string) {
+  const start = await $.clock.now()
+  const timeout = $.clock.sleep(TIMEOUT_MS).then(() => null)
+  try {
+    const res = await Promise.race([$.http.fetch(url, { method: 'GET', headers: { 'User-Agent': 'jr-uptime (Claude Code mod)' } }), timeout])
+    const end = await $.clock.now()
+    return { at: end, ms: end - start, status: res ? res.status : null }
+  } catch {
+    const end = await $.clock.now()
+    return { at: end, ms: end - start, status: null }
+  }
+}
+
+async function checkAll($: EngineInterface) {
+  if (live.urls.length === 0) return
+  const results = await Promise.all(live.urls.map(url => ping($, url)))
+  const saved = ((await $.store.get('incidents')) as Record<string, JrUptimeSite['lastIncident']> | undefined) ?? {}
+  await update($, sites, prev =>
+    live.urls.map((url, i) => {
+      const site = prev.find(s => s.url === url) ?? { ...emptySite(url), lastIncident: saved[url] ?? null }
+      return addCheck(site, results[i]!)
+    }),
+  )
+  const next = await read($, sites)
+  await $.store.set('incidents', Object.fromEntries(next.map(s => [s.url, s.lastIncident])))
+}
+
+async function ensureStarted($: EngineInterface) {
+  if (live.isStarted) return
+  live.isStarted = true
+  await $.command.register({ name: 'jruptime', description: 'Your sites: up or down, latency, last incident' })
+  if (live.urls.length === 0) return
+  await checkAll($)
+  $.clock.every(EVERY_MS, () => {
+    void checkAll($)
+  })
+}
+
+export const register: Register = (on, options) => {
+  live.urls = parseUrls(String(options.urls ?? ''))
+  const showWhenUp = options.showWhenUp === true
+
+  on('session.start', async ($, e, next) => {
+    const started = await next(e)
+    await ensureStarted($)
+    return started
+  })
+
+  on('prompt.submit', async ($, e, next) => {
+    await ensureStarted($)
+    return next(e)
+  })
+
+  on('command.run', { command: 'jruptime' }, async $ => {
+    await ensureStarted($)
+    if (live.urls.length === 0) return { text: 'jr uptime · add the URLs to watch in /config under jr-uptime (separated by commas).' }
+    await checkAll($)
+    await $.ui.open({ id: PANE, title: 'jr uptime', rows: Math.min(30, live.urls.length * 2 + 3) })
+    return { text: 'jr uptime opened.' }
+  })
+
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
+    const list = await read($, sites)
+    const now = await $.clock.now()
+    const width = Math.max(30, ...list.map(s => label(s.url).length + 2))
+    return (
+      <Box flexDirection="column">
+        {gradientText(Text, 'jr uptime', GRADIENTS.heat)}
+        {list.length === 0 && <Text dimColor>Checking…</Text>}
+        {list.map(s => {
+          const lastCheck = s.history[s.history.length - 1]
+          const up = isUp(lastCheck?.status ?? null)
+          return (
+            <Box flexDirection="column">
+              <Text wrap="truncate-end">
+                <Text color={up ? '#2cb67d' : '#ef4565'}>{up ? '● ' : '✕ '}</Text>
+                <Text bold>{label(s.url).padEnd(width)}</Text>
+                <Text color={up ? '#2cb67d' : '#ef4565'}>{up ? `${lastCheck?.status} · ${lastCheck?.ms} ms` : `down ${s.downSince !== null ? duration(now - s.downSince) : ''}`}</Text>
+              </Text>
+              <Text wrap="truncate-end">
+                <Text>{'  '}</Text>
+                <Text color="#3da9fc">{latencySpark(s.history)}</Text>
+                <Text dimColor>{s.lastIncident ? `   last incident ${ago(now - s.lastIncident.to)}, ${duration(s.lastIncident.to - s.lastIncident.from)}` : '   no incident seen'}</Text>
+              </Text>
+            </Box>
+          )
+        })}
+      </Box>
+    )
+  })
+
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    const below = await next(e)
+    const list = await read($, sites)
+    if (list.length === 0 || e.props.hasSurvey) return below
+    const down = list.filter(s => !isUp(s.history[s.history.length - 1]?.status ?? null))
+    if (down.length === 0 && !showWhenUp) return below
+    const { Box, Text } = $.ui.resolve(e)
+    return (
+      <Box flexDirection="column">
+        {down.length > 0 ? (
+          <Text wrap="truncate-end">
+            <Text backgroundColor="#ef4565" color="black" bold>{' DOWN '}</Text>
+            <Text color="#ef4565" bold>{` ${down.map(s => label(s.url)).join(', ')}`}</Text>
+          </Text>
+        ) : (
+          <Text>
+            {gradientText(Text, 'uptime ', GRADIENTS.money)}
+            {list.map(() => (
+              <Text color="#2cb67d">{'●'}</Text>
+            ))}
+            <Text dimColor>{` all ${list.length} up`}</Text>
+          </Text>
+        )}
+        {below}
+      </Box>
+    )
+  })
+}

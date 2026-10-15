@@ -1,0 +1,25 @@
+{
+  "name": "jr-uptime",
+  "version": "0.1.0",
+  "description": "Pings your sites every 2 minutes; a red band above the prompt the moment one goes down, and /jruptime with latency sparklines and the last incident.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "uptime", "monitoring"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "urls": {
+      "type": "string",
+      "title": "URLs to watch",
+      "description": "Separated by commas, e.g. example.com, api.example.com/health",
+      "default": ""
+    },
+    "showWhenUp": {
+      "type": "boolean",
+      "title": "Show the band when all is up",
+      "description": "Off: the band appears only when a site is down. On: a green dot per site the rest of the time.",
+      "default": false
+    }
+  }
+}
