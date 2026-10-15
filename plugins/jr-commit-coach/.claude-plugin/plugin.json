@@ -1,0 +1,25 @@
+{
+  "name": "jr-commit-coach",
+  "version": "0.1.0",
+  "description": "Nudges you toward small atomic commits: when uncommitted changes pass a threshold, a band and a toast suggest a split by folder.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "git", "commits"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "threshold": {
+      "type": "number",
+      "title": "Threshold (lines)",
+      "description": "Uncommitted lines (added + removed) from which the coach speaks up.",
+      "default": 300
+    },
+    "showBand": {
+      "type": "boolean",
+      "title": "Show the band",
+      "description": "Keep the reminder above the prompt while the pile stays over the threshold.",
+      "default": true
+    }
+  }
+}
