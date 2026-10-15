@@ -4,6 +4,7 @@ import type { EngineInterface, Register } from 'claude-code'
 import { advice, pending } from './coach'
 import { gauge, gradientText } from './jr/draw'
 import { GRADIENTS } from './jr/gradient'
+import { safeGit } from './jr/git'
 
 const nudge = atom({ plugin: 'jr-commit-coach', key: 'nudge' } as const, null)
 // The last size a toast was shown for, so the same pile does not toast again every turn.
@@ -12,9 +13,9 @@ const shown = { lines: 0 }
 /** Uncommitted lines and new files in the session's repository, or null outside git. */
 async function measure($: EngineInterface) {
   const root = await $.session.root()
-  const diff = await $.process.run(['git', '-C', root, 'diff', '--numstat', 'HEAD']).catch(() => null)
+  const diff = await $.process.run(safeGit(['-C', root, 'diff', '--numstat', 'HEAD'])).catch(() => null)
   if (!diff || diff.exitCode !== 0) return null
-  const fresh = await $.process.run(['git', '-C', root, 'ls-files', '--others', '--exclude-standard']).catch(() => null)
+  const fresh = await $.process.run(safeGit(['-C', root, 'ls-files', '--others', '--exclude-standard'])).catch(() => null)
   return pending(diff.stdout, fresh?.exitCode === 0 ? fresh.stdout : '')
 }
 

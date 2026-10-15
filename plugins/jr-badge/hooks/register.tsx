@@ -2,13 +2,14 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import { badgeOf } from './badge'
+import { safeGit } from './jr/git'
 
 const badge = atom({ plugin: 'jr-badge', key: 'badge' } as const, null)
 const live = { isScheduled: false }
 
 async function git($: EngineInterface, cwd: string, args: string[]) {
   try {
-    const { exitCode, stdout } = await $.process.run(['git', '-C', cwd, ...args])
+    const { exitCode, stdout } = await $.process.run(safeGit(['-C', cwd, ...args]))
     return exitCode === 0 && stdout.trim() ? stdout.trim() : null
   } catch {
     return null
