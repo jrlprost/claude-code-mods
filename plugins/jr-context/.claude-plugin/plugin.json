@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "description": "A context bar above the prompt: what fills the window, category by category, in a stacked colour bar with a legend, free space and the compaction point.",
   "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr"],
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {

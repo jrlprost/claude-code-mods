@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "/jrmods: every installed plugin and mod in one list. Space ticks or unticks, Enter applies all the changes at once.",
   "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr"],
   "license": "MIT",
   "types": "./types/index.d.ts"
 }
