@@ -1,0 +1,11 @@
+{
+  "name": "jr-done-check",
+  "version": "0.1.0",
+  "description": "Flags replies that claim something was tested or verified when nothing was run in the turn to check it: a warning under the message and a toast.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "reliability", "verification"],
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}
