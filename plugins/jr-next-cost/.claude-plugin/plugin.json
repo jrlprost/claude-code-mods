@@ -1,0 +1,32 @@
+{
+  "name": "jr-next-cost",
+  "version": "0.1.0",
+  "description": "What the next prompt costs before you send it: the context it resends, at the current model's price, read from a warm cache or written to a cold one, at API rates.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "cost", "prompt-cache"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "ttlMinutes": {
+      "type": "string",
+      "title": "Cache lifetime (minutes)",
+      "description": "5 for the default cache, 60 if your setup uses the one-hour cache.",
+      "options": ["5", "60"],
+      "default": "5"
+    },
+    "inputPrice": {
+      "type": "number",
+      "title": "Input price override ($ per million tokens)",
+      "description": "0 uses the built-in price of the session's model.",
+      "default": 0
+    },
+    "cacheReadPrice": {
+      "type": "number",
+      "title": "Cache read price override ($ per million tokens)",
+      "description": "Used with the input override; 0 means a tenth of the input price.",
+      "default": 0
+    }
+  }
+}
