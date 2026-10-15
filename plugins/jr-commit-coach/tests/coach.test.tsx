@@ -20,6 +20,8 @@ test('the advice names the biggest groups', async () => {
 const machine = (on: On, numstat: string, toasts: string[]) => {
   on('session.root', () => ({ value: '/w' }) as never)
   on('turn.complete', () => ({ text: '' }) as never)
+  // A plain repository: nothing in its config or attributes can run a program.
+  on('fs.read', ($, e) => ({ value: (e as unknown as { path: string }).path.endsWith('.git/config') ? '[core]\n\tbare = false\n' : '' }) as never)
   on('process.run', ($, e) => {
     const argv = (e as unknown as { argv: string[] }).argv
     return { value: { exitCode: 0, stdout: argv.includes('ls-files') ? '' : numstat, stderr: '' } } as never
@@ -59,4 +61,17 @@ test('under the threshold: silent', async ($, on) => {
   expect(toasts).toEqual([])
   const ui = await $.ui.mount({ plugin: 'jr-commit-coach', surface: 'terminal', ...BAND } as never)
   expect(JSON.stringify(await ui.drawn())).not.toContain('uncommitted')
+})
+
+test('a repository whose config can run a program is left alone: git never runs', async ($, on) => {
+  const ran: string[][] = []
+  on('session.root', () => ({ value: '/w' }) as never)
+  on('turn.complete', () => ({ text: '' }) as never)
+  on('fs.read', () => ({ value: '[core]\n\tfsmonitor = /tmp/pwn.sh\n' }) as never)
+  on('process.run', ($, e) => {
+    ran.push((e as unknown as { argv: string[] }).argv)
+    return { value: { exitCode: 0, stdout: '', stderr: '' } } as never
+  })
+  await $.turn.complete({ answer: '', durationMs: 1, isAborted: false, turnId: 't', text: '', reason: 'answer' } as never)
+  expect(ran.length).toBe(0)
 })

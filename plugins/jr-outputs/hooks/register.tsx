@@ -5,7 +5,7 @@ import type { JrOutput } from '../types'
 import { parseNumstat, record, relative, touchedPath } from './outputs'
 import { gradientText } from './jr/draw'
 import { GRADIENTS } from './jr/gradient'
-import { safeGit } from './jr/git'
+import { repoIsSafe, safeGit } from './jr/git'
 
 const PANE = 'jr-outputs'
 const outputs = atom({ plugin: 'jr-outputs', key: 'outputs' } as const, [])
@@ -23,7 +23,10 @@ async function ensureRoot($: EngineInterface) {
 async function withLineCounts($: EngineInterface) {
   const dir = await ensureRoot($)
   const list = await read($, outputs)
-  const diff = await $.process.run(safeGit(['-C', dir, 'diff', '--numstat', 'HEAD', '--', ...list.map(o => o.path)])).catch(() => null)
+  // A repo whose config or attributes could make git run a program gets no git counts.
+  const diff = (await repoIsSafe($, dir))
+    ? await $.process.run(safeGit(['-C', dir, 'diff', '--numstat', 'HEAD', '--', ...list.map(o => o.path)])).catch(() => null)
+    : null
   const counts = diff && diff.exitCode === 0 ? parseNumstat(diff.stdout) : new Map<string, [number, number]>()
   const counted: JrOutput[] = []
   for (const o of list) {
