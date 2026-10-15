@@ -15,7 +15,7 @@ const view = atom({ plugin: 'jr-time', key: 'view' } as const, null)
 const band = atom({ plugin: 'jr-time', key: 'band' } as const, null)
 
 // This session's record, reloaded from the store when the module reloads.
-const live: { log: JrTimeSession | null; period: JrTimePeriod } = { log: null, period: 'today' }
+const live: { log: JrTimeSession | null; period: JrTimePeriod; isSampling: boolean } = { log: null, period: 'today', isSampling: false }
 
 async function loadSettings($: EngineInterface): Promise<JrTimeSettings> {
   const saved = (await $.store.get(SETTINGS_KEY)) as Partial<JrTimeSettings> | undefined
@@ -44,6 +44,27 @@ async function idleSeconds($: EngineInterface) {
     return exitCode === 0 && Number.isFinite(n) ? n : null
   } catch {
     return null
+  }
+}
+
+/**
+ * Starts recording this session, once: at session.start, or at the first event after the mod
+ * was installed or reloaded mid-session, when session.start has already gone by.
+ */
+async function ensureRecording($: EngineInterface) {
+  if (!live.log) {
+    const id = await $.session.id()
+    const root = await $.session.root()
+    const now = await $.clock.now()
+    const saved = (await $.store.get(SESSION_PREFIX + id)) as JrTimeSession | undefined
+    live.log = saved ?? { id, project: root.split('/').pop() || root, start: now, last: now, prompts: [], turns: [], present: [], hasPresence: false }
+    await save($)
+  }
+  if (!live.isSampling) {
+    live.isSampling = true
+    $.clock.every(SAMPLE_MS, () => {
+      void sample($)
+    })
   }
 }
 
@@ -130,20 +151,13 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await $.command.register({ name: 'jrtime', description: 'Billable time: categories, ratios, hourly rate, export' })
-    const id = await $.session.id()
-    const root = await $.session.root()
-    const now = await $.clock.now()
-    const saved = (await $.store.get(SESSION_PREFIX + id)) as JrTimeSession | undefined
-    live.log = saved ?? { id, project: root.split('/').pop() || root, start: now, last: now, prompts: [], turns: [], present: [], hasPresence: false }
-    await save($)
+    await ensureRecording($)
     await refresh($)
-    $.clock.every(SAMPLE_MS, () => {
-      void sample($)
-    })
     return started
   })
 
   on('prompt.submit', async ($, e, next) => {
+    await ensureRecording($)
     if (live.log && !e.command && !e.isMeta) {
       const now = await $.clock.now()
       live.log.prompts.push(now)
@@ -155,6 +169,7 @@ export const register: Register = (on, options) => {
 
   on('turn.complete', async ($, e, next) => {
     const done = await next(e)
+    await ensureRecording($)
     if (live.log && e.agentId === undefined) {
       const now = await $.clock.now()
       live.log.turns.push([now - e.durationMs, now])
@@ -166,6 +181,7 @@ export const register: Register = (on, options) => {
   })
 
   on('command.run', { command: 'jrtime' }, async ($, e) => {
+    await ensureRecording($)
     const answer = await runCommand($, e.args)
     if (answer) return { text: answer }
     await refresh($)
@@ -190,6 +206,11 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const b = await read($, band)
+    if (!b && !live.isSampling) {
+      $.clock.after(0, () => {
+        void ensureRecording($).then(() => refresh($))
+      })
+    }
     if (!showBand || !b || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (

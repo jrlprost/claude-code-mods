@@ -1,6 +1,6 @@
 {
   "name": "jr-time",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Billable time per project: every minute of a session sorted into categories, a ratio per category, an hourly rate, and an amount. /jrtime to adjust, export to CSV or Markdown.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

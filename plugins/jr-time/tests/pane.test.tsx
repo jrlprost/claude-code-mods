@@ -63,3 +63,15 @@ test('the band shows today\'s billable time for this project', async ($, on) => 
   expect(await ui.find({ text: /billable today · tokenkarma/ } as never)).toBeDefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
 })
+
+test('installed mid-session, with no session.start, the first prompt starts recording', async ($, on) => {
+  const clock = machine(on, [])
+  await $.prompt.submit({ text: 'go', origin: { kind: 'composer' }, wait: false } as never)
+  await (clock as never as { advance: (ms: number) => Promise<void> }).advance(3 * MIN)
+  const opened = await $.command.run({ command: 'jrtime', args: '' } as never)
+  expect(JSON.stringify(opened)).toContain('jr time opened')
+  const ui = (await $.ui.mount({ plugin: 'jr-time', surface: 'terminal', component: 'Pane', requestId: 'jr-time', props: {} } as never)) as never as {
+    drawn: (s: object) => Promise<unknown>
+  }
+  expect(JSON.stringify(await ui.drawn({ in: 'time' }))).toContain('tokenkarma')
+})
