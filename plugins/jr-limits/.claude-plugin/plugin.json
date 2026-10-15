@@ -1,0 +1,19 @@
+{
+  "name": "jr-limits",
+  "version": "0.1.0",
+  "description": "Plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges with reset countdowns, a toast at 80 % and 95 %, and /jrlimits for the detail.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "rate-limits", "usage"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "showBand": {
+      "type": "boolean",
+      "title": "Show the band",
+      "description": "The 5h and 7d gauges above the prompt.",
+      "default": true
+    }
+  }
+}
