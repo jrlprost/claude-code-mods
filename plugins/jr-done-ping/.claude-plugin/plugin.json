@@ -1,0 +1,25 @@
+{
+  "name": "jr-done-ping",
+  "version": "0.1.0",
+  "description": "A notification, and a sound on macOS, when a long turn finishes: work in another window and come back when Claude is done. Names the project and how long it took.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "notification"],
+  "license": "MIT",
+  "userConfig": {
+    "minSeconds": {
+      "type": "number",
+      "title": "Only after (seconds)",
+      "description": "Turns shorter than this finish silently.",
+      "default": 120
+    },
+    "sound": {
+      "type": "string",
+      "title": "Sound (macOS)",
+      "description": "A macOS system sound played with the notification.",
+      "options": ["none", "Glass", "Hero", "Ping", "Submarine", "Funk", "Purr"],
+      "default": "Glass"
+    }
+  }
+}
