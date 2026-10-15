@@ -1,0 +1,46 @@
+{
+  "name": "jr-quota",
+  "version": "0.1.0",
+  "description": "Balances of the other paid APIs you use (OpenRouter, Firecrawl, DeepSeek), checked every 10 minutes: /jrquota shows them all, a band and a toast appear only when one runs low.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "quota", "billing"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "openrouterKey": {
+      "type": "string",
+      "title": "OpenRouter management key",
+      "description": "Empty reads OPENROUTER_API_KEY. The credits endpoint needs a management key.",
+      "sensitive": true,
+      "default": ""
+    },
+    "firecrawlKey": {
+      "type": "string",
+      "title": "Firecrawl API key",
+      "description": "Empty reads FIRECRAWL_API_KEY.",
+      "sensitive": true,
+      "default": ""
+    },
+    "deepseekKey": {
+      "type": "string",
+      "title": "DeepSeek API key",
+      "description": "Empty reads DEEPSEEK_API_KEY.",
+      "sensitive": true,
+      "default": ""
+    },
+    "lowUsd": {
+      "type": "number",
+      "title": "Low balance ($)",
+      "description": "OpenRouter and DeepSeek balances under this are flagged.",
+      "default": 5
+    },
+    "lowCredits": {
+      "type": "number",
+      "title": "Low Firecrawl credits",
+      "description": "Firecrawl credits under this are flagged.",
+      "default": 500
+    }
+  }
+}
