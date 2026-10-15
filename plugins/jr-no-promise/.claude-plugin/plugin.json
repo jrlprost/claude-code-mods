@@ -1,0 +1,18 @@
+{
+  "name": "jr-no-promise",
+  "version": "0.1.0",
+  "description": "When a reply ends by announcing work (\"I'll…\", \"Let me…\", \"je vais…\") and no tool ran in the turn, Claude is sent back once to actually do it.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "reliability"],
+  "license": "MIT",
+  "userConfig": {
+    "enabled": {
+      "type": "boolean",
+      "title": "Send Claude back",
+      "description": "Turn the re-prompt off without uninstalling.",
+      "default": true
+    }
+  }
+}
