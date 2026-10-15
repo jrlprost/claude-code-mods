@@ -34,6 +34,13 @@ export const register: Register = on => {
   on('command.run', { command: 'jrmods' }, async $ => {
     if (!(await loadItems($))) return { text: 'jr-mods: could not list plugins (claude plugin list failed).' }
     await $.ui.open({ id: PANE, title: 'jr mods', focus: true, closeOnEscape: true })
+    // Hand the keys straight to the list, so no click is needed before space and arrows work.
+    try {
+      const focused = await $.ui.focus({ requestId: PANE, key: 'list' })
+      if (focused && 'deny' in focused && focused.deny) $.ui.toast(`jr mods · click the list once to use the keys (${focused.deny})`)
+    } catch (error) {
+      $.ui.toast(`jr mods · click the list once to use the keys (${String(error).slice(0, 80)})`)
+    }
     return { text: 'jr-mods opened: space ticks, enter applies.' }
   })
 

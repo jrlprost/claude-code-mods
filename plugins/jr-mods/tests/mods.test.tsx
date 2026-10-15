@@ -33,6 +33,7 @@ const machine = (on: On, ran: string[][]) => {
   on('fs.read', () => ({ value: JSON.stringify({ description: 'a plugin' }) }) as never)
   on('ui.open', () => ({ value: { isPlaced: true } }) as never)
   on('ui.close', () => ({ value: undefined }) as never)
+  on('ui.focus', () => ({}) as never)
   on('ui.toast', () => ({ value: undefined }) as never)
 }
 
