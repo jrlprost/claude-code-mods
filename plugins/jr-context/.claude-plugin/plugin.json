@@ -1,7 +1,7 @@
 {
   "name": "jr-context",
-  "version": "0.1.0",
-  "description": "A gradient context bar above the prompt: how full the window is, in tokens and percent, with a warning before auto-compact.",
+  "version": "0.2.0",
+  "description": "A context bar above the prompt: what fills the window, category by category, in a stacked colour bar with a legend, free space and the compaction point.",
   "author": { "name": "jrlprost" },
   "license": "MIT",
   "types": "./types/index.d.ts",
@@ -9,15 +9,15 @@
     "warnAt": {
       "type": "number",
       "title": "Warn at (%)",
-      "description": "Context fill, in percent, from which the bar warns that compaction is near.",
+      "description": "Context fill, in percent, from which the bar says compaction is near.",
       "default": 80
     },
-    "width": {
+    "layout": {
       "type": "string",
-      "title": "Bar width",
-      "description": "How wide the gauge is drawn.",
-      "options": ["compact", "normal", "wide"],
-      "default": "normal"
+      "title": "Layout",
+      "description": "full: header, bar and legend. compact: header and bar only.",
+      "options": ["full", "compact"],
+      "default": "full"
     }
   }
 }

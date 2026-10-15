@@ -1,14 +1,17 @@
-import { test, expect } from 'claude-code/testing'
+import { test, expect, mock } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
-const BAND = {
-  component: 'AbovePrompt',
-  props: { hasSurvey: false, isWorking: false, maxRows: 4, bodyColumns: 100 },
-} as const
+import { BREAKDOWN } from './fill.test'
 
-// The engine beneath: a context window at `tokens`, and something already drawn above the prompt.
-const engineWith = (on: On, tokens: number) => {
-  on('session.usage', () => ({ value: { startedAt: 0, context: { tokens, window: 200_000 }, rateLimits: [] } }) as never)
+const band = (maxRows: number) => ({
+  component: 'AbovePrompt',
+  props: { hasSurvey: false, isWorking: false, maxRows, bodyColumns: 100 },
+}) as const
+
+// The engine beneath: the breakdown above, and something already drawn above the prompt.
+const engineWith = (on: On, percentage: number) => {
+  mock.clock(on)
+  on('session.usage', () => ({ value: { startedAt: 0, context: { tokens: 1, window: 1_000_000, breakdown: { ...BREAKDOWN, percentage } }, rateLimits: [] } }) as never)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
     const { Text } = $.ui.resolve(e)
@@ -18,23 +21,32 @@ const engineWith = (on: On, tokens: number) => {
 
 const start = { cwd: '/tmp', surface: 'terminal', isInteractive: true } as const
 
-test('the band draws the gauge on terminal and desktop, and keeps what is below', async ($, on) => {
-  engineWith(on, 124_000)
+test('header, bar and legend on terminal and desktop, keeping what is below', async ($, on) => {
+  engineWith(on, 26)
   await $.session.start(start)
 
   for (const surface of ['terminal', 'desktop'] as const) {
-    const ui = await $.ui.mount({ plugin: 'jr-context', surface, ...BAND } as never)
-    expect(await ui.find({ text: /62%/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /124k \/ 200k/ } as never)).toBeDefined()
+    const ui = await $.ui.mount({ plugin: 'jr-context', surface, ...band(8) } as never)
+    expect(await ui.find({ text: /256k of 1\.0M · compacts at 967k/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /26%/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /messages/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /autocompact buffer 33k/ } as never)).toBeDefined()
     expect(await ui.find({ text: /below/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /compact soon/ } as never)).toBeUndefined()
     await ui.unmount()
   }
 })
 
-test('past the threshold the band warns', async ($, on) => {
-  engineWith(on, 170_000)
+test('a short band drops the legend', async ($, on) => {
+  engineWith(on, 26)
   await $.session.start(start)
-  const ui = await $.ui.mount({ plugin: 'jr-context', surface: 'terminal', ...BAND } as never)
-  expect(await ui.find({ text: /compact soon/ } as never)).toBeDefined()
+  const ui = await $.ui.mount({ plugin: 'jr-context', surface: 'terminal', ...band(3) } as never)
+  expect(await ui.find({ text: /autocompact buffer/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /26%/ } as never)).toBeDefined()
+})
+
+test('past the threshold the header warns', async ($, on) => {
+  engineWith(on, 85)
+  await $.session.start(start)
+  const ui = await $.ui.mount({ plugin: 'jr-context', surface: 'terminal', ...band(8) } as never)
+  expect(await ui.find({ text: /compaction is near/ } as never)).toBeDefined()
 })
