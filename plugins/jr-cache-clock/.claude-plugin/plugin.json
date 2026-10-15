@@ -1,0 +1,26 @@
+{
+  "name": "jr-cache-clock",
+  "version": "0.1.0",
+  "description": "A prompt-cache countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, the last cache hit rate, and a toast 30 seconds before it goes cold.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "prompt-cache", "cost"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "ttlMinutes": {
+      "type": "string",
+      "title": "Cache lifetime (minutes)",
+      "description": "5 for the default cache, 60 if your setup uses the one-hour cache.",
+      "options": ["5", "60"],
+      "default": "5"
+    },
+    "warnBeforeExpiry": {
+      "type": "boolean",
+      "title": "Warn before it goes cold",
+      "description": "A toast 30 seconds before the cache expires.",
+      "default": true
+    }
+  }
+}
