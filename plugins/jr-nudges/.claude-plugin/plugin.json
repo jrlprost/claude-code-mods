@@ -1,0 +1,10 @@
+{
+  "name": "jr-nudges",
+  "version": "0.1.0",
+  "description": "At the end of a turn, one toast when the code Claude wrote added debug statements (console.log, print, debugger) or TODO/FIXME/HACK lines.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "lint", "debug"],
+  "license": "MIT"
+}
