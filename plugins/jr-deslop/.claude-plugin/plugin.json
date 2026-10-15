@@ -1,0 +1,11 @@
+{
+  "name": "jr-deslop",
+  "version": "0.1.0",
+  "description": "Flags AI-writing tells (em dashes, \"delve\", \"not X, but Y\", stock openers...) in the prose files Claude writes. A toast after each file, /jrdeslop for the list. Never rewrites anything.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "writing", "slop"],
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}
