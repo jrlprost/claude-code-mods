@@ -1,6 +1,6 @@
 {
   "name": "jr-context",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A context bar above the prompt: what fills the window, category by category, in a stacked colour bar with a legend, free space and the compaction point.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

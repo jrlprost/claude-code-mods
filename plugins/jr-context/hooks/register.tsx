@@ -7,7 +7,7 @@ import { GRADIENTS, colorAt, formatTokens } from './jr/gradient'
 
 const fill = atom({ plugin: 'jr-context', key: 'fill' } as const, null)
 const REFRESH_EVERY_MS = 4000
-const last = { refreshedAt: 0 }
+const last = { refreshedAt: 0, isScheduled: false }
 
 async function refresh($: EngineInterface, force = false) {
   const now = await $.clock.now()
@@ -43,6 +43,13 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const now = await read($, fill)
+    // Installed or reloaded mid-session, the mod saw no session.start: read the figures once now.
+    if (!now && !last.isScheduled) {
+      last.isScheduled = true
+      $.clock.after(0, () => {
+        void refresh($, true)
+      })
+    }
     if (!now || e.props.hasSurvey) return below
 
     const { Box, Text } = $.ui.resolve(e)

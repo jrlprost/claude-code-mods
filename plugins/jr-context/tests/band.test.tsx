@@ -50,3 +50,15 @@ test('past the threshold the header warns', async ($, on) => {
   const ui = await $.ui.mount({ plugin: 'jr-context', surface: 'terminal', ...band(8) } as never)
   expect(await ui.find({ text: /compaction is near/ } as never)).toBeDefined()
 })
+
+test('installed mid-session, with no session.start, the bar still fills on its first draw', async ($, on) => {
+  const clock = mock.clock(on)
+  on('session.usage', () => ({ value: { startedAt: 0, context: { tokens: 1, window: 1_000_000, breakdown: { ...BREAKDOWN, percentage: 26 } }, rateLimits: [] } }) as never)
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>below</Text>
+  })
+  const ui = await $.ui.mount({ plugin: 'jr-context', surface: 'terminal', ...band(8) } as never)
+  await (clock as never as { advance: (ms: number) => Promise<void> }).advance(10)
+  expect(await ui.find({ text: /26%/ } as never)).toBeDefined()
+})
