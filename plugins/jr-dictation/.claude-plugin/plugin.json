@@ -1,0 +1,25 @@
+{
+  "name": "jr-dictation",
+  "version": "0.1.0",
+  "description": "Fixes what dictation mishears (\"cloud code\" → Claude Code) before Claude reads your prompt, and shows each fix in your prompt row: red struck, green added.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "dictation", "voice"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "words": {
+      "type": "string",
+      "title": "Your corrections",
+      "description": "Extra fixes, as heard => right, separated by semicolons. Example: acme corp => ACME; my app => MyApp",
+      "default": ""
+    },
+    "builtIn": {
+      "type": "boolean",
+      "title": "Built-in corrections",
+      "description": "Use the built-in list of common developer mishears (Claude Code, TypeScript, package.json...).",
+      "default": true
+    }
+  }
+}
