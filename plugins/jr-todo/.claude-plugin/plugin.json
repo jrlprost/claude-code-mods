@@ -1,0 +1,70 @@
+{
+  "name": "jr-todo",
+  "version": "0.1.0",
+  "description": "/jrtodo <task>: capture a task instantly, with no model call, to TODO.md, Todoist, Linear, Notion, a GitHub issue, Things, Apple Reminders, or your own command.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "todo", "tasks"],
+  "license": "MIT",
+  "userConfig": {
+    "target": {
+      "type": "string",
+      "title": "Where tasks go",
+      "description": "markdown (a TODO.md file), todoist, linear, notion, github (an issue in the current repo), things, reminders (Apple Reminders) or custom (your own command).",
+      "options": ["markdown", "todoist", "linear", "notion", "github", "things", "reminders", "custom"],
+      "default": "markdown"
+    },
+    "file": {
+      "type": "string",
+      "title": "Markdown file",
+      "description": "For the markdown target: a path, absolute or relative to the project root. Empty: TODO.md at the project root.",
+      "default": ""
+    },
+    "todoistToken": {
+      "type": "string",
+      "title": "Todoist API token",
+      "description": "Todoist → Settings → Integrations → Developer.",
+      "sensitive": true,
+      "default": ""
+    },
+    "linearKey": {
+      "type": "string",
+      "title": "Linear API key",
+      "description": "Linear → Settings → Security & access → Personal API keys (starts with lin_api_).",
+      "sensitive": true,
+      "default": ""
+    },
+    "linearTeamId": {
+      "type": "string",
+      "title": "Linear team id",
+      "description": "The id of the team new issues go to.",
+      "default": ""
+    },
+    "notionToken": {
+      "type": "string",
+      "title": "Notion token",
+      "description": "An internal integration token, with the database shared to the integration.",
+      "sensitive": true,
+      "default": ""
+    },
+    "notionDatabaseId": {
+      "type": "string",
+      "title": "Notion database id",
+      "description": "The database new tasks are added to.",
+      "default": ""
+    },
+    "notionTitleProperty": {
+      "type": "string",
+      "title": "Notion title property",
+      "description": "The name of the database's title column.",
+      "default": "Name"
+    },
+    "command": {
+      "type": "string",
+      "title": "Custom command",
+      "description": "For the custom target: a shell command with {task} where the task goes, passed as one quoted argument. Example: my-tasks add {task}",
+      "default": ""
+    }
+  }
+}
