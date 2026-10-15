@@ -1,0 +1,19 @@
+{
+  "name": "jr-time",
+  "version": "0.1.0",
+  "description": "Billable time per project: every minute of a session sorted into categories, a ratio per category, an hourly rate, and an amount. /jrtime to adjust, export to CSV or Markdown.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "time-tracking", "billing"],
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "showBand": {
+      "type": "boolean",
+      "title": "Show the band",
+      "description": "A line above the prompt with today's billable time and amount for this project.",
+      "default": true
+    }
+  }
+}
