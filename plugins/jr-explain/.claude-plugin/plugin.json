@@ -1,0 +1,24 @@
+{
+  "name": "jr-explain",
+  "version": "0.1.0",
+  "description": "Every shell command Claude asks permission for comes with a plain-English explanation and a risk level: low, medium or high.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "permissions", "beginners"],
+  "license": "MIT",
+  "userConfig": {
+    "useModel": {
+      "type": "boolean",
+      "title": "Explain unknown commands with a small model",
+      "description": "When the built-in table does not know a command, ask a small model for a one-line explanation (uses tokens).",
+      "default": false
+    },
+    "model": {
+      "type": "string",
+      "title": "Model",
+      "description": "The model asked for unknown commands.",
+      "default": "claude-haiku-5-5"
+    }
+  }
+}
