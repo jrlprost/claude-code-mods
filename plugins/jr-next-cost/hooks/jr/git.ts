@@ -19,6 +19,10 @@ const SAFE_CONFIG = [
   '-c', 'diff.external=',
   '-c', 'core.untrackedCache=false',
   '-c', 'protocol.ext.allow=never',
+  // Never step into submodules: each has its own config, which repoIsSafe does not read.
+  '-c', 'submodule.recurse=false',
+  '-c', 'diff.ignoreSubmodules=all',
+  '-c', 'status.submoduleSummary=false',
 ]
 
 /** `git <args>` with command-running config switched off. Diffs never run external drivers. */
@@ -26,7 +30,7 @@ export const safeGit = (args: readonly string[]) => {
   const rest = [...args]
   if (rest[0] === '-C') rest.splice(0, 2)
   const cwd = args[0] === '-C' ? ['-C', args[1] ?? '.'] : []
-  const extra = rest[0] === 'diff' ? ['--no-ext-diff', '--no-textconv'] : []
+  const extra = rest[0] === 'diff' ? ['--no-ext-diff', '--no-textconv', '--ignore-submodules=all'] : []
   return ['git', ...SAFE_CONFIG, ...cwd, ...(rest.length ? [rest[0]!, ...extra, ...rest.slice(1)] : [])]
 }
 

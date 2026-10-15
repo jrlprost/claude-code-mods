@@ -1,6 +1,6 @@
 {
   "name": "jr-mod-audit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "/jrmodaudit owner/repo: clones a mod, runs the official validator on each plugin in it, reads its source, and shows what it can reach with a green, amber or red verdict before you install it.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

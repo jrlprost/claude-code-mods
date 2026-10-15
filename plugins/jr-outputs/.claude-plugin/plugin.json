@@ -1,6 +1,6 @@
 {
   "name": "jr-outputs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "/jroutputs: every file this session created or changed, newest first, with + and - line counts from git.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

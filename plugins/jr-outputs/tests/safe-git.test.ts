@@ -7,7 +7,8 @@ test('git runs with the config that could run programs switched off', async () =
   expect(argv.slice(0, 3)).toEqual(['git', '-c', 'core.fsmonitor=false'])
   expect(argv).toContain('core.sshCommand=false')
   expect(argv).toContain('credential.helper=')
-  expect(argv.slice(-7)).toEqual(['-C', '/repo', 'diff', '--no-ext-diff', '--no-textconv', '--numstat', 'HEAD'])
+  expect(argv).toContain('submodule.recurse=false')
+  expect(argv.slice(-8)).toEqual(['-C', '/repo', 'diff', '--no-ext-diff', '--no-textconv', '--ignore-submodules=all', '--numstat', 'HEAD'])
 })
 
 // What `git config --list --show-origin -z` prints: origin NUL key LF value NUL.
