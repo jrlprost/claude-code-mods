@@ -1,0 +1,18 @@
+{
+  "name": "jr-deploy-guard",
+  "version": "0.1.0",
+  "description": "Production deploys and pushes to main always come to you for confirmation, even when your rules allow them. Optional: no deploys on Friday.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "deploy", "safety"],
+  "license": "MIT",
+  "userConfig": {
+    "noFridayDeploys": {
+      "type": "boolean",
+      "title": "No deploys on Friday",
+      "description": "Refuse production deploys on Fridays (local time), unless the command carries JR_FRIDAY_DEPLOY=yes.",
+      "default": false
+    }
+  }
+}
