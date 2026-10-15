@@ -1,0 +1,8 @@
+{
+  "name": "jr-mods",
+  "version": "0.1.0",
+  "description": "/jrmods: every installed plugin and mod in one list. Space ticks or unticks, Enter applies all the changes at once.",
+  "author": { "name": "jrlprost" },
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}
