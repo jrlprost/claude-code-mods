@@ -1,0 +1,18 @@
+{
+  "name": "jr-image-guard",
+  "version": "0.1.0",
+  "description": "Keeps oversized images out of the conversation: an image over 7800 px is read through a resized copy, and browser viewports over the limit are refused.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "images", "screenshots"],
+  "license": "MIT",
+  "userConfig": {
+    "maxPixels": {
+      "type": "number",
+      "title": "Largest side (px)",
+      "description": "Images larger than this on either side are resized before Claude reads them.",
+      "default": 7800
+    }
+  }
+}
