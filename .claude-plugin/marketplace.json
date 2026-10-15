@@ -1,0 +1,19 @@
+{
+  "name": "claude-code-mods",
+  "owner": { "name": "jrlprost" },
+  "metadata": {
+    "description": "jr mods: Claude Code mods for solo builders. Context bar, plugin toggler, and more on the way."
+  },
+  "plugins": [
+    {
+      "name": "jr-context",
+      "source": "./plugins/jr-context",
+      "description": "A context bar above the prompt: what fills the window, category by category, with a legend and the compaction point."
+    },
+    {
+      "name": "jr-mods",
+      "source": "./plugins/jr-mods",
+      "description": "/jrmods: every installed plugin and mod in one list, in two tabs. Space ticks, Enter applies all changes at once."
+    }
+  ]
+}
