@@ -1,16 +1,8 @@
 # jr mods
 
-```text
-     ██╗██████╗    ███╗   ███╗ ██████╗ ██████╗ ███████╗
-     ██║██╔══██╗   ████╗ ████║██╔═══██╗██╔══██╗██╔════╝
-     ██║██████╔╝   ██╔████╔██║██║   ██║██║  ██║███████╗
-██   ██║██╔══██╗   ██║╚██╔╝██║██║   ██║██║  ██║╚════██║
-╚█████╔╝██║  ██║   ██║ ╚═╝ ██║╚██████╔╝██████╔╝███████║
- ╚════╝ ╚═╝  ╚═╝   ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-                     for Claude Code
-```
+<p align="center"><img src="assets/banner.svg" alt="jr mods for Claude Code" width="760"></p>
 
-In colour, in your terminal: `scripts/banner.sh`.
+The same banner in your terminal, in colour: `scripts/banner.sh`.
 
 Claude Code mods I build because I need them. Each one is a small plugin of function hooks: it draws in the terminal, reacts to what Claude does, and installs on its own.
 
