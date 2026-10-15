@@ -126,7 +126,13 @@ export const formatHours = (ms: number) => {
 
 export const formatMoney = (amount: number, currency: string) => `${Math.round(amount).toLocaleString('en-US')} ${currency}`
 
-const csvCell = (v: string | number) => (typeof v === 'number' ? String(v) : `"${v.replace(/"/g, '""')}"`)
+// A text cell opening with = + - @ (or a tab or carriage return) would run as a formula in a
+// spreadsheet: it gets a leading apostrophe, which spreadsheets show as plain text.
+const csvCell = (v: string | number) => {
+  if (typeof v === 'number') return String(v)
+  const safe = /^[=+\-@\t\r]/.test(v) ? `'${v}` : v
+  return `"${safe.replace(/"/g, '""')}"`
+}
 
 /** One row per project: client, hours per category, billable hours, rate and amount. */
 export const toCsv = (r: JrTimeReport, s: JrTimeSettings, logs: readonly JrTimeSession[], now: number) => {

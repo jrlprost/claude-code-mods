@@ -91,3 +91,10 @@ test('you near Claude between two prompts count as between', async () => {
   const near = { ...session, last: T0 + 24 * MIN, present: [[T0, T0 + 24 * MIN]] as [number, number][] }
   expect(classify(near, DEFAULT_SETTINGS, 0, Infinity).between).toBe(4 * MIN) // 9:20–9:24
 })
+
+test('a project or client name that looks like a formula is exported as text', async () => {
+  const s = { ...DEFAULT_SETTINGS, clients: { tokenkarma: '=HYPERLINK("http://x")' } }
+  const r = report([session], s, 'today', T0 + 60 * MIN)
+  const row = toCsv(r, s, [session], T0 + 60 * MIN).split('\n')[1]
+  expect(row?.startsWith('"tokenkarma","\'=HYPERLINK(""http://x"")"')).toBe(true)
+})
