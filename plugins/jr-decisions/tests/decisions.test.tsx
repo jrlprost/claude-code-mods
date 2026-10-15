@@ -19,7 +19,7 @@ test('the export is ADR-lite, numbered, oldest first', async () => {
   expect(md).toContain('Less code to own.')
 })
 
-const machine = (on: On, written: Record<string, string>, toasts: string[]) => {
+const machine = (on: On, written: Record<string, string>, toasts: string[], links: Record<string, string> = {}) => {
   mock.clock(on)
   mock.store(on)
   on('session.root', () => ({ value: '/work/shop' }) as never)
@@ -36,6 +36,13 @@ const machine = (on: On, written: Record<string, string>, toasts: string[]) => {
     return { value: undefined } as never
   })
   on('prompt.submit', ($, e) => ({ text: e.text }) as never)
+  // The project root exists; docs/ and the file exist only where a test plants a link.
+  on('fs.stat', ($, e) => {
+    const p = (e as unknown as { path: string }).path
+    if (p === '/work/shop') return { value: { kind: 'dir', size: 0, mtimeMs: 0, isLink: false, realPath: '/work/shop' } } as never
+    if (links[p]) return { value: { kind: 'dir', size: 0, mtimeMs: 0, isLink: true, realPath: links[p] } } as never
+    return { deny: 'no such file' } as never
+  })
 }
 
 test('commands and prompts fill the journal, the pane lists it newest first, export writes the file', async ($, on) => {
@@ -54,4 +61,14 @@ test('commands and prompts fill the journal, the pane lists it newest first, exp
   const out = await $.command.run({ command: 'jrdecisions', args: 'export' } as never)
   expect(JSON.stringify(out)).toContain('2 written to /work/shop/docs/decisions.md')
   expect(Object.keys(written)).toEqual(['/work/shop/docs/decisions.md'])
+})
+
+test('export refuses when docs/ is a link pointing out of the project', async ($, on) => {
+  const written: Record<string, string> = {}
+  machine(on, written, [], { '/work/shop/docs': '/Users/someone' })
+  await $.session.start({ cwd: '/work/shop', surface: 'terminal', isInteractive: true })
+  await $.command.run({ command: 'jrdecide', args: 'Keep Postgres' } as never)
+  const out = await $.command.run({ command: 'jrdecisions', args: 'export' } as never)
+  expect(JSON.stringify(out)).toContain('not written')
+  expect(Object.keys(written)).toEqual([])
 })

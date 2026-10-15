@@ -30,12 +30,33 @@ async function add($: EngineInterface, text: string, source: JrDecision['source'
   return next.length
 }
 
+/** The real path of `path`, or null when it does not exist yet. */
+async function realPathOf($: EngineInterface, path: string) {
+  try {
+    const stat = await $.fs.stat(path, { resolve: true })
+    return { isLink: stat.isLink, real: stat.realPath ?? path }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Writes docs/decisions.md only where it really lies inside the project: a repository could
+ * make docs/ or the file a symbolic link pointing anywhere on the machine, and the write would follow it.
+ */
 async function exportJournal($: EngineInterface) {
   await ensureLoaded($)
   const list = await read($, decisions)
   const target = `${live.root}/docs/decisions.md`
+  const root = (await realPathOf($, live.root))?.real ?? live.root
+  for (const path of [`${live.root}/docs`, target]) {
+    const found = await realPathOf($, path)
+    if (found && (found.isLink || !found.real.startsWith(`${root}/`))) {
+      return { target, count: list.length, refused: `${path} is a link or lies outside the project` }
+    }
+  }
   await $.fs.write(target, toMarkdown(await read($, project), list))
-  return { target, count: list.length }
+  return { target, count: list.length, refused: undefined }
 }
 
 export const register: Register = on => {
@@ -57,7 +78,8 @@ export const register: Register = on => {
   on('command.run', { command: 'jrdecisions' }, async ($, e) => {
     await ensureLoaded($)
     if (e.args.trim() === 'export') {
-      const { target, count } = await exportJournal($)
+      const { target, count, refused } = await exportJournal($)
+      if (refused) return { text: `jr decisions · not written: ${refused}` }
       return { text: `jr decisions · ${count} written to ${target}` }
     }
     const count = (await read($, decisions)).length
