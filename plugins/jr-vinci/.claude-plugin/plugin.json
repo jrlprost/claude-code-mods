@@ -1,0 +1,11 @@
+{
+  "name": "jr-vinci",
+  "version": "0.1.0",
+  "description": "An opt-in sparring partner: after each answer, one line above the prompt with the sharpest challenge to what was just decided. /jrvinci on, off, or the history.",
+  "author": { "name": "jrlprost" },
+  "homepage": "https://github.com/jrlprost/claude-code-mods",
+  "repository": "https://github.com/jrlprost/claude-code-mods",
+  "keywords": ["claude-code-mod", "jr", "review", "decisions"],
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}
