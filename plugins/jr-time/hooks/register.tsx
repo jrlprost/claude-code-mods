@@ -3,8 +3,6 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { JrTimeMessage, JrTimePeriod, JrTimeSession, JrTimeSettings } from '../types'
 import { addPresence, CATEGORIES, DEFAULT_SETTINGS, formatHours, formatMoney, report, toCsv, toMarkdown } from './model'
-import { gradientText } from './jr/draw'
-import { GRADIENTS } from './jr/gradient'
 
 const PANE = 'jr-time'
 const SAMPLE_MS = 30_000
@@ -94,7 +92,8 @@ async function refresh($: EngineInterface) {
   const current = live.log?.project ?? ''
   await update($, view, () => ({ report: report(logs, settings, live.period, now), settings, current }))
   const today = report(logs, settings, 'today', now).projects.find(p => p.project === current)
-  await update($, band, () => ({ billableMs: today?.billableMs ?? 0, amount: today?.amount ?? 0, project: current, currency: settings.currency }))
+  const hasRate = (settings.rates[current] ?? settings.defaultRate) > 0
+  await update($, band, () => ({ billableMs: today?.billableMs ?? 0, amount: today?.amount ?? 0, project: current, currency: settings.currency, hasRate }))
 }
 
 async function sample($: EngineInterface) {
@@ -164,6 +163,14 @@ async function runCommand($: EngineInterface, args: string) {
   return `jr time · ${project}: client ${s.clients[project] ?? project}, ${s.rates[project] ?? s.defaultRate} ${s.currency}/h`
 }
 
+/** What `/jrtime` answers: today's figure, then how to read and adjust the billing. */
+async function openedText($: EngineInterface) {
+  const b = await read($, band)
+  const today = b ? `today ${formatHours(b.billableMs)} billable on ${b.project}${b.hasRate ? `, ${formatMoney(b.amount, b.currency)}` : ''}` : 'nothing recorded yet'
+  const rate = b?.hasRate ? '' : ' · no rate yet: /jrtime rate 80'
+  return `jr time opened · ${today}${rate} · in the pane, click it, then ↑↓ pick a category, ←→ change its ratio, tab switch day/week/month, e export · /jrtime client <name> · /jrtime rate <per hour>`
+}
+
 export const register: Register = (on, options) => {
   const showBand = options.showBand !== false
 
@@ -207,7 +214,7 @@ export const register: Register = (on, options) => {
     if (answer) return { text: answer }
     await refresh($)
     await $.ui.open({ id: PANE, title: 'jr time', focus: true, closeOnEscape: true, rows: CATEGORIES.length + 12 })
-    return { text: 'jr time opened.' }
+    return { text: await openedText($) }
   })
 
   on('ui.message', { requestId: PANE }, async ($, e) => {
@@ -232,17 +239,30 @@ export const register: Register = (on, options) => {
         void ensureRecording($).then(() => refresh($))
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!bandState.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     if (!showBand || !b || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
-        <Box>
-          {gradientText(Text, 'time ', GRADIENTS.brand)}
-          <Text color="#2cb67d">{'● '}</Text>
-          <Text bold>{formatHours(b.billableMs)}</Text>
-          <Text dimColor>{` billable today · ${b.project}`}</Text>
-          {b.amount > 0 && <Text color="#2cb67d" bold>{` · ${formatMoney(b.amount, b.currency)}`}</Text>}
+        <Box justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            <Text>{formatHours(b.billableMs)}</Text>
+            <Text dimColor>{' billable · '}</Text>
+            {b.hasRate ? (
+              <Text>
+                <Text color="#2cb67d">{formatMoney(b.amount, b.currency)}</Text>
+                <Text dimColor>{' · /jrtime'}</Text>
+              </Text>
+            ) : (
+              <Text dimColor>{'set a rate: /jrtime rate 80'}</Text>
+            )}
+          </Text>
         </Box>
         {below}
       </Box>
