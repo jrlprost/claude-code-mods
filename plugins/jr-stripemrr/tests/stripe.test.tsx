@@ -62,6 +62,7 @@ test('with a key, the band shows MRR and today, and /jrmrr the 30 days', { optio
   expect(urls.some(u => u.includes('/v1/subscriptions?limit=100&status=active'))).toBe(true)
   for (const surface of ['terminal', 'desktop'] as const) {
     const band = await $.ui.mount({ plugin: 'jr-stripemrr', surface, component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as never)
+    expect(bandRow(await band.drawn())).toEqual({ isOneRow: true, isRight: true })
     expect(await band.find({ text: /87 €/ } as never)).toBeDefined()
     expect(await band.find({ text: /49\.90 €/ } as never)).toBeDefined()
     await band.unmount()
@@ -101,3 +102,16 @@ test('/jrmrr hide takes the band away, the bare command toggles it, on brings it
   await $.command.run({ command: 'jrmrr', args: 'on' } as never)
   expect(await shows()).toBe(true)
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}

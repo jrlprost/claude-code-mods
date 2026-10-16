@@ -3,8 +3,10 @@
 Your Stripe numbers above the prompt, so you see the business while you build it.
 
 ```
-mrr 4,320 € · today 149 €
+                                        mrr 4,320 € · today 149 €
 ```
+
+One quiet row, right-aligned, out of the way of your eye.
 
 `/jrmrr details` opens the detail:
 
