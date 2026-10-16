@@ -1,7 +1,7 @@
 {
   "name": "jr-mods",
-  "version": "0.1.0",
-  "description": "/jrmods: every installed plugin and mod in one list. Space ticks or unticks, Enter applies all the changes at once.",
+  "version": "0.2.0",
+  "description": "/jrmods: every installed plugin and mod in one list. Space ticks or unticks, Enter applies all the changes at once. /jrmods welcome explains what each jr mod shows.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",

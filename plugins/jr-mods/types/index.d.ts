@@ -7,6 +7,6 @@ export type JrModsApply = { type: 'apply'; wanted: Record<string, boolean> }
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-mods': { items: JrModsItem[] }
+    'jr-mods': { items: JrModsItem[]; installed: string[] }
   }
 }

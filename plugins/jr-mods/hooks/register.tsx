@@ -2,10 +2,37 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { JrModsApply } from '../types'
+import { gradientText } from './jr/draw'
+import { GRADIENTS } from './jr/gradient'
 import { changesOf, itemsOf, kindOf, summary } from './plugins'
+import { BILLING, GROUP_TITLES, RULE, enabledNames, welcomeOf } from './welcome'
 
 const PANE = 'jr-mods'
+const WELCOME = 'jr-mods-welcome'
 const items = atom({ plugin: 'jr-mods', key: 'items' } as const, [])
+const installed = atom({ plugin: 'jr-mods', key: 'installed' } as const, [])
+
+/** Opens the welcome pane listing the installed jr mods; false when plugins could not be listed. */
+async function openWelcome($: EngineInterface) {
+  const { exitCode, stdout } = await $.process.run(['claude', 'plugin', 'list', '--json'])
+  if (exitCode !== 0) return false
+  const names = enabledNames(JSON.parse(stdout) as { id: string; enabled: boolean }[])
+  await update($, installed, () => names)
+  const rows = welcomeOf(names).reduce((n, g) => n + g.entries.length + 2, 0) + (names.includes('jr-time') ? BILLING.length : 0)
+  await $.ui.open({ id: WELCOME, title: 'jr mods · welcome', closeOnEscape: true, rows: Math.min(rows + 4, 40) })
+  return true
+}
+
+/** The first session after install shows the welcome once; the flag is set before the one attempt. */
+async function onboard($: EngineInterface) {
+  if ((await $.store.get('isOnboarded')) === true) return
+  await $.store.set('isOnboarded', true)
+  try {
+    await openWelcome($)
+  } catch {
+    // One attempt only: /jrmods welcome opens it again.
+  }
+}
 
 async function loadItems($: EngineInterface) {
   const { exitCode, stdout } = await $.process.run(['claude', 'plugin', 'list', '--json'])
@@ -33,11 +60,19 @@ async function loadItems($: EngineInterface) {
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'jrmods', description: 'Turn plugins and mods on or off: space ticks, enter applies' })
-    return next(e)
+    await $.command.register({ name: 'jrmods', description: 'Turn plugins and mods on or off: space ticks, enter applies. /jrmods welcome: what each jr mod shows' })
+    const started = await next(e)
+    $.clock.after(0, () => {
+      void onboard($)
+    })
+    return started
   })
 
-  on('command.run', { command: 'jrmods' }, async $ => {
+  on('command.run', { command: 'jrmods' }, async ($, e) => {
+    if (e.args.trim() === 'welcome') {
+      if (!(await openWelcome($))) return { text: 'jr-mods: could not list plugins (claude plugin list failed).' }
+      return { text: 'jr-mods: welcome opened.' }
+    }
     if (!(await loadItems($))) return { text: 'jr-mods: could not list plugins (claude plugin list failed).' }
     // Tall enough for the longer tab, the tab line and the footer.
     const list = await read($, items)
@@ -74,5 +109,37 @@ export const register: Register = on => {
     const list = await read($, items)
     if (!Client) return <Text>Open /jrmods in the terminal or the desktop app to toggle plugins.</Text>
     return <Client key="list" module="./list.client.tsx" props={{ items: list }} height="100%" flexGrow={1} />
+  })
+
+  on('ui.render', { component: 'Pane', requestId: WELCOME }, async ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
+    const names = await read($, installed)
+    const groups = welcomeOf(names)
+    return (
+      <Box flexDirection="column">
+        <Text>{gradientText(Text, 'jr mods', GRADIENTS.brand)}<Text dimColor>{'  what each mod shows, and how to hide it'}</Text></Text>
+        {groups.length === 0 && <Text dimColor>No jr mod with a band is installed.</Text>}
+        {groups.map(g => (
+          <Box flexDirection="column" marginTop={1}>
+            <Text bold>{GROUP_TITLES[g.group]}</Text>
+            {g.entries.map(entry => (
+              <Box flexDirection="column">
+                <Text wrap="truncate-end">
+                  <Text color="#ff5ca8">{`  ${entry.command.padEnd(15)}`}</Text>
+                  <Text dimColor>{entry.what}</Text>
+                </Text>
+                {entry.name === 'jr-time' &&
+                  BILLING.map(line => (
+                    <Text wrap="truncate-end" dimColor>{`  ${''.padEnd(15)}${line}`}</Text>
+                  ))}
+              </Box>
+            ))}
+          </Box>
+        ))}
+        <Box marginTop={1}>
+          <Text dimColor wrap="wrap">{RULE}</Text>
+        </Box>
+      </Box>
+    )
   })
 }
