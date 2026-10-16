@@ -72,3 +72,22 @@ test('on screen only: an assistant reply is masked while recording, and the band
     await band.unmount()
   }
 })
+
+test('/jrrec hide takes the band away while masking stays on, show brings it back', async ($, on) => {
+  machine(on)
+  await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
+  await $.command.run({ command: 'jrrec', args: 'on' } as never)
+  const answer = await $.command.run({ command: 'jrrec', args: 'hide' } as never)
+  expect(JSON.stringify(answer)).toContain('masking stays active')
+  const BAND = { plugin: 'jr-record', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 4, bodyColumns: 80 } } as const
+  let band = await $.ui.mount(BAND as never)
+  expect(await band.find({ text: /REC/ } as never)).toBeUndefined()
+  expect(await band.find({ text: /below/ } as never)).toBeDefined()
+  await band.unmount()
+  const reply = await $.ui.mount({ plugin: 'jr-record', surface: 'terminal', component: 'AssistantMessage', props: { text: 'Mail jane@acme.io', isFirstOfReply: true } } as never)
+  expect(JSON.stringify(await reply.drawn())).not.toContain('jane@acme.io')
+  await reply.unmount()
+  await $.command.run({ command: 'jrrec', args: 'show' } as never)
+  band = await $.ui.mount(BAND as never)
+  expect(await band.find({ text: /REC/ } as never)).toBeDefined()
+})

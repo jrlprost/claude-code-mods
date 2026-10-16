@@ -29,6 +29,7 @@ Only the drawing changes. Claude still reads the real text, your files are untou
 | `/jrrec on` | Mask emails, money, keys, phones, IPs |
 | `/jrrec strict` | Also home paths and long numbers |
 | `/jrrec off` | Show everything again |
+| `/jrrec hide` / `/jrrec show` | Hide or show the REC band, in every session; masking stays active |
 
 ## Install
 

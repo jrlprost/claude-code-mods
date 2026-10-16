@@ -7,12 +7,31 @@ import { maskText, maskValue, parseMode } from './mask'
 
 const mode = atom({ plugin: 'jr-record', key: 'mode' } as const, 'off')
 const isLoaded = atom({ plugin: 'jr-record', key: 'isLoaded' } as const, false)
+const bandHidden = atom({ plugin: 'jr-record', key: 'isBandHidden' } as const, false)
+
+const bandState = { isLoaded: false }
+
+/** True while the band is hidden; the saved choice is read once per load of the mod. */
+async function isBandHidden($: EngineInterface) {
+  if (!bandState.isLoaded) {
+    bandState.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+/** Hides or shows the band for every session, kept across restarts. */
+async function setBand($: EngineInterface, hide: boolean, name: string, command: string) {
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? `${name} · hidden (${command} to bring it back)` : `${name} · shown` }
+}
 const scheduled = { load: false, command: false }
 
 async function registerCommand($: EngineInterface) {
   if (scheduled.command) return
   scheduled.command = true
-  await $.command.register({ name: 'jrrec', description: 'Recording mode: mask emails, money, keys and phone numbers on screen (on, off, strict)' })
+  await $.command.register({ name: 'jrrec', description: 'Recording mode: mask emails, money, keys and phone numbers on screen (on, off, strict; hide or show the band)' })
 }
 
 /** The mode survives sessions: a recording setup stays masked until you turn it off. */
@@ -38,8 +57,13 @@ export const register: Register = on => {
 
   on('command.run', { command: 'jrrec' }, async ($, e) => {
     if (!(await read($, isLoaded))) await load($)
+    const word = e.args.trim().toLowerCase()
+    if (word === 'hide' || word === 'show') {
+      const answer = await setBand($, word === 'hide', 'jr rec band', '/jrrec show')
+      return word === 'hide' && (await read($, mode)) !== 'off' ? { text: `${answer.text}; masking stays active, /jrrec off to stop it` } : answer
+    }
     const chosen = parseMode(e.args, await read($, mode))
-    if (!chosen) return { text: 'jr rec · usage: /jrrec, /jrrec on, /jrrec off, /jrrec strict' }
+    if (!chosen) return { text: 'jr rec · usage: /jrrec, /jrrec on, /jrrec off, /jrrec strict, /jrrec hide, /jrrec show' }
     await setMode($, chosen)
     return {
       text:
@@ -59,6 +83,7 @@ export const register: Register = on => {
         void registerCommand($)
       })
     }
+    if (await isBandHidden($)) return below
     const current = await read($, mode)
     if (current === 'off' || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
