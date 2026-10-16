@@ -75,3 +75,22 @@ test('installed mid-session, with no session.start, the first prompt starts reco
   }
   expect(JSON.stringify(await ui.drawn({ in: 'time' }))).toContain('tokenkarma')
 })
+
+test('/jrtime hide takes the band away and keeps what is below, show brings it back', async ($, on) => {
+  machine(on, [])
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>below</Text>
+  })
+  await $.session.start(start)
+  const BAND = { plugin: 'jr-time', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as const
+  const answer = await $.command.run({ command: 'jrtime', args: 'hide' } as never)
+  expect(JSON.stringify(answer)).toContain('hidden')
+  let ui = await $.ui.mount(BAND as never)
+  expect(await ui.find({ text: /billable today/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrtime', args: 'show' } as never)
+  ui = await $.ui.mount(BAND as never)
+  expect(await ui.find({ text: /billable today · tokenkarma/ } as never)).toBeDefined()
+})

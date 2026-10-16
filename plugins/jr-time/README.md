@@ -45,6 +45,7 @@ Everything is kept raw: change a ratio, the window or the idle time later and th
 | `/jrtime client Acme` | Client name for this project |
 | `/jrtime currency $` | Currency symbol (default €) |
 | `/jrtime export` | Write the current period to `~/Downloads` as CSV and Markdown |
+| `/jrtime hide` / `/jrtime show` | Hide or show the band, in every session; time keeps being recorded |
 
 In the pane: ↑↓ pick a line, ←→ change its value (ratio by 10 %, minutes by 1, rate by 5), tab switches today / week / month, `e` exports. The pane opens with a "click here to use the keyboard" zone: the terminal hands keys over only after a click.
 

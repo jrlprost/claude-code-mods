@@ -13,6 +13,25 @@ const SESSION_PREFIX = 'session:'
 
 const view = atom({ plugin: 'jr-time', key: 'view' } as const, null)
 const band = atom({ plugin: 'jr-time', key: 'band' } as const, null)
+const bandHidden = atom({ plugin: 'jr-time', key: 'isBandHidden' } as const, false)
+
+const bandState = { isLoaded: false }
+
+/** True while the band is hidden; the saved choice is read once per load of the mod. */
+async function isBandHidden($: EngineInterface) {
+  if (!bandState.isLoaded) {
+    bandState.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+/** Hides or shows the band for every session, kept across restarts. */
+async function setBand($: EngineInterface, hide: boolean, name: string, command: string) {
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? `${name} · hidden (${command} to bring it back)` : `${name} · shown` }
+}
 
 // This session's record, reloaded from the store when the module reloads.
 const live: { log: JrTimeSession | null; period: JrTimePeriod; isSampling: boolean } = { log: null, period: 'today', isSampling: false }
@@ -136,7 +155,7 @@ async function runCommand($: EngineInterface, args: string) {
   } else if (verb === 'export') {
     return `jr time · exported ${await exportReport($)}.csv and .md`
   } else if (verb) {
-    return 'jr time · usage: /jrtime, /jrtime client <name>, /jrtime rate <per hour>, /jrtime rate default <per hour>, /jrtime currency <symbol>, /jrtime export'
+    return 'jr time · usage: /jrtime, /jrtime client <name>, /jrtime rate <per hour>, /jrtime rate default <per hour>, /jrtime currency <symbol>, /jrtime export, /jrtime hide, /jrtime show'
   } else {
     return null
   }
@@ -150,7 +169,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrtime', description: 'Billable time: categories, ratios, hourly rate, export' })
+    await $.command.register({ name: 'jrtime', description: 'Billable time: categories, ratios, hourly rate, export; /jrtime hide or show toggles the band' })
     await ensureRecording($)
     await refresh($)
     return started
@@ -182,6 +201,8 @@ export const register: Register = (on, options) => {
 
   on('command.run', { command: 'jrtime' }, async ($, e) => {
     await ensureRecording($)
+    const word = e.args.trim().toLowerCase()
+    if (word === 'hide' || word === 'show') return setBand($, word === 'hide', 'jr time band', '/jrtime show')
     const answer = await runCommand($, e.args)
     if (answer) return { text: answer }
     await refresh($)
@@ -211,6 +232,7 @@ export const register: Register = (on, options) => {
         void ensureRecording($).then(() => refresh($))
       })
     }
+    if (await isBandHidden($)) return below
     if (!showBand || !b || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (

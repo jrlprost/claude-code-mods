@@ -57,6 +57,6 @@ export type JrTimeMessage =
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-time': { view: JrTimeView | null; band: { billableMs: number; amount: number; project: string; currency: string } | null }
+    'jr-time': { view: JrTimeView | null; band: { billableMs: number; amount: number; project: string; currency: string } | null; isBandHidden: boolean }
   }
 }
