@@ -3,7 +3,7 @@
 Recording mode for demos, screen shares and videos. `/jrrec` masks what you would not want on screen, everywhere the transcript draws text: your prompts, Claude's replies, command output, tool calls and their results.
 
 ```
-● REC masked · /jrrec off to stop
+● REC masking on · /jrrec off
 
 Sent the invoice to █████: █████ due on the 30th.
 STRIPE_SECRET_KEY=█████

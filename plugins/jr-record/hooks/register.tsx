@@ -2,7 +2,6 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { JrRecordMode } from '../types'
-import { gradientText } from './jr/draw'
 import { maskText, maskValue, parseMode } from './mask'
 
 const mode = atom({ plugin: 'jr-record', key: 'mode' } as const, 'off')
@@ -83,17 +82,23 @@ export const register: Register = on => {
         void registerCommand($)
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!bandState.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const current = await read($, mode)
     if (current === 'off' || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
-        <Box>
+        <Text wrap="truncate-end">
           <Text color="#ef4565" bold>{'● REC '}</Text>
-          {gradientText(Text, 'masked', ['#ef4565', '#ff5ca8', '#ffb86b'])}
-          <Text dimColor>{current === 'strict' ? ' · strict · /jrrec off to stop' : ' · /jrrec off to stop'}</Text>
-        </Box>
+          <Text>{current === 'strict' ? 'masking on, strict' : 'masking on'}</Text>
+          <Text dimColor>{' · /jrrec off'}</Text>
+        </Text>
         {below}
       </Box>
     )

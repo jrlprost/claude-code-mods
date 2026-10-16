@@ -68,6 +68,7 @@ test('on screen only: an assistant reply is masked while recording, and the band
     expect(drawn).not.toContain('jane@acme.io')
     await reply.unmount()
     const band = await $.ui.mount({ plugin: 'jr-record', surface, component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 4, bodyColumns: 80 } } as never)
+    expect(bandRow(await band.drawn())).toEqual({ isOneRow: true, isRight: false })
     expect(await band.find({ text: /REC/ } as never)).toBeDefined()
     await band.unmount()
   }
@@ -91,3 +92,16 @@ test('/jrrec hide takes the band away while masking stays on, show brings it bac
   band = await $.ui.mount(BAND as never)
   expect(await band.find({ text: /REC/ } as never)).toBeDefined()
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}
