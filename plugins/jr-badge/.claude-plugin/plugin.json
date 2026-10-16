@@ -1,7 +1,7 @@
 {
   "name": "jr-badge",
-  "version": "0.2.0",
-  "description": "A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. /jrbadge shows or hides it. A `badge: LABEL #hex` line in CLAUDE.md sets your own.",
+  "version": "0.3.0",
+  "description": "A coloured project badge and its branch, on the right above the prompt, so you always know which window you are typing in. Hidden until you type /jrbadge. A `badge: LABEL #hex` line in CLAUDE.md sets your own.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",

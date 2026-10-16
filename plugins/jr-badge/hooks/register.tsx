@@ -5,14 +5,15 @@ import { badgeOf } from './badge'
 import { safeGit } from './jr/git'
 
 const badge = atom({ plugin: 'jr-badge', key: 'badge' } as const, null)
-const isHidden = atom({ plugin: 'jr-badge', key: 'isHidden' } as const, false)
+// Hidden until the person asks for it.
+const isHidden = atom({ plugin: 'jr-badge', key: 'isHidden' } as const, true)
 const live = { isScheduled: false, isLoaded: false }
 
-/** Hidden or shown is one choice for every session, kept across restarts. */
+/** Hidden or shown is one choice for every session, kept across restarts; read outside a drawing, which cannot write state. */
 async function ensureLoaded($: EngineInterface) {
   if (live.isLoaded) return
   live.isLoaded = true
-  if ((await $.store.get('isHidden')) === true) await update($, isHidden, () => true)
+  if ((await $.store.get('isHidden')) === false) await update($, isHidden, () => false)
 }
 
 async function git($: EngineInterface, cwd: string, args: string[]) {
@@ -43,7 +44,7 @@ async function refresh($: EngineInterface) {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrbadge', description: 'Show or hide the badge: /jrbadge toggles, /jrbadge on or off' })
+    await $.command.register({ name: 'jrbadge', description: 'Show or hide the project badge (hidden by default): /jrbadge toggles, /jrbadge on or off' })
     await ensureLoaded($)
     await refresh($)
     return started
@@ -55,7 +56,7 @@ export const register: Register = on => {
     const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : !(await read($, isHidden))
     await $.store.set('isHidden', hide)
     await update($, isHidden, () => hide)
-    return { text: hide ? 'jr badge · hidden (/jrbadge to bring it back)' : 'jr badge · shown' }
+    return { text: hide ? 'jr badge · hidden (/jrbadge to bring it back)' : 'jr badge · shown above the prompt (/jrbadge to hide it)' }
   })
 
   // The branch or the folder can change during a turn.
@@ -67,21 +68,26 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    if (await read($, isHidden)) return below
     const b = await read($, badge)
-    if (!b && !live.isScheduled) {
+    // Installed mid-session: no session.start, so load the choice and the badge after this draw.
+    if ((!b || !live.isLoaded) && !live.isScheduled) {
       live.isScheduled = true
       $.clock.after(0, () => {
+        void ensureLoaded($)
         void refresh($)
       })
     }
+    if (await read($, isHidden)) return below
     if (!b || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
+    // One quiet row on the right: the project chip and its branch, no path.
     return (
       <Box flexDirection="column">
-        <Box>
-          <Text backgroundColor={b.color} color="black" bold>{` ${b.label} `}</Text>
-          <Text color={b.color} wrap="truncate-end">{` ${b.detail}`}</Text>
+        <Box justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            <Text backgroundColor={b.color} color="black" bold>{` ${b.label} `}</Text>
+            {b.branch && <Text dimColor>{` ${b.branch}`}</Text>}
+          </Text>
         </Box>
         {below}
       </Box>

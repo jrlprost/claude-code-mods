@@ -1,10 +1,12 @@
 # jr-badge
 
-A coloured badge above the prompt with the project, its branch and folder. With several terminal windows open, you see at a glance which one you are typing in.
+A coloured badge with the project and its branch, one quiet row on the right above the prompt. With several terminal windows open, you see at a glance which one you are typing in.
 
 ```
- SHOP  feature/cart · ~/code/shop
+                                                         SHOP  feature/cart
 ```
+
+Hidden by default: type `/jrbadge` to show it.
 
 - The colour is derived from the name, so a project keeps the same colour in every window.
 - In your home directory the badge says `HOME`.
@@ -15,7 +17,7 @@ badge: CLIENT ACME PROD #ef4565
 ```
 
 - Refreshed after every turn, so a branch switch shows up.
-- `/jrbadge` hides or shows it in every session, and the choice survives a restart. `/jrbadge on` and `/jrbadge off` set it explicitly.
+- `/jrbadge` shows or hides it in every session, and the choice survives a restart. `/jrbadge on` and `/jrbadge off` set it explicitly.
 
 ## Install
 

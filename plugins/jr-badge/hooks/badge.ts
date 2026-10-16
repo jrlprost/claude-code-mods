@@ -17,9 +17,8 @@ export const badgeLine = (claudeMd: string | null) => {
 
 export const badgeOf = (args: { cwd: string; home: string | null; root: string; branch: string | null; claudeMd: string | null }): JrBadge => {
   const { cwd, home, root, branch, claudeMd } = args
-  const where = home && cwd.startsWith(home) ? `~${cwd.slice(home.length)}` || '~' : cwd
   const declared = badgeLine(claudeMd)
   const project = root.split('/').filter(Boolean).pop() ?? root
   const label = declared?.label ?? (home && cwd === home ? 'HOME' : project.toUpperCase())
-  return { label, detail: [branch, where].filter(Boolean).join(' · '), color: declared?.color ?? colorOf(label) }
+  return { label, branch, color: declared?.color ?? colorOf(label) }
 }
