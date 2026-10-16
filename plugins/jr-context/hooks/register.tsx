@@ -7,7 +7,32 @@ import { gradientText } from './jr/draw'
 import { GRADIENTS, colorAt, formatTokens } from './jr/gradient'
 
 const fill = atom({ plugin: 'jr-context', key: 'fill' } as const, null)
-const isHidden = atom({ plugin: 'jr-context', key: 'isHidden' } as const, false)
+const bandHidden = atom({ plugin: 'jr-context', key: 'isBandHidden' } as const, false)
+const band = { isLoaded: false }
+
+/** `hide`/`off`, `show`/`on`, or a bare command, which toggles; anything else is not about the band. */
+const bandVerb = (args: string) => {
+  const arg = args.trim().toLowerCase()
+  if (arg === 'hide' || arg === 'off') return 'hide' as const
+  if (arg === 'show' || arg === 'on') return 'show' as const
+  return arg === '' ? ('toggle' as const) : null
+}
+
+/** Hidden or shown is one choice for every session, kept across restarts. */
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
+  const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? 'jr context · hidden (/jrcontext to bring it back)' : 'jr context · shown' }
+}
 const PANE = 'jr-context'
 const REFRESH_EVERY_MS = 4000
 const last = { refreshedAt: 0, isScheduled: false }
@@ -83,20 +108,14 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrcontext', description: 'Open the context bar in a pane; /jrcontext hide or show toggles the band' })
-    await update($, isHidden, () => false)
-    if ((await $.store.get('isHidden')) === true) await update($, isHidden, () => true)
+    await $.command.register({ name: 'jrcontext', description: 'Show or hide the context band; /jrcontext details opens the full bar' })
     await refresh($, true)
     return started
   })
 
   on('command.run', { command: 'jrcontext' }, async ($, e) => {
-    const arg = e.args.trim()
-    if (arg === 'hide' || arg === 'show') {
-      await $.store.set('isHidden', arg === 'hide')
-      await update($, isHidden, () => arg === 'hide')
-      return { text: arg === 'hide' ? 'jr context · band hidden (/jrcontext show to bring it back)' : 'jr context · band shown' }
-    }
+    const verb = bandVerb(e.args)
+    if (verb) return setBand($, verb)
     await refresh($, true)
     await $.ui.open({ id: PANE, title: 'jr context', rows: 8 })
     return { text: 'jr context opened.' }
@@ -124,6 +143,7 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
+    if (await isBandHidden($)) return below
     const now = await read($, fill)
     // Installed or reloaded mid-session, the mod saw no session.start: read the figures once now.
     if (!now && !last.isScheduled) {
@@ -132,7 +152,7 @@ export const register: Register = (on, options) => {
         void refresh($, true)
       })
     }
-    if (!now || e.props.hasSurvey || (await read($, isHidden))) return below
+    if (!now || e.props.hasSurvey) return below
 
     const { Box, Text } = $.ui.resolve(e)
     const isCompact = layout === 'compact' || e.props.maxRows < 4

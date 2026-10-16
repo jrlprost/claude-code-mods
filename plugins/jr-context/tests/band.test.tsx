@@ -55,6 +55,7 @@ test('past the threshold the header warns', async ($, on) => {
 
 test('installed mid-session, with no session.start, the bar still fills on its first draw', async ($, on) => {
   const clock = mock.clock(on)
+  mock.store(on)
   on('session.usage', () => ({ value: { startedAt: 0, context: { tokens: 1, window: 1_000_000, breakdown: { ...BREAKDOWN, percentage: 26 } }, rateLimits: [] } }) as never)
   on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
     const { Text } = $.ui.resolve(e)

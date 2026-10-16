@@ -18,9 +18,9 @@ A context bar above the Claude Code prompt.
 
 | Command | |
 | --- | --- |
-| `/jrcontext` | Open the full bar, legend included, in a pane |
-| `/jrcontext hide` | Hide the band above the prompt |
-| `/jrcontext show` | Bring the band back |
+| `/jrcontext` | Hide the band above the prompt, or bring it back |
+| `/jrcontext hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jrcontext details` | Open the full bar, legend included, in a pane |
 
 ## Install
 
