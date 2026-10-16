@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { JrFleetBeat, JrFleetState } from '../types'
-import { CLEAN_AFTER_MS, liveSessions, shortPath, since, summary } from './fleet'
+import { CLEAN_AFTER_MS, fitSessions, liveSessions, selfFirst, shortName, shortPath, since, summary } from './fleet'
 import { gradientText } from './jr/draw'
 import { GRADIENTS } from './jr/gradient'
 
@@ -168,23 +168,50 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const f = await read($, fleet)
-    const others = f?.sessions.filter(x => x.id !== f.self) ?? []
-    if (!f || others.length === 0 || e.props.hasSurvey) return below
-    const waiting = others.filter(x => x.state === 'waiting')
+    if (!f || f.sessions.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
+    const waiting = f.sessions.filter(x => x.id !== f.self && x.state === 'waiting')
+    const count = ` · ${f.sessions.length} session${f.sessions.length === 1 ? '' : 's'}`
+    // A session waiting for you is the one thing worth the eye: on the left, in colour.
+    if (waiting.length > 0) {
+      return (
+        <Box flexDirection="column">
+          <Box>
+            <Text wrap="truncate-end">
+              <Text color="#ff8c42">{'▲ '}</Text>
+              <Text>{waiting.map(x => shortName(x.project)).join(', ')}</Text>
+              <Text color="#ffb86b">{waiting.length === 1 ? ' waits for you' : ' wait for you'}</Text>
+              <Text dimColor>{count}</Text>
+            </Text>
+          </Box>
+          {below}
+        </Box>
+      )
+    }
+    // Otherwise a quiet row on the right: what each session works on.
+    const { shown, more } = fitSessions(selfFirst(f.sessions, f.self), Math.max(20, e.props.bodyColumns - 2))
     return (
       <Box flexDirection="column">
-        <Text wrap="truncate-end">
-          {gradientText(Text, 'fleet ', GRADIENTS.brand)}
-          <Text bold>{`${f.sessions.length} sessions`}</Text>
-          {waiting.length > 0 ? (
-            <Text color="#ffb86b" bold>{` · ${waiting.length} waiting for you: ${waiting.map(x => x.project).join(', ')}`}</Text>
-          ) : (
-            <Text dimColor>{' · none waiting'}</Text>
-          )}
-        </Text>
+        <Box justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            {shown.map((x, i) => (
+              <Text>
+                {i > 0 && <Text dimColor>{' · '}</Text>}
+                <Text color={x.id === f.self ? '#ff5ca8' : undefined}>{shortName(x.project)}</Text>
+                <Text color={x.state === 'working' ? '#7f5af0' : '#5c5f77'}>{x.state === 'working' ? ' ●' : ' ○'}</Text>
+              </Text>
+            ))}
+            {more > 0 && <Text dimColor>{` · +${more}`}</Text>}
+          </Text>
+        </Box>
         {below}
       </Box>
     )

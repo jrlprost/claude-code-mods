@@ -33,3 +33,23 @@ export const since = (ms: number) => {
 }
 
 export const shortPath = (cwd: string, home: string) => (home && cwd.startsWith(home) ? `~${cwd.slice(home.length)}` : cwd)
+
+/** This session first, then the others in liveSessions' order. */
+export const selfFirst = <T extends { id: string }>(sessions: readonly T[], self: string) => [...sessions.filter(s => s.id === self), ...sessions.filter(s => s.id !== self)]
+
+const NAME_MAX = 20
+export const shortName = (project: string) => (project.length > NAME_MAX ? `${project.slice(0, NAME_MAX - 1)}…` : project)
+
+/** The sessions that fit in `columns` as `name ●` joined by ` · `, and how many are left for a `+N`. */
+export const fitSessions = <T extends { project: string }>(sessions: readonly T[], columns: number) => {
+  const shown: T[] = []
+  let width = 0
+  for (const [i, s] of sessions.entries()) {
+    const w = shortName(s.project).length + 2 + (shown.length ? 3 : 0)
+    const tail = i < sessions.length - 1 ? ` · +${sessions.length - i - 1}`.length : 0
+    if (shown.length && width + w + tail > columns) break
+    shown.push(s)
+    width += w
+  }
+  return { shown, more: sessions.length - shown.length }
+}

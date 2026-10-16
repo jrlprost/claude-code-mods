@@ -2,8 +2,16 @@
 
 When several Claude Code sessions run at once, jr-fleet tells you which ones are working and which ones are waiting for you, without switching windows.
 
+A quiet row on the right above the prompt names what each session works on, this one first (● working, ○ waiting or idle):
+
 ```
-fleet 3 sessions · 1 waiting for you: acme
+                                        tokenkarma ○ · acme ● · northwind ○
+```
+
+When a session finished and waits for your next prompt, the row moves to the left and says so:
+
+```
+▲ acme waits for you · 3 sessions
 ```
 
 `/jrfleet details` lists them:
@@ -16,7 +24,7 @@ jr fleet   3 sessions · 1 working · 1 waiting for you
 ```
 
 - **Working**: Claude is on a turn. **Waiting for you**: Claude finished and nobody has sent the next prompt. **Idle**: waiting for more than 30 minutes.
-- The band appears only when another session is open on the machine.
+- The row is always there, even with a single session, as a reminder of what you work on. Sessions that do not fit become `+3`.
 - Each session needs jr-fleet installed (it is a user-scope plugin, so every new session has it).
 
 ## How it works
