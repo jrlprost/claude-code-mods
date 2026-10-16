@@ -42,6 +42,7 @@ test('with a project and key, the band and the pane show visitors', { options: {
   expect(sent[0]).toBe('https://us.posthog.com/api/projects/42/query/')
   for (const surface of ['terminal', 'desktop'] as const) {
     const band = await $.ui.mount({ plugin: 'jr-visitors', surface, component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as never)
+    expect(bandRow(await band.drawn())).toEqual({ isOneRow: true, isRight: true })
     expect(await band.find({ text: /^3$/ } as never)).toBeDefined()
     expect(await band.find({ text: /^118$/ } as never)).toBeDefined()
     await band.unmount()
@@ -76,3 +77,16 @@ test('/jrvisitors hide takes the band away, the bare command toggles it, on brin
   await $.command.run({ command: 'jrvisitors', args: 'on' } as never)
   expect(await shows()).toBe(true)
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}

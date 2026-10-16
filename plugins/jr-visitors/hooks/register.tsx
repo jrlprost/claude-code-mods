@@ -135,20 +135,27 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const f = await read($, figures)
     if (!showBand || !f || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
-        <Box>
-          {gradientText(Text, 'visitors ', GRADIENTS.ice)}
-          <Text color={f.now > 0 ? '#2cb67d' : '#6b7089'}>{'● '}</Text>
-          <Text bold>{String(f.now)}</Text>
-          <Text dimColor>{' now · '}</Text>
-          <Text bold>{String(f.today)}</Text>
-          <Text dimColor>{' today'}</Text>
-          {f.error && <Text color="#ef4565">{' · PostHog unreachable'}</Text>}
+        <Box justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            <Text dimColor>{'visitors '}</Text>
+            <Text color={f.now > 0 ? '#2cb67d' : undefined}>{String(f.now)}</Text>
+            <Text dimColor>{' now · '}</Text>
+            <Text>{String(f.today)}</Text>
+            <Text dimColor>{' today'}</Text>
+            {f.error && <Text color="#ef4565">{' · PostHog unreachable'}</Text>}
+          </Text>
         </Box>
         {below}
       </Box>

@@ -3,8 +3,10 @@
 Who is on your site right now, from PostHog, above the prompt.
 
 ```
-visitors ● 3 now · 118 today
+                                     visitors 3 now · 118 today
 ```
+
+One quiet row, right-aligned, out of the way of your eye.
 
 `/jrvisitors details` adds today's top pages:
 
