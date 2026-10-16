@@ -11,6 +11,7 @@ next ≈ $2.56 to resend 512k · cache cold
 - Cold cache: it is written again (1.25 × the input price).
 - Prices are Anthropic's first-party API rates for the model in use: Claude Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5 and the older models still served. On a subscription you do not pay per token; read the figure as what the turn is worth at API rates.
 - Your own prompt text and Claude's answer come on top; the resent context is usually most of the cost.
+- `/jrnextcost` hides or shows the band, in every session and across restarts; `/jrnextcost on` and `/jrnextcost off` set it.
 
 ## Settings (`/config`)
 
@@ -28,4 +29,4 @@ next ≈ $2.56 to resend 512k · cache cold
 
 ## Access
 
-Reads the session's context size, model and turn completions. Writes nothing, runs nothing, sends nothing over the network.
+Reads the session's context size, model and turn completions. Remembers whether the band is hidden. Writes nothing else, runs nothing, sends nothing over the network.

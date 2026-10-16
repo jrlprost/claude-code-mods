@@ -7,6 +7,25 @@ import { nextCost, priceOf, usd } from './prices'
 import type { Price } from './prices'
 
 const next = atom({ plugin: 'jr-next-cost', key: 'next' } as const, null)
+const bandHidden = atom({ plugin: 'jr-next-cost', key: 'isBandHidden' } as const, false)
+const commands = { isRegistered: false }
+const band = { isLoaded: false }
+
+async function ensureCommand($: EngineInterface) {
+  if (commands.isRegistered) return
+  commands.isRegistered = true
+  await $.command.register({ name: 'jrnextcost', description: 'Show or hide the next-prompt cost band: /jrnextcost toggles, /jrnextcost on or off' })
+}
+
+/** True while the band is hidden: one choice for every session, read from the store once per load. */
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
 const TICK_MS = 5000
 
 const live = { isTicking: false, ttlMin: 5 }
@@ -37,6 +56,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, nextHook) => {
     const started = await nextHook(e)
+    await ensureCommand($)
     await ensureTicking($)
     return started
   })
@@ -49,6 +69,15 @@ export const register: Register = (on, options) => {
     return done
   })
 
+  on('command.run', { command: 'jrnextcost' }, async ($, e) => {
+    const arg = e.args.trim().toLowerCase()
+    const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : arg === '' ? !(await isBandHidden($)) : null
+    if (hide === null) return { text: 'jr next cost · usage: /jrnextcost toggles the band, /jrnextcost on or off' }
+    await $.store.set('isBandHidden', hide)
+    await update($, bandHidden, () => hide)
+    return { text: hide ? 'jr next cost · hidden (/jrnextcost to bring it back)' : 'jr next cost · shown' }
+  })
+
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, nextHook) => {
     const below = await nextHook(e)
     const n = await read($, next)
@@ -57,6 +86,12 @@ export const register: Register = (on, options) => {
         void ensureTicking($)
       })
     }
+    if (!commands.isRegistered) {
+      $.clock.after(0, () => {
+        void ensureCommand($)
+      })
+    }
+    if (await isBandHidden($)) return below
     const price = override ?? (n ? priceOf(n.model) : null)
     if (!n || !price || n.tokens <= 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)

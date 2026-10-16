@@ -9,6 +9,6 @@ export type JrNextCost = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-next-cost': { next: JrNextCost | null }
+    'jr-next-cost': { next: JrNextCost | null; isBandHidden: boolean }
   }
 }
