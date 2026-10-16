@@ -94,3 +94,17 @@ test('/jrawake session is shared: the mode is stored for every session', async (
   const answer = await $.command.run({ command: 'jrawake', args: 'session' } as never)
   expect(JSON.stringify(answer)).toContain('mode session (all sessions)')
 })
+
+test('/jrawake hide takes the band away and keeps what is below, show brings it back', async ($, on) => {
+  machine(on, PMSET_FREE, [])
+  await $.session.start(start)
+  const answer = await $.command.run({ command: 'jrawake', args: 'hide' } as never)
+  expect(JSON.stringify(answer)).toContain('still kept awake')
+  let ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /Mac sleeps in/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrawake', args: 'show' } as never)
+  ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /Mac sleeps in 3:00/ } as never)).toBeDefined()
+})

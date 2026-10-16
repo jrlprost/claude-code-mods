@@ -1,6 +1,6 @@
 {
   "name": "jr-awake",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

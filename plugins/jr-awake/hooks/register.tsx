@@ -7,6 +7,25 @@ import { gradientText } from './jr/draw'
 import { GRADIENTS, colorAt } from './jr/gradient'
 
 const view = atom({ plugin: 'jr-awake', key: 'view' } as const, null)
+const bandHidden = atom({ plugin: 'jr-awake', key: 'isBandHidden' } as const, false)
+
+const bandState = { isLoaded: false }
+
+/** True while the band is hidden; the saved choice is read once per load of the mod. */
+async function isBandHidden($: EngineInterface) {
+  if (!bandState.isLoaded) {
+    bandState.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+/** Hides or shows the band for every session, kept across restarts. */
+async function setBand($: EngineInterface, hide: boolean, name: string, command: string) {
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? `${name} · hidden (${command} to bring it back)` : `${name} · shown` }
+}
 const TICK_MS = 15_000
 const MODE_KEY = 'mode'
 const BEAT_PREFIX = 'beat:'
@@ -112,7 +131,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrawake', description: 'Keep the Mac awake: /jrawake working | session | off | status' })
+    await $.command.register({ name: 'jrawake', description: 'Keep the Mac awake: /jrawake working | session | off | status | hide | show' })
     await ensureStarted($, fallbackMode, keepDisplay, warnAt)
     return started
   })
@@ -144,6 +163,11 @@ export const register: Register = (on, options) => {
 
   on('command.run', { command: 'jrawake' }, async ($, e) => {
     await ensureStarted($, fallbackMode, keepDisplay, warnAt)
+    const word = e.args.trim().toLowerCase()
+    if (word === 'hide' || word === 'show') {
+      const answer = await setBand($, word === 'hide', 'jr awake band', '/jrawake show')
+      return word === 'hide' ? { text: `${answer.text}; the Mac is still kept awake` } : answer
+    }
     const arg = e.args.trim() as JrAwakeMode | 'on' | 'status' | ''
     const mode: JrAwakeMode | null = arg === 'on' ? 'session' : MODES.includes(arg as JrAwakeMode) ? (arg as JrAwakeMode) : null
     if (mode) {
@@ -168,6 +192,7 @@ export const register: Register = (on, options) => {
         void ensureStarted($, fallbackMode, keepDisplay, warnAt)
       })
     }
+    if (await isBandHidden($)) return below
     if (!showBand || !v || e.props.hasSurvey) return below
     // Quiet unless the Mac is held awake or about to sleep.
     const soon = v.sleepIn !== null && v.sleepIn <= 5 * 60

@@ -26,6 +26,6 @@ export type JrAwakeView = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-awake': { view: JrAwakeView | null }
+    'jr-awake': { view: JrAwakeView | null; isBandHidden: boolean }
   }
 }

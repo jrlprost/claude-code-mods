@@ -31,6 +31,7 @@ The mod reads your sleep setting (`pmset -g`) and the time since your last keybo
 | `/jrawake working` | Awake while Claude works |
 | `/jrawake session` (or `on`) | Awake while any session is open |
 | `/jrawake off` | Let the Mac sleep |
+| `/jrawake hide` / `/jrawake show` | Hide or show the band, in every session; the Mac is still kept awake |
 
 ## Settings (`/config`)
 
