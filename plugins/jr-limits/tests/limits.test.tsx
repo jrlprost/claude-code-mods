@@ -1,7 +1,7 @@
 import { test, expect, mock } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
-import { countdown, crossed, labelOf, windowsOf } from '../hooks/limits'
+import { countdown, crossed, fullest, labelOf, levelColor, shortCountdown, windowsOf } from '../hooks/limits'
 
 const HOUR = 3_600_000
 
@@ -19,6 +19,19 @@ test('countdowns read in minutes, hours or days', async () => {
   expect(countdown(72 * 60_000, 0)).toBe('1h12')
   expect(countdown(76 * HOUR, 0)).toBe('3d 4h')
   expect(countdown(null, 0)).toBe('')
+})
+
+test('the short countdown keeps one unit', async () => {
+  expect(shortCountdown(42 * 60_000, 0)).toBe('42m')
+  expect(shortCountdown(45 * HOUR + 20 * 60_000, 0)).toBe('45h')
+  expect(shortCountdown(76 * HOUR, 0)).toBe('3d')
+  expect(shortCountdown(null, 0)).toBe('')
+})
+
+test('levels go green, amber, red, and the fullest window wins', async () => {
+  expect([levelColor(2), levelColor(48), levelColor(50), levelColor(84)]).toEqual(['#2cb67d', '#2cb67d', '#f4d35e', '#ef4565'])
+  expect(fullest(windowsOf([{ kind: 'five_hour', percentUsed: 2 }, { kind: 'seven_day', percentUsed: 48 }]))!.kind).toBe('seven_day')
+  expect(fullest([])).toBe(null)
 })
 
 test('each threshold is announced once', async () => {
@@ -44,26 +57,59 @@ const machine = (on: On, rateLimits: unknown[], toasts: string[]) => {
 }
 
 const BAND = { component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as const
+const bandAt = (bodyColumns: number) => ({ component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns } }) as const
 
-test('the band shows both windows and keeps what is below, on terminal and desktop', async ($, on) => {
+type Found = { type: string; props: Record<string, unknown>; text: string; children: unknown[] }
+
+/** One row: a Box holding a single Text cut at the row's end, with no line break in it. */
+const expectOneRow = (row: Found | undefined) => {
+  expect(row).toBeDefined()
+  expect(row!.type).toBe('Box')
+  expect(row!.props.flexDirection === undefined || row!.props.flexDirection === 'row').toBe(true)
+  expect(row!.children.length).toBe(1)
+  const only = row!.children[0] as Found
+  expect(only.type).toBe('Text')
+  expect(only.props.wrap).toBe('truncate-end')
+  expect(row!.text.includes('\n')).toBe(false)
+}
+
+test('one quiet row on the right: both windows and the reset of the fullest, on terminal and desktop', async ($, on) => {
   const toasts: string[] = []
-  machine(on, [{ kind: 'five_hour', percentUsed: 64, resetsAt: new Date(Date.now() + 72 * 60_000).toISOString() }, { kind: 'seven_day', percentUsed: 31 }], toasts)
+  machine(on, [{ kind: 'five_hour', percentUsed: 2 }, { kind: 'seven_day', percentUsed: 48, resetsAt: new Date(45 * HOUR + 10 * 60_000).toISOString() }], toasts)
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  for (const surface of ['terminal', 'desktop'] as const) {
+    for (const columns of [80, 200]) {
+      const ui = await $.ui.mount({ plugin: 'jr-limits', surface, ...bandAt(columns) } as never)
+      const row = (await ui.find({ key: 'jr-limits-row' } as never)) as Found | undefined
+      expectOneRow(row)
+      expect(row!.props.justifyContent).toBe('flex-end')
+      expect(row!.text).toBe('5h 2% · 7d 48% ↻45h')
+      expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+      await ui.unmount()
+    }
+  }
+  expect(toasts.length).toBe(0)
+})
+
+test('from 80 % the row is an alert on the left, still one row', async ($, on) => {
+  machine(on, [{ kind: 'five_hour', percentUsed: 12 }, { kind: 'seven_day', percentUsed: 84, resetsAt: new Date(45 * HOUR + 10 * 60_000).toISOString() }], [])
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-limits', surface, ...BAND } as never)
-    expect(await ui.find({ text: /64%/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /31%/ } as never)).toBeDefined()
+    const row = (await ui.find({ key: 'jr-limits-row' } as never)) as Found | undefined
+    expectOneRow(row)
+    expect(row!.props.justifyContent).toBeUndefined()
+    expect(row!.text).toBe('▲ 7d limit 84% · resets in 45h')
     expect(await ui.find({ text: /below/ } as never)).toBeDefined()
     await ui.unmount()
   }
-  expect(toasts.length).toBe(0)
 })
 
 test('no figures, no band', async ($, on) => {
   machine(on, [], [])
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const ui = await $.ui.mount({ plugin: 'jr-limits', surface: 'terminal', ...BAND } as never)
-  expect(await ui.find({ text: /limits/ } as never)).toBeUndefined()
+  expect(await ui.find({ key: 'jr-limits-row' } as never)).toBeUndefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
 })
 

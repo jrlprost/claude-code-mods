@@ -4,7 +4,7 @@ import type { EngineInterface, Register } from 'claude-code'
 import type { JrLimitsView } from '../types'
 import { gauge, gradientText } from './jr/draw'
 import { GRADIENTS, colorAt } from './jr/gradient'
-import { countdown, crossed, labelOf, windowsOf } from './limits'
+import { countdown, crossed, fullest, labelOf, levelColor, shortCountdown, windowsOf } from './limits'
 
 const view = atom({ plugin: 'jr-limits', key: 'view' } as const, null)
 const bandHidden = atom({ plugin: 'jr-limits', key: 'isBandHidden' } as const, false)
@@ -35,6 +35,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
 }
 const PANE = 'jr-limits'
 const THRESHOLDS = [80, 95]
+const ALERT_AT = 80
 const TICK_MS = 60_000
 
 // Module state: which thresholds were already announced, per window and reset time.
@@ -133,24 +134,47 @@ export const register: Register = (on, options) => {
         void ensureTicking($)
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     if (!showBand || !v || v.windows.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
+    const top = fullest(v.windows)!
+    const width = Math.max(20, e.props.bodyColumns)
+    // Something needs attention: one alert row on the left, the fullest window and its reset.
+    if (top.percent >= ALERT_AT) {
+      const color = top.percent >= 95 ? '#ef4565' : '#ff8c42'
+      const resets = top.resetsAt !== null ? ` · resets in ${shortCountdown(top.resetsAt, v.now)}` : ''
+      return (
+        <Box flexDirection="column">
+          <Box key="jr-limits-row" width={width}>
+            <Text wrap="truncate-end">
+              <Text color={color}>{`▲ ${labelOf(top.kind)} limit ${Math.round(top.percent)}%`}</Text>
+              <Text dimColor>{resets}</Text>
+            </Text>
+          </Box>
+          {below}
+        </Box>
+      )
+    }
+    // Otherwise one quiet row on the right: each window's fill, and when the fullest resets.
     const shown = v.windows.slice(0, 2)
-    const width = Math.max(6, Math.min(16, Math.floor((e.props.bodyColumns - 14) / shown.length) - 20))
     return (
       <Box flexDirection="column">
-        <Box>
-          {gradientText(Text, 'limits ', GRADIENTS.brand)}
-          {shown.map((w, i) => (
-            <Box>
-              {i > 0 && <Text>{'   '}</Text>}
-              <Text color="#6b7089">{`${labelOf(w.kind)} `}</Text>
-              {gauge(Text, w.percent / 100, width, GRADIENTS.heat)}
-              <Text bold color={colorAt(GRADIENTS.heat, w.percent / 100)}>{` ${Math.round(w.percent)}%`}</Text>
-              {w.resetsAt !== null && <Text dimColor>{` ${countdown(w.resetsAt, v.now)}`}</Text>}
-            </Box>
-          ))}
+        <Box key="jr-limits-row" width={width} justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            {shown.map((w, i) => (
+              <Text>
+                <Text dimColor>{`${i > 0 ? ' · ' : ''}${labelOf(w.kind)} `}</Text>
+                <Text color={levelColor(w.percent)}>{`${Math.round(w.percent)}%`}</Text>
+              </Text>
+            ))}
+            {top.resetsAt !== null && <Text dimColor>{` ↻${shortCountdown(top.resetsAt, v.now)}`}</Text>}
+          </Text>
         </Box>
         {below}
       </Box>

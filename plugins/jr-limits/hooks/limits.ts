@@ -23,3 +23,19 @@ export const countdown = (at: number | null, now: number) => {
 /** Thresholds crossed by this reading that were not crossed before (e.g. [80] then [95]). */
 export const crossed = (percent: number, alreadyWarned: readonly number[], thresholds: readonly number[]) =>
   thresholds.filter(t => percent >= t && !alreadyWarned.includes(t))
+
+/** The short countdown of the one-row band: "3d", "45h", "42m". */
+export const shortCountdown = (at: number | null, now: number) => {
+  if (at === null) return ''
+  const minutes = Math.max(0, Math.round((at - now) / 60_000))
+  if (minutes >= 48 * 60) return `${Math.floor(minutes / 1440)}d`
+  if (minutes >= 60) return `${Math.floor(minutes / 60)}h`
+  return `${minutes}m`
+}
+
+/** Green under 50 %, amber under 80 %, red from 80 %. */
+export const levelColor = (percent: number) => (percent >= 80 ? '#ef4565' : percent >= 50 ? '#f4d35e' : '#2cb67d')
+
+/** The window that matters most: the fullest one. */
+export const fullest = (windows: readonly JrLimitWindow[]) =>
+  windows.reduce<JrLimitWindow | null>((top, w) => (top === null || w.percent > top.percent ? w : top), null)

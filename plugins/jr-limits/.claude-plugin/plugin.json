@@ -1,18 +1,25 @@
 {
   "name": "jr-limits",
-  "version": "0.2.0",
-  "description": "Plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges with reset countdowns, a toast at 80 % and 95 %, /jrlimits to hide or show it, /jrlimits details for the detail.",
-  "author": { "name": "jrlprost" },
+  "version": "0.3.0",
+  "description": "Plan limits in one quiet row above the prompt: the 5-hour and 7-day fill and when the fullest resets, an alert from 80 %, a toast at 80 % and 95 %. /jrlimits hides or shows it, /jrlimits details opens the gauges.",
+  "author": {
+    "name": "jrlprost"
+  },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",
-  "keywords": ["claude-code-mod", "jr", "rate-limits", "usage"],
+  "keywords": [
+    "claude-code-mod",
+    "jr",
+    "rate-limits",
+    "usage"
+  ],
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
     "showBand": {
       "type": "boolean",
       "title": "Show the band",
-      "description": "The 5h and 7d gauges above the prompt.",
+      "description": "The one-row limits band above the prompt.",
       "default": true
     }
   }

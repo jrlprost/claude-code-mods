@@ -1,12 +1,19 @@
 # jr-limits
 
-Your plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges, green to red, with the time left until each resets.
+Your plan limits in one quiet row above the prompt, aligned to the right: the fill of the 5-hour and 7-day windows, coloured green, amber or red, and when the fullest one resets.
 
 ```
-limits 5h ██████████▎····· 64% 1h12   7d █████··········· 31% 3d 4h
+                                                              5h 2% · 7d 48% ↻45h
+```
+
+- From 80 % on any window, the row moves to the left as an alert:
+
+```
+▲ 7d limit 84% · resets in 45h
 ```
 
 - A toast when a window crosses 80 % and again at 95 %, once per window.
+- `/jrlimits details` opens every window in a pane, as gradient gauges with the exact reset time.
 - Countdowns refresh every minute.
 - Nothing is drawn when the session has no plan-limit figures (API-key sessions, or before the first reply).
 
@@ -16,13 +23,13 @@ limits 5h ██████████▎····· 64% 1h12   7d ████
 | --- | --- |
 | `/jrlimits` | Hide the band above the prompt, or bring it back |
 | `/jrlimits hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
-| `/jrlimits details` | Every window in a pane, with its exact reset time |
+| `/jrlimits details` | Every window in a pane, as gauges with its exact reset time |
 
 ## Settings (`/config`)
 
 | Option | Default | |
 | --- | --- | --- |
-| Show the band | on | The gauges above the prompt |
+| Show the band | on | The one-row band above the prompt |
 
 ## Install
 
