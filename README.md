@@ -30,7 +30,11 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 
 ## The mods
 
-42 mods, each installable on its own. Bands above the prompt stack; turn any mod off with `/jrmods`.
+42 mods, each installable on its own. Bands above the prompt stack, and each one hides without turning its mod off:
+
+- A command that takes no options toggles its band: type `/jrlimits` to hide it, again to bring it back. `/jrlimits details` opens the full view.
+- A command that takes options keeps them and adds `hide` and `show`: `/jrtime hide`.
+- The choice holds in every session and survives a restart. `/jrmods` turns a whole mod off.
 
 ### Context, limits and cost
 
@@ -38,8 +42,8 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 | --- | --- | --- |
 | [jr-context](plugins/jr-context) | A context bar above the prompt: what fills the window, category by category, in a stacked colour bar with a legend, free space and the compaction point. | `/jrcontext` |
 | [jr-limits](plugins/jr-limits) | Plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges with reset countdowns, a toast at 80 % and 95 %, and /jrlimits for the detail. | `/jrlimits` |
-| [jr-cache-clock](plugins/jr-cache-clock) | A prompt-cache countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, the last cache hit rate, and a toast 30 seconds before it goes cold. |  |
-| [jr-next-cost](plugins/jr-next-cost) | What the next prompt costs before you send it: the context it resends, at the current model's price, read from a warm cache or written to a cold one, at API rates. |  |
+| [jr-cache-clock](plugins/jr-cache-clock) | A prompt-cache countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, the last cache hit rate, and a toast 30 seconds before it goes cold. | `/jrcache` |
+| [jr-next-cost](plugins/jr-next-cost) | What the next prompt costs before you send it: the context it resends, at the current model's price, read from a warm cache or written to a cold one, at API rates. | `/jrnextcost` |
 | [jr-quota](plugins/jr-quota) | Balances of the other paid APIs you use (OpenRouter, Firecrawl, DeepSeek), checked every 10 minutes: /jrquota shows them all, a band and a toast appear only when one runs low. | `/jrquota` |
 | [jr-read-cap](plugins/jr-read-cap) | Stops Claude from reading a long file whole: a Read of a file over 1,000 lines without a range is refused with a hint to grep first and read only the lines it needs. |  |
 
@@ -62,8 +66,8 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 | --- | --- | --- |
 | [jr-done-check](plugins/jr-done-check) | Flags replies that claim something was tested or verified when nothing was run in the turn to check it: a warning under the message and a toast. |  |
 | [jr-no-promise](plugins/jr-no-promise) | When a reply ends by announcing work ("I'll…", "Let me…", "je vais…") and no tool ran in the turn, Claude is sent back once to actually do it. |  |
-| [jr-scope](plugins/jr-scope) | Warns when a turn writes sensitive files nobody asked for (lockfiles, manifests, CI, .env, migrations, infra) or too many files at once. |  |
-| [jr-commit-coach](plugins/jr-commit-coach) | Nudges you toward small atomic commits: when uncommitted changes pass a threshold, a band and a toast suggest a split by folder. |  |
+| [jr-scope](plugins/jr-scope) | Warns when a turn writes sensitive files nobody asked for (lockfiles, manifests, CI, .env, migrations, infra) or too many files at once. | `/jrscope` |
+| [jr-commit-coach](plugins/jr-commit-coach) | Nudges you toward small atomic commits: when uncommitted changes pass a threshold, a band and a toast suggest a split by folder. | `/jrcommit` |
 | [jr-nudges](plugins/jr-nudges) | At the end of a turn, one toast when the code Claude wrote added debug statements (console.log, print, debugger) or TODO/FIXME/HACK lines. |  |
 
 ### Safety and privacy

@@ -15,7 +15,7 @@
     {
       "name": "jr-limits",
       "source": "./plugins/jr-limits",
-      "description": "Plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges with reset countdowns, a toast at 80 % and 95 %, and /jrlimits for the detail."
+      "description": "Plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges with reset countdowns, a toast at 80 % and 95 %, /jrlimits to hide or show it, /jrlimits details for the detail."
     },
     {
       "name": "jr-cache-clock",
@@ -30,7 +30,7 @@
     {
       "name": "jr-quota",
       "source": "./plugins/jr-quota",
-      "description": "Balances of the other paid APIs you use (OpenRouter, Firecrawl, DeepSeek), checked every 10 minutes: /jrquota shows them all, a band and a toast appear only when one runs low."
+      "description": "Balances of the other paid APIs you use (OpenRouter, Firecrawl, DeepSeek), checked every 10 minutes: /jrquota details shows them all, /jrquota hides or shows the band; a band and a toast appear only when one runs low."
     },
     {
       "name": "jr-read-cap",
@@ -200,7 +200,7 @@
     {
       "name": "jr-fleet",
       "source": "./plugins/jr-fleet",
-      "description": "Every Claude Code session on this machine at a glance: which ones are working and which ones wait for you, in a band above the prompt and in /jrfleet."
+      "description": "Every Claude Code session on this machine at a glance: which ones are working and which ones wait for you, in a band above the prompt (/jrfleet hides or shows it) and in /jrfleet details."
     },
     {
       "name": "jr-badge",
