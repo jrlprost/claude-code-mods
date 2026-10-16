@@ -4,6 +4,6 @@ export type JrGoal = { goal: string; steps: JrGoalStep[]; updatedAt: number }
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-goal': { goal: JrGoal | null }
+    'jr-goal': { goal: JrGoal | null; isBandHidden: boolean }
   }
 }

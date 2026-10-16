@@ -16,6 +16,7 @@ One goal per project, broken into steps you tick off, always in view above the p
 | `/jrgoal undo <n>` | Untick step n |
 | `/jrgoal` | Show the goal and its steps |
 | `/jrgoal clear` | Remove the goal |
+| `/jrgoal hide` / `/jrgoal show` | Hide or show the band, in every session; the goal is kept |
 
 The goal is kept per project (the session's root folder) and comes back in every session opened there.
 
