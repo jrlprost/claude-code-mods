@@ -1,4 +1,4 @@
-import { test, expect } from 'claude-code/testing'
+import { test, expect, mock } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 import { judge, sensitiveKind } from '../hooks/scope'
@@ -24,6 +24,10 @@ test('too many files in one turn', async () => {
 })
 
 const machine = (on: On, toasts: string[]) => {
+  mock.clock(on)
+  mock.store(on)
+  on('command.register', () => ({ value: undefined }) as never)
+  on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('session.root', () => ({ value: '/w' }) as never)
   on('turn.start', () => ({ turnId: 't1' }) as never)
   on('turn.complete', () => ({ text: '' }) as never)
@@ -62,4 +66,26 @@ test('a clean turn says nothing', async ($, on) => {
   await $.tool.call({ tool: 'Edit', file_path: '/w/src/login.ts', old_string: 'a', new_string: 'b' } as never)
   await $.turn.complete({ answer: 'done', durationMs: 1, isAborted: false, turnId: 't1', text: '', reason: 'answer' } as never)
   expect(toasts).toEqual([])
+})
+
+test('/jrscope on|off and the bare command hide and bring back the band', async ($, on) => {
+  machine(on, [])
+  await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
+  await $.turn.start({ text: 'fix the login bug', turnId: 't1' } as never)
+  await $.tool.call({ tool: 'Write', file_path: '/w/.env', content: 'X=1' } as never)
+  await $.turn.complete({ answer: 'done', durationMs: 1, isAborted: false, turnId: 't1', text: '', reason: 'answer' } as never)
+  const mount = () => $.ui.mount({ plugin: 'jr-scope', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
+  const said = await $.command.run({ command: 'jrscope', args: 'off' } as never)
+  expect(JSON.stringify(said)).toContain('hidden')
+  let ui = await mount()
+  expect(await ui.find({ text: /without being asked/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrscope', args: '' } as never)
+  ui = await mount()
+  expect(await ui.find({ text: /without being asked/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrscope', args: '' } as never)
+  ui = await mount()
+  expect(await ui.find({ text: /without being asked/ } as never)).toBeUndefined()
 })

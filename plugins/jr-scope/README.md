@@ -18,6 +18,7 @@ At the end of each turn, the files Claude wrote (Write, Edit, NotebookEdit) are 
 | infra | `*.tf`, `*.tfvars`, `terraform/`, `infra/`, `k8s/`, `helm/`, `Dockerfile`, `docker-compose*.yml` |
 
 A sensitive file is fine when the prompt names it (its file name or its path). The warning shows as a toast and stays above the prompt until the next turn.
+- `/jrscope` hides or shows the band, in every session and across restarts; `/jrscope on` and `/jrscope off` set it.
 
 ## Settings (`/config`)
 
@@ -34,4 +35,4 @@ A sensitive file is fine when the prompt names it (its file name or its path). T
 
 ## Access
 
-Watches Write, Edit and NotebookEdit calls and reads the prompt of each turn. Never blocks a call. Runs nothing, sends nothing over the network.
+Watches Write, Edit and NotebookEdit calls and reads the prompt of each turn. Never blocks a call. Runs nothing, sends nothing over the network. Remembers whether the band is hidden.
