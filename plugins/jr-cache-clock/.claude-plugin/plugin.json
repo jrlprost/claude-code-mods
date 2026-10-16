@@ -1,6 +1,6 @@
 {
   "name": "jr-cache-clock",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A prompt-cache countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, the last cache hit rate, and a toast 30 seconds before it goes cold.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

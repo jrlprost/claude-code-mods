@@ -10,6 +10,7 @@ cache ○ cold · the next prompt rewrites the cache
 - Counts down every second from the end of the last main-loop reply, green to red.
 - Shows the share of the last turn's input that was read from the cache.
 - A toast 30 seconds before the cache goes cold.
+- `/jrcache` hides or shows the band, in every session and across restarts; `/jrcache on` and `/jrcache off` set it.
 
 ## Settings (`/config`)
 
@@ -26,4 +27,4 @@ cache ○ cold · the next prompt rewrites the cache
 
 ## Access
 
-Reads turn completions and their token usage. Writes nothing, runs nothing, sends nothing over the network.
+Reads turn completions and their token usage. Remembers whether the band is hidden. Writes nothing else, runs nothing, sends nothing over the network.

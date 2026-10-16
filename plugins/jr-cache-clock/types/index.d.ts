@@ -8,6 +8,6 @@ export type JrCacheClock = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-cache-clock': { clock: JrCacheClock | null }
+    'jr-cache-clock': { clock: JrCacheClock | null; isBandHidden: boolean }
   }
 }

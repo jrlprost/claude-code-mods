@@ -23,6 +23,8 @@ type Clock = { advance: (ms: number) => Promise<void> }
 
 const machine = (on: On, toasts: string[]) => {
   const c = mock.clock(on) as unknown as Clock
+  mock.store(on)
+  on('command.register', () => ({ value: undefined }) as never)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('turn.complete', () => ({ text: '' }) as never)
   on('ui.toast', (_$, e) => {
@@ -65,4 +67,24 @@ test('after a reply the band counts down, then says cold; one toast before expir
   const ui = await $.ui.mount({ plugin: 'jr-cache-clock', surface: 'terminal', ...BAND } as never)
   expect(await ui.find({ text: /cold/ } as never)).toBeDefined()
   expect(toasts.length).toBe(1)
+})
+
+test('/jrcache on|off and the bare command hide and bring back the band', async ($, on) => {
+  machine(on, [])
+  await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
+  await $.turn.complete(DONE as never)
+  const mount = () => $.ui.mount({ plugin: 'jr-cache-clock', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
+  const said = await $.command.run({ command: 'jrcache', args: 'off' } as never)
+  expect(JSON.stringify(said)).toContain('hidden')
+  let ui = await mount()
+  expect(await ui.find({ text: /warm/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrcache', args: '' } as never)
+  ui = await mount()
+  expect(await ui.find({ text: /warm/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrcache', args: '' } as never)
+  ui = await mount()
+  expect(await ui.find({ text: /warm/ } as never)).toBeUndefined()
 })
