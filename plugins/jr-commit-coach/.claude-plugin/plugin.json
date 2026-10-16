@@ -1,6 +1,6 @@
 {
   "name": "jr-commit-coach",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Nudges you toward small atomic commits: when uncommitted changes pass a threshold, a band and a toast suggest a split by folder.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

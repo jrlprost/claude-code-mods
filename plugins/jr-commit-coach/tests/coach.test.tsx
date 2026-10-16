@@ -49,6 +49,7 @@ test('over the threshold: a toast once, and the band stays', async ($, on) => {
   expect(toasts.length).toBe(1)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-commit-coach', surface, ...BAND } as never)
+    expect(bandRow(await ui.drawn())).toEqual({ isOneRow: true, isRight: false })
     const drawn = JSON.stringify(await ui.drawn())
     expect(drawn).toContain('364')
     expect(drawn).toContain('below')
@@ -100,3 +101,16 @@ test('/jrcommit on|off and the bare command hide and bring back the band', async
   ui = await mount()
   expect(await ui.find({ text: /uncommitted/ } as never)).toBeUndefined()
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}

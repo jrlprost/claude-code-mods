@@ -1,5 +1,5 @@
 /** The uncommitted work above the threshold, as the band shows it. */
-export type JrCommitCoachNudge = { lines: number; untracked: number; advice: string }
+export type JrCommitCoachNudge = { lines: number; untracked: number; advice: string; folders: string[] }
 
 declare module 'claude-code' {
   interface PluginState {

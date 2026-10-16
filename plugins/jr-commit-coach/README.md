@@ -3,8 +3,10 @@
 Keeps commits small. After each turn it measures the uncommitted work in the repository; past a threshold, a band and a toast suggest an atomic commit and how to split it.
 
 ```
-commit ████······ 364 lines uncommitted + 1 new · time for an atomic commit
+▲ 364 lines uncommitted + 1 new · split: src/ docs/ root/
 ```
+
+One row on the left, only while there is something to act on.
 
 ```
 jr commit coach · 364 lines uncommitted, 1 new file: commit in small steps, e.g. src (320 lines, 2 files), docs (40 lines, 1 file), root (4 lines, 1 file) and 1 more

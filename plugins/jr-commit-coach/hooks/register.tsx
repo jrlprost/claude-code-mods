@@ -2,8 +2,6 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import { advice, pending } from './coach'
-import { gauge, gradientText } from './jr/draw'
-import { GRADIENTS } from './jr/gradient'
 import { repoIsSafe, safeGit } from './jr/git'
 
 const nudge = atom({ plugin: 'jr-commit-coach', key: 'nudge' } as const, null)
@@ -60,7 +58,7 @@ export const register: Register = (on, options) => {
       return done
     }
     const text = advice(p)
-    await update($, nudge, () => ({ lines: p.lines, untracked: p.untracked, advice: text }))
+    await update($, nudge, () => ({ lines: p.lines, untracked: p.untracked, advice: text, folders: p.split.slice(0, 3).map(g => `${g.folder}/`) }))
     // A toast the first time, then again only when the pile grew by half.
     if (p.lines >= Math.max(threshold, shown.lines * 1.5)) {
       shown.lines = p.lines
@@ -85,17 +83,23 @@ export const register: Register = (on, options) => {
         void ensureCommand($)
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const n = await read($, nudge)
     if (!showBand || !n || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
         <Text wrap="truncate-end">
-          {gradientText(Text, 'commit ', GRADIENTS.brand)}
-          {gauge(Text, Math.min(1, n.lines / (threshold * 3)), 10, GRADIENTS.heat)}
-          <Text bold>{` ${n.lines}`}</Text>
-          <Text dimColor>{` lines uncommitted${n.untracked ? ` + ${n.untracked} new` : ''} · time for an atomic commit`}</Text>
+          <Text color="#ff8c42">{'▲ '}</Text>
+          <Text bold>{`${n.lines}`}</Text>
+          <Text>{` lines uncommitted${n.untracked ? ` + ${n.untracked} new` : ''}`}</Text>
+          {n.folders.length > 0 && <Text dimColor>{` · split: ${n.folders.join(' ')}`}</Text>}
         </Text>
         {below}
       </Box>
