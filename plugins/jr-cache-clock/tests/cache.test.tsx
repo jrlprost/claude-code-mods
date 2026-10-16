@@ -49,42 +49,65 @@ const DONE = {
   usage: { model: 'claude-opus-5-5', input_tokens: 100, output_tokens: 50, cache_read_input_tokens: 900, cache_creation_input_tokens: 0 },
 } as const
 
-test('after a reply the band counts down, then says cold; one toast before expiry', async ($, on) => {
+/** The band is one row: the rows of the tree above `below`, which is the last child. */
+const rowsAbove = (tree: unknown) => {
+  const t = tree as { type: string; props?: { flexDirection?: string }; children?: unknown[] }
+  if (t.type !== 'Box' || t.props?.flexDirection !== 'column') return 0
+  return (t.children ?? []).length - 1
+}
+
+test('hidden on a fresh install: nothing drawn, the toast still comes', async ($, on) => {
   const toasts: string[] = []
   const c = machine(on, toasts)
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   await $.turn.complete(DONE as never)
-  await c.advance(60_000)
-  for (const surface of ['terminal', 'desktop'] as const) {
-    const ui = await $.ui.mount({ plugin: 'jr-cache-clock', surface, ...BAND } as never)
-    expect(await ui.find({ text: /warm 4:00/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /last hit 90%/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /below/ } as never)).toBeDefined()
-    await ui.unmount()
-  }
-  // Step through the last minute so the per-second tick sees the 30-second mark.
-  for (let i = 0; i < 70; i++) await c.advance(5_000)
   const ui = await $.ui.mount({ plugin: 'jr-cache-clock', surface: 'terminal', ...BAND } as never)
-  expect(await ui.find({ text: /cold/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /cache/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  for (let i = 0; i < 60; i++) await c.advance(5_000)
   expect(toasts.length).toBe(1)
 })
 
-test('/jrcache on|off and the bare command hide and bring back the band', async ($, on) => {
+test('shown, one quiet row: countdown and hit rate, then cold', async ($, on) => {
+  const c = machine(on, [])
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  await $.command.run({ command: 'jrcache', args: 'show' } as never)
+  await $.turn.complete(DONE as never)
+  await c.advance(60_000)
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({ plugin: 'jr-cache-clock', surface, ...BAND } as never)
+    expect(await ui.find({ text: /^4:00$/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /hit 90%/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+    expect(rowsAbove(await ui.drawn())).toBe(1)
+    await ui.unmount()
+  }
+  for (let i = 0; i < 70; i++) await c.advance(5_000)
+  const ui = await $.ui.mount({ plugin: 'jr-cache-clock', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /^cold$/ } as never)).toBeDefined()
+})
+
+test('/jrcache toggles, on and off set it', async ($, on) => {
   machine(on, [])
   await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
   await $.turn.complete(DONE as never)
-  const mount = () => $.ui.mount({ plugin: 'jr-cache-clock', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
-  const said = await $.command.run({ command: 'jrcache', args: 'off' } as never)
-  expect(JSON.stringify(said)).toContain('hidden')
+  const mount = () => $.ui.mount({ plugin: 'jr-cache-clock', surface: 'terminal', ...BAND } as never)
+  const shown = await $.command.run({ command: 'jrcache', args: '' } as never)
+  expect(JSON.stringify(shown)).toContain('shown')
   let ui = await mount()
-  expect(await ui.find({ text: /warm/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /hit 90%/ } as never)).toBeDefined()
+  await ui.unmount()
+  const hidden = await $.command.run({ command: 'jrcache', args: '' } as never)
+  expect(JSON.stringify(hidden)).toContain('hidden')
+  ui = await mount()
+  expect(await ui.find({ text: /hit 90%/ } as never)).toBeUndefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
   await ui.unmount()
-  await $.command.run({ command: 'jrcache', args: '' } as never)
+  await $.command.run({ command: 'jrcache', args: 'on' } as never)
   ui = await mount()
-  expect(await ui.find({ text: /warm/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /hit 90%/ } as never)).toBeDefined()
   await ui.unmount()
-  await $.command.run({ command: 'jrcache', args: '' } as never)
+  await $.command.run({ command: 'jrcache', args: 'off' } as never)
   ui = await mount()
-  expect(await ui.find({ text: /warm/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /hit 90%/ } as never)).toBeUndefined()
 })
