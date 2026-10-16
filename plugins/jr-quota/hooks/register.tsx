@@ -133,17 +133,23 @@ export const register: Register = (on, options) => {
         void ensurePolling($)
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const lows = v?.balances.filter(b => b.isLow) ?? []
     if (lows.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
-        <Box>
-          {gradientText(Text, 'quota ', GRADIENTS.brand)}
-          <Text color="#ef4565" bold>{'low · '}</Text>
+        <Text wrap="truncate-end">
+          <Text color="#ef4565">{'▲ '}</Text>
           <Text>{lows.map(b => `${b.label} ${b.text}`).join(' · ')}</Text>
-        </Box>
+          <Text dimColor>{' · /jrquota details'}</Text>
+        </Text>
         {below}
       </Box>
     )

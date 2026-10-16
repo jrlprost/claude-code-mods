@@ -49,6 +49,7 @@ test('a low balance shows in the band and the pane, and toasts once', async ($, 
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   for (const surface of ['terminal', 'desktop'] as const) {
     const band = await $.ui.mount({ plugin: 'jr-quota', surface, component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
+    expect(bandRow(await band.drawn())).toEqual({ isOneRow: true, isRight: false })
     expect(await band.find({ text: /Firecrawl 120 credits left/ } as never)).toBeDefined()
     expect(await band.find({ text: /below/ } as never)).toBeDefined()
     await band.unmount()
@@ -73,3 +74,16 @@ test('/jrquota hide takes the band away, the bare command brings it back', async
   band = await $.ui.mount({ plugin: 'jr-quota', surface: 'terminal', component: 'AbovePrompt', props } as never)
   expect(await band.find({ text: /Firecrawl 120 credits left/ } as never)).toBeDefined()
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}

@@ -1,6 +1,6 @@
 {
   "name": "jr-quota",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Balances of the other paid APIs you use (OpenRouter, Firecrawl, DeepSeek), checked every 10 minutes: /jrquota details shows them all, /jrquota hides or shows the band; a band and a toast appear only when one runs low.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
