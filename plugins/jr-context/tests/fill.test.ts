@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 
-import { fillOf, share, stackedBar } from '../hooks/fill'
+import { fillOf, isNearCompaction, miniBar, share, stackedBar } from '../hooks/fill'
 
 export const BREAKDOWN = {
   categories: [
@@ -43,4 +43,19 @@ test('shares read like /context', async () => {
   expect(share(494, 1_000_000)).toBe('<0.1%')
   expect(share(2_200, 1_000_000)).toBe('0.2%')
   expect(share(233_000, 1_000_000)).toBe('23%')
+})
+
+test('the mini bar is exactly the width and fills in proportion, tiny categories may vanish', async () => {
+  const cells = miniBar(fillOf(BREAKDOWN)!, 20)
+  expect(cells.length).toBe(20)
+  expect(cells.filter(c => c.kind === 'used').length).toBe(5)
+  expect(cells[19]!.kind).toBe('free')
+  const tiny = { used: [{ name: 'a', tokens: 10 }], total: 10, max: 1_000_000, buffer: 0, percent: 0 }
+  expect(miniBar(tiny, 20).filter(c => c.kind === 'used').length).toBe(1)
+})
+
+test('compaction is near at the threshold share of where it starts, not of the window', async () => {
+  const at = (percent: number) => ({ ...fillOf(BREAKDOWN)!, percent })
+  expect(isNearCompaction(at(77), 80)).toBe(false)
+  expect(isNearCompaction(at(78), 80)).toBe(true)
 })

@@ -1,6 +1,19 @@
 # jr-context
 
-A context bar above the Claude Code prompt.
+The context window in one quiet row above the Claude Code prompt, aligned to the right so it stays out of the way.
+
+```
+                                              ctx ▕█████─────────────▏ 26% · 256k/1.0M
+```
+
+- A mini bar coloured by category (system prompt, tools, memory, skills, messages...), the fill in a colour from green to red, the tokens used and the window.
+- Once the window reaches the warning threshold of where compaction starts (80 % by default), the row moves to the left as an alert:
+
+```
+▲ context 85% · compacts in 117k · /jrcontext details
+```
+
+- `/jrcontext details` opens the full view in a pane: header, the stacked bar across the width, and the legend with each category's tokens and share.
 
 ```
 ◆ context                          272k of 1.0M · compacts at 967k  27%
@@ -9,9 +22,6 @@ A context bar above the Claude Code prompt.
 ─ free space 695k   █ autocompact buffer 33k
 ```
 
-- One stacked bar across the full width: each kind of content in the window has its own colour, the free space is a thin line, the compaction buffer a dark block at the end.
-- The header shows tokens used, the window, where compaction starts, and the fill in a pill that goes from green to red.
-- From the warning threshold on (80 % by default), the header says compaction is near.
 - The figures are the engine's own, the same breakdown as `/context`.
 
 ## Commands
@@ -32,10 +42,7 @@ A context bar above the Claude Code prompt.
 
 | Option | Default | |
 | --- | --- | --- |
-| Warn at (%) | 80 | Fill from which the header warns |
-| Layout | full | `full`: header, bar and legend. `compact`: header and bar only |
-
-When Claude Code gives the band fewer than four rows, the legend is left out.
+| Warn at (%) | 80 | Share of the compaction point from which the row becomes an alert |
 
 ## Access
 

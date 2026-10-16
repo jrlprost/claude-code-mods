@@ -52,3 +52,27 @@ export const share = (tokens: number, max: number) => {
   if (p < 0.1) return '<0.1%'
   return p < 10 ? `${p.toFixed(1)}%` : `${Math.round(p)}%`
 }
+
+/** Where compaction starts: the window less the buffer the engine keeps free. */
+export const compactsAtOf = (fill: JrContextFill) => fill.max - fill.buffer
+
+/** True once the fill (the engine's percentage) reaches `warnAt` percent of where compaction starts. */
+export const isNearCompaction = (fill: JrContextFill, warnAt: number) => (fill.percent / 100) * fill.max >= (compactsAtOf(fill) * warnAt) / 100
+
+/**
+ * The mini bar of the one-row band, `width` cells: the filled share coloured by category
+ * in proportion (a tiny category may get no cell), then the free space as a thin line.
+ */
+export const miniBar = (fill: JrContextFill, width: number): BarCell[] => {
+  const usedCells = Math.min(width, Math.max(fill.total > 0 ? 1 : 0, Math.round((fill.total / fill.max) * width)))
+  const cells: BarCell[] = []
+  let sum = 0
+  fill.used.forEach((segment, i) => {
+    sum += segment.tokens
+    const upTo = Math.min(usedCells, Math.round((sum / Math.max(1, fill.total)) * usedCells))
+    while (cells.length < upTo) cells.push({ char: '█', color: segmentColor(i, fill.used.length), kind: 'used' })
+  })
+  while (cells.length < usedCells) cells.push({ char: '█', color: '#ff8c42', kind: 'used' })
+  while (cells.length < width) cells.push({ char: '─', color: '#5c5f77', kind: 'free' })
+  return cells
+}

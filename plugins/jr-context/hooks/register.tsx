@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { JrContextFill } from '../types'
-import { fillOf, segmentColor, share, stackedBar } from './fill'
+import { compactsAtOf, fillOf, isNearCompaction, miniBar, segmentColor, share, stackedBar } from './fill'
 import { gradientText } from './jr/draw'
 import { GRADIENTS, colorAt, formatTokens } from './jr/gradient'
 
@@ -47,11 +47,15 @@ async function refresh($: EngineInterface, force = false) {
 
 type Elements = ReturnType<EngineInterface['ui']['resolve']>
 
-/** The header, the stacked bar and, unless compact, the legend: shared by the band and the pane. */
-function drawContext(Box: Elements['Box'], Text: Elements['Text'], now: JrContextFill, width: number, warnAt: number, isCompact: boolean) {
+const AMBER = '#ff8c42'
+const RED = '#ef4565'
+const MINI_BAR_CELLS = 18
+
+/** The full view of the pane: the header, the stacked bar and the legend. */
+function drawContext(Box: Elements['Box'], Text: Elements['Text'], now: JrContextFill, width: number, warnAt: number) {
   const heat = colorAt(GRADIENTS.heat, now.percent / 100)
-  const compactsAt = now.max - now.buffer
-  const isWarning = now.percent >= warnAt
+  const compactsAt = compactsAtOf(now)
+  const isWarning = isNearCompaction(now, warnAt)
 
   const header = (
     <Box justifyContent="space-between" width={width}>
@@ -97,14 +101,45 @@ function drawContext(Box: Elements['Box'], Text: Elements['Text'], now: JrContex
     <Box flexDirection="column">
       {header}
       {bar}
-      {!isCompact && legend}
+      {legend}
+    </Box>
+  )
+}
+
+/**
+ * The band: one row. Quiet and right-aligned while there is room; once compaction is near,
+ * an alert on the left with what is left before it.
+ */
+function drawRow(Box: Elements['Box'], Text: Elements['Text'], now: JrContextFill, width: number, warnAt: number) {
+  if (isNearCompaction(now, warnAt)) {
+    const compactsAt = compactsAtOf(now)
+    const color = isNearCompaction(now, 95) ? RED : AMBER
+    return (
+      <Box key="jr-context-row" width={width}>
+        <Text wrap="truncate-end">
+          <Text color={color}>{`▲ context ${now.percent}%`}</Text>
+          <Text dimColor>{` · compacts in ${formatTokens(Math.max(0, compactsAt - now.total))} · /jrcontext details`}</Text>
+        </Text>
+      </Box>
+    )
+  }
+  return (
+    <Box key="jr-context-row" width={width} justifyContent="flex-end">
+      <Text wrap="truncate-end">
+        <Text dimColor>{'ctx ▕'}</Text>
+        {miniBar(now, MINI_BAR_CELLS).map(cell =>
+          cell.kind === 'free' ? <Text color={cell.color} dimColor>{cell.char}</Text> : <Text color={cell.color}>{cell.char}</Text>,
+        )}
+        <Text dimColor>{'▏ '}</Text>
+        <Text color={colorAt(GRADIENTS.heat, now.percent / 100)}>{`${now.percent}%`}</Text>
+        <Text dimColor>{` · ${formatTokens(now.total)}/${formatTokens(now.max)}`}</Text>
+      </Text>
     </Box>
   )
 }
 
 export const register: Register = (on, options) => {
   const warnAt = Number(options.warnAt ?? 80)
-  const layout = String(options.layout ?? 'full')
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
@@ -125,7 +160,7 @@ export const register: Register = (on, options) => {
     const { Box, Text } = $.ui.resolve(e)
     const now = await read($, fill)
     if (!now) return <Text dimColor>Reading the context window…</Text>
-    return drawContext(Box, Text, now, Math.max(20, e.props.bodyColumns ?? e.viewport?.columns ?? 80), warnAt, false)
+    return drawContext(Box, Text, now, Math.max(20, e.props.bodyColumns ?? e.viewport?.columns ?? 80), warnAt)
   })
 
   // The window grows with every tool result; refreshed at most every few seconds.
@@ -143,7 +178,13 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const now = await read($, fill)
     // Installed or reloaded mid-session, the mod saw no session.start: read the figures once now.
     if (!now && !last.isScheduled) {
@@ -155,11 +196,9 @@ export const register: Register = (on, options) => {
     if (!now || e.props.hasSurvey) return below
 
     const { Box, Text } = $.ui.resolve(e)
-    const isCompact = layout === 'compact' || e.props.maxRows < 4
-
     return (
       <Box flexDirection="column">
-        {drawContext(Box, Text, now, Math.max(20, e.props.bodyColumns), warnAt, isCompact)}
+        {drawRow(Box, Text, now, Math.max(20, e.props.bodyColumns), warnAt)}
         {below}
       </Box>
     )
