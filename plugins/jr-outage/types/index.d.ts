@@ -5,6 +5,6 @@ export type JrOutageView = { services: JrOutageService[]; checkedAt: number }
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-outage': { view: JrOutageView | null }
+    'jr-outage': { view: JrOutageView | null; isBandHidden: boolean }
   }
 }

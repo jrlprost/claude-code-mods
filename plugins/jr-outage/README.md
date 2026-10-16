@@ -13,7 +13,8 @@ outage ● GitHub Partial outage of Actions
 
 | Command | |
 | --- | --- |
-| `/jroutage` | Check now and show every service in a pane |
+| `/jroutage` | Hide or show the band (it toggles); `/jroutage hide` and `show` set it |
+| `/jroutage details` | Check now and show every service in a pane |
 
 ## Settings (`/config`)
 
@@ -29,4 +30,4 @@ outage ● GitHub Partial outage of Actions
 
 ## Access
 
-Fetches the public `status.json` of status.claude.com, githubstatus.com, status.npmjs.org and vercel-status.com. No key, no personal data. Writes nothing, runs nothing.
+Fetches the public `status.json` of status.claude.com, githubstatus.com, status.npmjs.org and vercel-status.com. No key, no personal data. Remembers whether the band is hidden; runs nothing.

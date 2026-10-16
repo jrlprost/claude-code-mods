@@ -23,6 +23,7 @@ test('degraded lists real incidents, worst first', async () => {
 
 const machine = (on: On, toasts: string[]) => {
   mock.clock(on)
+  mock.store(on)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: undefined }) as never)
   on('http.fetch', ($, e) => {
@@ -52,9 +53,30 @@ test('an incident shows in the band and the pane, and toasts once', async ($, on
     expect(await band.find({ text: /below/ } as never)).toBeDefined()
     await band.unmount()
   }
-  const said = await $.command.run({ command: 'jroutage', args: '' } as never)
+  const said = await $.command.run({ command: 'jroutage', args: 'details' } as never)
   expect(JSON.stringify(said)).toContain('GitHub: Partial outage of Actions')
   const pane = await $.ui.mount({ plugin: 'jr-outage', surface: 'terminal', component: 'Pane', requestId: 'jr-outage', props: { bodyColumns: 80 } } as never)
   expect(await pane.find({ text: /All Systems Operational/ } as never)).toBeDefined()
   expect(toasts.length).toBe(1)
+})
+
+test('/jroutage hide takes the band away, the bare command toggles it, on brings it back', async ($, on) => {
+  machine(on, [])
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  const shows = async () => {
+    const band = await $.ui.mount({ plugin: 'jr-outage', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
+    const seen = (await band.find({ text: /Partial outage/ } as never)) !== undefined
+    expect(await band.find({ text: /below/ } as never)).toBeDefined()
+    await band.unmount()
+    return seen
+  }
+  expect(await shows()).toBe(true)
+  expect(JSON.stringify(await $.command.run({ command: 'jroutage', args: 'hide' } as never))).toContain('hidden')
+  expect(await shows()).toBe(false)
+  await $.command.run({ command: 'jroutage', args: '' } as never)
+  expect(await shows()).toBe(true)
+  await $.command.run({ command: 'jroutage', args: '' } as never)
+  expect(await shows()).toBe(false)
+  await $.command.run({ command: 'jroutage', args: 'on' } as never)
+  expect(await shows()).toBe(true)
 })

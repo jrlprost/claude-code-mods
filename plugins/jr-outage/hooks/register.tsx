@@ -6,6 +6,33 @@ import { GRADIENTS } from './jr/gradient'
 import { COLOR, degraded, serviceOf, SERVICES } from './services'
 
 const view = atom({ plugin: 'jr-outage', key: 'view' } as const, null)
+const bandHidden = atom({ plugin: 'jr-outage', key: 'isBandHidden' } as const, false)
+
+// The band can be hidden: /jroutage hide, show, or the bare command to toggle. One choice for
+// every session, kept across restarts.
+const band = { isLoaded: false }
+
+const bandVerb = (args: string) => {
+  const arg = args.trim().toLowerCase()
+  if (arg === 'hide' || arg === 'off') return 'hide' as const
+  if (arg === 'show' || arg === 'on') return 'show' as const
+  return arg === '' ? ('toggle' as const) : null
+}
+
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
+  const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? 'jr outage · band hidden (/jroutage to bring it back)' : 'jr outage · band shown' }
+}
 const PANE = 'jr-outage'
 const EVERY_MS = 10 * 60_000
 
@@ -46,12 +73,14 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jroutage', description: 'Is it them or is it me? Status of Claude, GitHub, npm and Vercel' })
+    await $.command.register({ name: 'jroutage', description: 'Show or hide the outage band; /jroutage details checks Claude, GitHub, npm and Vercel now' })
     await ensurePolling($)
     return started
   })
 
-  on('command.run', { command: 'jroutage' }, async $ => {
+  on('command.run', { command: 'jroutage' }, async ($, e) => {
+    const verb = bandVerb(e.args)
+    if (verb) return setBand($, verb)
     live.isPolling ? await check($) : await ensurePolling($)
     await $.ui.open({ id: PANE, title: 'jr outage', rows: SERVICES.length + 3 })
     const down = degraded((await read($, view))?.services ?? [])
@@ -86,6 +115,7 @@ export const register: Register = (on, options) => {
         void ensurePolling($)
       })
     }
+    if (await isBandHidden($)) return below
     const down = degraded(v?.services ?? [])
     if (!showBand || down.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
