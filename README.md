@@ -100,7 +100,7 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 | [jr-todo](plugins/jr-todo) | /jrtodo <task>: capture a task instantly, with no model call, to TODO.md, Todoist, Linear, Notion, a GitHub issue, Things, Apple Reminders, or your own command. | `/jrtodo` |
 | [jr-outputs](plugins/jr-outputs) | /jroutputs: every file this session created or changed, newest first, with + and - line counts from git. | `/jroutputs` |
 | [jr-fleet](plugins/jr-fleet) | Every Claude Code session on this machine at a glance: which ones are working and which ones wait for you, in a band above the prompt and in /jrfleet. | `/jrfleet` |
-| [jr-badge](plugins/jr-badge) | A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. |  |
+| [jr-badge](plugins/jr-badge) | A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. | `/jrbadge` |
 | [jr-done-ping](plugins/jr-done-ping) | A notification, and a sound on macOS, when a long turn finishes: work in another window and come back when Claude is done. |  |
 | [jr-awake](plugins/jr-awake) | Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep. | `/jrawake` |
 

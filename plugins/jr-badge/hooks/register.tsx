@@ -5,7 +5,15 @@ import { badgeOf } from './badge'
 import { safeGit } from './jr/git'
 
 const badge = atom({ plugin: 'jr-badge', key: 'badge' } as const, null)
-const live = { isScheduled: false }
+const isHidden = atom({ plugin: 'jr-badge', key: 'isHidden' } as const, false)
+const live = { isScheduled: false, isLoaded: false }
+
+/** Hidden or shown is one choice for every session, kept across restarts. */
+async function ensureLoaded($: EngineInterface) {
+  if (live.isLoaded) return
+  live.isLoaded = true
+  if ((await $.store.get('isHidden')) === true) await update($, isHidden, () => true)
+}
 
 async function git($: EngineInterface, cwd: string, args: string[]) {
   try {
@@ -35,8 +43,19 @@ async function refresh($: EngineInterface) {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    await $.command.register({ name: 'jrbadge', description: 'Show or hide the badge: /jrbadge toggles, /jrbadge on or off' })
+    await ensureLoaded($)
     await refresh($)
     return started
+  })
+
+  on('command.run', { command: 'jrbadge' }, async ($, e) => {
+    await ensureLoaded($)
+    const arg = e.args.trim().toLowerCase()
+    const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : !(await read($, isHidden))
+    await $.store.set('isHidden', hide)
+    await update($, isHidden, () => hide)
+    return { text: hide ? 'jr badge · hidden (/jrbadge to bring it back)' : 'jr badge · shown' }
   })
 
   // The branch or the folder can change during a turn.
@@ -48,6 +67,7 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
+    if (await read($, isHidden)) return below
     const b = await read($, badge)
     if (!b && !live.isScheduled) {
       live.isScheduled = true

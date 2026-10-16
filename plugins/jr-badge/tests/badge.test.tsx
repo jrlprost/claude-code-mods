@@ -17,6 +17,8 @@ test('home shows HOME, a project shows its name, branch and folder', async () =>
 
 const machine = (on: On) => {
   mock.clock(on)
+  mock.store(on)
+  on('command.register', () => ({ value: undefined }) as never)
   on('session.cwd', () => ({ value: '/work/shop' }) as never)
   on('env.get', () => ({ value: '/Users/a' }) as never)
   on('process.run', ($, e) => {
@@ -41,4 +43,25 @@ test('the band reads CLAUDE.md and git, and keeps what is below', async ($, on) 
     expect(await ui.find({ text: /below/ } as never)).toBeDefined()
     await ui.unmount()
   }
+})
+
+const BAND = { plugin: 'jr-badge', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as const
+
+test('/jrbadge toggles the badge, /jrbadge on and off set it', async ($, on) => {
+  machine(on)
+  await $.session.start({ cwd: '/work/shop', surface: 'terminal', isInteractive: true })
+  const hidden = await $.command.run({ command: 'jrbadge', args: '' } as never)
+  expect(JSON.stringify(hidden)).toContain('hidden')
+  let ui = await $.ui.mount(BAND as never)
+  expect(await ui.find({ text: /SHOP PROD/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrbadge', args: '' } as never)
+  ui = await $.ui.mount(BAND as never)
+  expect(await ui.find({ text: /SHOP PROD/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrbadge', args: 'off' } as never)
+  await $.command.run({ command: 'jrbadge', args: 'off' } as never)
+  ui = await $.ui.mount(BAND as never)
+  expect(await ui.find({ text: /SHOP PROD/ } as never)).toBeUndefined()
 })

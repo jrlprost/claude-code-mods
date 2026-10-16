@@ -205,7 +205,7 @@
     {
       "name": "jr-badge",
       "source": "./plugins/jr-badge",
-      "description": "A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. A `badge: LABEL #hex` line in CLAUDE.md sets your own."
+      "description": "A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. /jrbadge shows or hides it. A `badge: LABEL #hex` line in CLAUDE.md sets your own."
     },
     {
       "name": "jr-done-ping",
