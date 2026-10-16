@@ -8,6 +8,33 @@ import { body, countOf, pagesOf, QUERIES, queryUrl } from './posthog'
 const PANE = 'jr-visitors'
 const REFRESH_MS = 2 * 60_000
 const figures = atom({ plugin: 'jr-visitors', key: 'figures' } as const, null)
+const bandHidden = atom({ plugin: 'jr-visitors', key: 'isBandHidden' } as const, false)
+
+// The band can be hidden: /jrvisitors hide, show, or the bare command to toggle. One choice for
+// every session, kept across restarts.
+const band = { isLoaded: false }
+
+const bandVerb = (args: string) => {
+  const arg = args.trim().toLowerCase()
+  if (arg === 'hide' || arg === 'off') return 'hide' as const
+  if (arg === 'show' || arg === 'on') return 'show' as const
+  return arg === '' ? ('toggle' as const) : null
+}
+
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
+  const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? 'jr visitors · band hidden (/jrvisitors to bring it back)' : 'jr visitors · band shown' }
+}
 const live = { isStarted: false, host: '', projectId: '', key: '' }
 
 async function ask($: EngineInterface, query: string) {
@@ -35,7 +62,7 @@ async function refresh($: EngineInterface, withPages: boolean) {
 async function ensureStarted($: EngineInterface) {
   if (live.isStarted) return
   live.isStarted = true
-  await $.command.register({ name: 'jrvisitors', description: 'PostHog: visitors now and today, top pages today' })
+  await $.command.register({ name: 'jrvisitors', description: 'Show or hide the visitors band; /jrvisitors details opens visitors now, today and top pages' })
   if (!live.key || !live.projectId) return
   await refresh($, false)
   $.clock.every(REFRESH_MS, () => {
@@ -60,8 +87,11 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrvisitors' }, async $ => {
+  on('command.run', { command: 'jrvisitors' }, async ($, e) => {
     await ensureStarted($)
+    const verb = bandVerb(e.args)
+    // Not set up yet: the bare command says how, instead of toggling a band that cannot show.
+    if (verb && (live.key && live.projectId || verb !== 'toggle')) return setBand($, verb)
     if (!live.key || !live.projectId) return { text: 'jr visitors · set the PostHog project id and a personal API key (Query Read) in /config under jr-visitors.' }
     await refresh($, true)
     await $.ui.open({ id: PANE, title: 'jr visitors', rows: 14 })
@@ -105,6 +135,7 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
+    if (await isBandHidden($)) return below
     const f = await read($, figures)
     if (!showBand || !f || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)

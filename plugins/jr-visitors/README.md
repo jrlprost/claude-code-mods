@@ -6,7 +6,7 @@ Who is on your site right now, from PostHog, above the prompt.
 visitors ● 3 now · 118 today
 ```
 
-`/jrvisitors` adds today's top pages:
+`/jrvisitors details` adds today's top pages:
 
 ```
 jr visitors   updated 14:05
@@ -18,7 +18,7 @@ TOP PAGES TODAY
 ```
 
 - **Now** counts unique people with a page view in the last 5 minutes; **today** since midnight in your PostHog project's time zone.
-- The band refreshes every 2 minutes; `/jrvisitors` refreshes everything when you open it.
+- The band refreshes every 2 minutes; `/jrvisitors details` refreshes everything when you open it.
 
 ## Setup
 
@@ -28,7 +28,8 @@ In PostHog, create a **personal API key** (Settings → Personal API keys) with 
 
 | Command | |
 | --- | --- |
-| `/jrvisitors` | Visitors now, today, and today's top pages |
+| `/jrvisitors` | Hide or show the band (it toggles); `/jrvisitors hide` and `show` set it |
+| `/jrvisitors details` | Visitors now, today, and today's top pages |
 
 ## Settings (`/config`)
 

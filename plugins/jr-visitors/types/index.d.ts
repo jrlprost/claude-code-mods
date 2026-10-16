@@ -10,6 +10,6 @@ export type JrVisitorsFigures = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-visitors': { figures: JrVisitorsFigures | null }
+    'jr-visitors': { figures: JrVisitorsFigures | null; isBandHidden: boolean }
   }
 }

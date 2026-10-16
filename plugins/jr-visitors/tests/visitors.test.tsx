@@ -19,6 +19,7 @@ test('answers become numbers and pages', async () => {
 
 const machine = (on: On, sent: string[]) => {
   mock.clock(on)
+  mock.store(on)
   on('command.register', () => ({ value: undefined }) as never)
   on('ui.open', () => ({ value: { isPlaced: true } }) as never)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
@@ -45,7 +46,7 @@ test('with a project and key, the band and the pane show visitors', { options: {
     expect(await band.find({ text: /^118$/ } as never)).toBeDefined()
     await band.unmount()
   }
-  await $.command.run({ command: 'jrvisitors', args: '' } as never)
+  await $.command.run({ command: 'jrvisitors', args: 'details' } as never)
   const pane = await $.ui.mount({ plugin: 'jr-visitors', surface: 'terminal', component: 'Pane', requestId: 'jr-visitors', props: {} } as never)
   expect(await pane.find({ text: /\/pricing/ } as never)).toBeDefined()
 })
@@ -53,4 +54,25 @@ test('with a project and key, the band and the pane show visitors', { options: {
 test('without settings, /jrvisitors explains what to set', async ($, on) => {
   machine(on, [])
   expect(JSON.stringify(await $.command.run({ command: 'jrvisitors', args: '' } as never))).toContain('personal API key')
+})
+
+test('/jrvisitors hide takes the band away, the bare command toggles it, on brings it back', { options: { projectId: '42', apiKey: 'phx_x' } }, async ($, on) => {
+  machine(on, [])
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  const shows = async () => {
+    const band = await $.ui.mount({ plugin: 'jr-visitors', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
+    const seen = (await band.find({ text: /^118$/ } as never)) !== undefined
+    expect(await band.find({ text: /below/ } as never)).toBeDefined()
+    await band.unmount()
+    return seen
+  }
+  expect(await shows()).toBe(true)
+  expect(JSON.stringify(await $.command.run({ command: 'jrvisitors', args: 'hide' } as never))).toContain('hidden')
+  expect(await shows()).toBe(false)
+  await $.command.run({ command: 'jrvisitors', args: '' } as never)
+  expect(await shows()).toBe(true)
+  await $.command.run({ command: 'jrvisitors', args: '' } as never)
+  expect(await shows()).toBe(false)
+  await $.command.run({ command: 'jrvisitors', args: 'on' } as never)
+  expect(await shows()).toBe(true)
 })
