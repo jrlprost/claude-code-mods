@@ -115,23 +115,29 @@ export const register: Register = (on, options) => {
         void ensurePolling($)
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const down = degraded(v?.services ?? [])
     if (!showBand || down.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
-        <Box>
-          {gradientText(Text, 'outage ', GRADIENTS.brand)}
+        <Text wrap="truncate-end">
+          <Text color={down.some(s => s.indicator === 'major' || s.indicator === 'critical') ? '#ef4565' : '#ff8c42'}>{'▲ '}</Text>
           {down.map((s, i) => (
             <Text>
-              {i > 0 ? '  ' : ''}
-              <Text color={COLOR[s.indicator]}>{'● '}</Text>
+              {i > 0 ? <Text dimColor>{' · '}</Text> : ''}
               <Text bold>{`${s.name} `}</Text>
               <Text color={COLOR[s.indicator]}>{s.description}</Text>
             </Text>
           ))}
-        </Box>
+          <Text dimColor>{' · /jroutage details'}</Text>
+        </Text>
         {below}
       </Box>
     )

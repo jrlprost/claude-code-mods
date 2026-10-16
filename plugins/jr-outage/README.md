@@ -3,8 +3,10 @@
 Is it them or is it me? jr-outage checks the public status pages of the services a build depends on, every 10 minutes.
 
 ```
-outage ● GitHub Partial outage of Actions
+▲ GitHub Partial outage of Actions · /jroutage details
 ```
+
+One row on the left, only while there is something to act on.
 
 - Claude, GitHub, npm and Vercel.
 - A band and a toast appear only while one of them reports an incident; an unreachable status page is not treated as an outage.
