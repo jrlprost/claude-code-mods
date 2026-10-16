@@ -48,7 +48,8 @@ test('a site down raises a red band; the pane lists both', { options: { urls: 'o
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   for (const surface of ['terminal', 'desktop'] as const) {
     const band = await $.ui.mount({ plugin: 'jr-uptime', surface, ...BAND } as never)
-    expect(await band.find({ text: /DOWN/ } as never)).toBeDefined()
+    expect(bandRow(await band.drawn())).toEqual({ isOneRow: true, isRight: false })
+    expect(await band.find({ text: /down/ } as never)).toBeDefined()
     expect(await band.find({ text: /broken\.dev/ } as never)).toBeDefined()
     await band.unmount()
   }
@@ -69,7 +70,7 @@ test('all up with the option on: a green line', { options: { urls: 'ok.dev', sho
   machine(on, {})
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const band = await $.ui.mount({ plugin: 'jr-uptime', surface: 'terminal', ...BAND } as never)
-  expect(await band.find({ text: /all 1 up/ } as never)).toBeDefined()
+  expect(await band.find({ text: /1\/1 up/ } as never)).toBeDefined()
 })
 
 test('/jruptime hide takes the band away, the bare command toggles it, on brings it back', { options: { urls: 'ok.dev, broken.dev' } }, async ($, on) => {
@@ -77,7 +78,7 @@ test('/jruptime hide takes the band away, the bare command toggles it, on brings
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const shows = async () => {
     const band = await $.ui.mount({ plugin: 'jr-uptime', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
-    const seen = (await band.find({ text: /DOWN/ } as never)) !== undefined
+    const seen = (await band.find({ text: /down/ } as never)) !== undefined
     expect(await band.find({ text: /below/ } as never)).toBeDefined()
     await band.unmount()
     return seen
@@ -92,3 +93,16 @@ test('/jruptime hide takes the band away, the bare command toggles it, on brings
   await $.command.run({ command: 'jruptime', args: 'on' } as never)
   expect(await shows()).toBe(true)
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}

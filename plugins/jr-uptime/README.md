@@ -3,8 +3,10 @@
 Watches your sites while you work. Nothing shows while everything is up; the moment one goes down, a red band appears above the prompt.
 
 ```
- DOWN  api.example.com
+▲ api.example.com down 4 min · /jruptime details
 ```
+
+One row on the left, only while there is something to act on.
 
 `/jruptime details` shows every site:
 

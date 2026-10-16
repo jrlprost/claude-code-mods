@@ -137,27 +137,40 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const list = await read($, sites)
     if (list.length === 0 || e.props.hasSurvey) return below
     const down = list.filter(s => !isUp(s.history[s.history.length - 1]?.status ?? null))
     if (down.length === 0 && !showWhenUp) return below
+    const now = await $.clock.now()
     const { Box, Text } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
         {down.length > 0 ? (
           <Text wrap="truncate-end">
-            <Text backgroundColor="#ef4565" color="black" bold>{' DOWN '}</Text>
-            <Text color="#ef4565" bold>{` ${down.map(s => label(s.url)).join(', ')}`}</Text>
+            <Text color="#ef4565">{'▲ '}</Text>
+            {down.map((s, i) => (
+              <Text>
+                {i > 0 ? <Text dimColor>{' · '}</Text> : ''}
+                <Text color="#ef4565" bold>{label(s.url)}</Text>
+                <Text>{s.downSince === null ? ' down' : ` down ${duration(now - s.downSince)}`}</Text>
+              </Text>
+            ))}
+            <Text dimColor>{' · /jruptime details'}</Text>
           </Text>
         ) : (
-          <Text>
-            {gradientText(Text, 'uptime ', GRADIENTS.money)}
-            {list.map(() => (
-              <Text color="#2cb67d">{'●'}</Text>
-            ))}
-            <Text dimColor>{` all ${list.length} up`}</Text>
-          </Text>
+          <Box justifyContent="flex-end">
+            <Text wrap="truncate-end">
+              <Text dimColor>{'uptime '}</Text>
+              <Text color="#2cb67d">{`${list.length}/${list.length} up`}</Text>
+            </Text>
+          </Box>
         )}
         {below}
       </Box>
