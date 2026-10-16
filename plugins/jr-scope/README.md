@@ -3,8 +3,10 @@
 Tells you when a turn reaches further than you asked: it writes a sensitive file your prompt never named, or changes too many files at once.
 
 ```
-▲ scope touched pnpm-lock.yaml (lockfile), .env (env) without being asked
+▲ touched pnpm-lock.yaml (lockfile), .env (env) without being asked · /jrscope hides
 ```
+
+One row on the left, only while there is something to act on.
 
 At the end of each turn, the files Claude wrote (Write, Edit, NotebookEdit) are checked against the prompt that started the turn:
 

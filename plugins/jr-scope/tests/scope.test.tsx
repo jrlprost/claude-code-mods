@@ -52,6 +52,7 @@ test('a turn that edits an unasked .env gets a toast and a band', async ($, on) 
   expect(toasts.join()).toContain('.env (env) without being asked')
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-scope', surface, component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as never)
+    expect(bandRow(await ui.drawn())).toEqual({ isOneRow: true, isRight: false })
     const drawn = JSON.stringify(await ui.drawn())
     expect(drawn).toContain('without being asked')
     expect(drawn).toContain('below')
@@ -89,3 +90,16 @@ test('/jrscope on|off and the bare command hide and bring back the band', async 
   ui = await mount()
   expect(await ui.find({ text: /without being asked/ } as never)).toBeUndefined()
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}

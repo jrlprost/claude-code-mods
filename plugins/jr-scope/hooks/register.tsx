@@ -2,8 +2,6 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import { judge, summary } from './scope'
-import { gradientText } from './jr/draw'
-import { GRADIENTS } from './jr/gradient'
 
 const warning = atom({ plugin: 'jr-scope', key: 'warning' } as const, null)
 const bandHidden = atom({ plugin: 'jr-scope', key: 'isBandHidden' } as const, false)
@@ -89,7 +87,13 @@ export const register: Register = (on, options) => {
         void ensureCommand($)
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!band.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const text = await read($, warning)
     if (!showBand || !text || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
@@ -97,8 +101,8 @@ export const register: Register = (on, options) => {
       <Box flexDirection="column">
         <Text wrap="truncate-end">
           <Text color="#ff8c42">{'▲ '}</Text>
-          {gradientText(Text, 'scope ', GRADIENTS.heat.slice(1))}
           <Text>{text}</Text>
+          <Text dimColor>{' · /jrscope hides'}</Text>
         </Text>
         {below}
       </Box>
