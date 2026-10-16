@@ -10,22 +10,22 @@
     {
       "name": "jr-context",
       "source": "./plugins/jr-context",
-      "description": "A context bar above the prompt: what fills the window, category by category, in a stacked colour bar with a legend, free space and the compaction point."
+      "description": "The context window in one quiet row above the prompt: a mini bar coloured by category, the fill and the window, turning into an alert when compaction is near. /jrcontext hides or shows it, /jrcontext details opens the full bar with its legend."
     },
     {
       "name": "jr-limits",
       "source": "./plugins/jr-limits",
-      "description": "Plan limits above the prompt: the 5-hour and 7-day windows as gradient gauges with reset countdowns, a toast at 80 % and 95 %, /jrlimits to hide or show it, /jrlimits details for the detail."
+      "description": "Plan limits in one quiet row above the prompt: the 5-hour and 7-day fill and when the fullest resets, an alert from 80 %, a toast at 80 % and 95 %. /jrlimits hides or shows it, /jrlimits details opens the gauges."
     },
     {
       "name": "jr-cache-clock",
       "source": "./plugins/jr-cache-clock",
-      "description": "A prompt-cache countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, the last cache hit rate, and a toast 30 seconds before it goes cold."
+      "description": "A toast 30 seconds before the prompt cache goes cold, and on /jrcache a quiet countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, and the last cache hit rate."
     },
     {
       "name": "jr-next-cost",
       "source": "./plugins/jr-next-cost",
-      "description": "What the next prompt costs before you send it: the context it resends, at the current model's price, read from a warm cache or written to a cold one, at API rates."
+      "description": "What the next prompt costs before you send it, on /jrnextcost: the context it resends at the current model's price, read from a warm cache or written to a cold one, at API rates."
     },
     {
       "name": "jr-quota",
@@ -175,7 +175,7 @@
     {
       "name": "jr-mods",
       "source": "./plugins/jr-mods",
-      "description": "/jrmods: every installed plugin and mod in one list. Space ticks or unticks, Enter applies all the changes at once."
+      "description": "/jrmods: every installed plugin and mod in one list. Space ticks or unticks, Enter applies all the changes at once. /jrmods welcome explains what each jr mod shows."
     },
     {
       "name": "jr-goal",
@@ -205,7 +205,7 @@
     {
       "name": "jr-badge",
       "source": "./plugins/jr-badge",
-      "description": "A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. /jrbadge shows or hides it. A `badge: LABEL #hex` line in CLAUDE.md sets your own."
+      "description": "A coloured project badge and its branch, on the right above the prompt, so you always know which window you are typing in. Hidden until you type /jrbadge. A `badge: LABEL #hex` line in CLAUDE.md sets your own."
     },
     {
       "name": "jr-done-ping",

@@ -30,7 +30,9 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 
 ## The mods
 
-42 mods, each installable on its own. Bands above the prompt stack, and each one hides without turning its mod off:
+42 mods, each installable on its own. Every band above the prompt is one row: quiet figures on the right, alerts on the left only when something needs you. Context, fleet, limits and time show by default; badge, cache, next-prompt cost and awake are hidden until you ask for them. `/jrmods welcome` lists what you have and how to show or hide it.
+
+Each band hides without turning its mod off:
 
 - A command that takes no options toggles its band: type `/jrlimits` to hide it, again to bring it back. `/jrlimits details` opens the full view.
 - A command that takes options keeps them and adds `hide` and `show`: `/jrtime hide`.
@@ -98,7 +100,7 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 
 | Mod | What it does | Command |
 | --- | --- | --- |
-| [jr-mods](plugins/jr-mods) | /jrmods: every installed plugin and mod in one list. | `/jrmods` |
+| [jr-mods](plugins/jr-mods) | /jrmods: every installed plugin and mod in one list. | `/jrmods` `/jrmods welcome` |
 | [jr-goal](plugins/jr-goal) | A goal per project with steps you tick off, shown above the prompt with a progress gauge. | `/jrgoal` |
 | [jr-decisions](plugins/jr-decisions) | A decision journal per project: /jrdecide or a prompt starting with "decision:" records one, /jrdecisions lists them and exports docs/decisions.md. | `/jrdecide` `/jrdecisions` |
 | [jr-todo](plugins/jr-todo) | /jrtodo <task>: capture a task instantly, with no model call, to TODO.md, Todoist, Linear, Notion, a GitHub issue, Things, Apple Reminders, or your own command. | `/jrtodo` |
