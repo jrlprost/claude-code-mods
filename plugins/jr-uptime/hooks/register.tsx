@@ -10,6 +10,33 @@ const PANE = 'jr-uptime'
 const EVERY_MS = 2 * 60_000
 const TIMEOUT_MS = 10_000
 const sites = atom({ plugin: 'jr-uptime', key: 'sites' } as const, [])
+const bandHidden = atom({ plugin: 'jr-uptime', key: 'isBandHidden' } as const, false)
+
+// The band can be hidden: /jruptime hide, show, or the bare command to toggle. One choice for
+// every session, kept across restarts.
+const band = { isLoaded: false }
+
+const bandVerb = (args: string) => {
+  const arg = args.trim().toLowerCase()
+  if (arg === 'hide' || arg === 'off') return 'hide' as const
+  if (arg === 'show' || arg === 'on') return 'show' as const
+  return arg === '' ? ('toggle' as const) : null
+}
+
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
+  const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? 'jr uptime · band hidden (/jruptime to bring it back)' : 'jr uptime · band shown' }
+}
 const live = { isStarted: false, urls: [] as string[] }
 
 /** One request; a status, or null when it fails or takes longer than the timeout. */
@@ -43,7 +70,7 @@ async function checkAll($: EngineInterface) {
 async function ensureStarted($: EngineInterface) {
   if (live.isStarted) return
   live.isStarted = true
-  await $.command.register({ name: 'jruptime', description: 'Your sites: up or down, latency, last incident' })
+  await $.command.register({ name: 'jruptime', description: 'Show or hide the uptime band; /jruptime details opens your sites with latency and last incident' })
   if (live.urls.length === 0) return
   await checkAll($)
   $.clock.every(EVERY_MS, () => {
@@ -66,8 +93,11 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jruptime' }, async $ => {
+  on('command.run', { command: 'jruptime' }, async ($, e) => {
     await ensureStarted($)
+    const verb = bandVerb(e.args)
+    // Not set up yet: the bare command says how, instead of toggling a band that cannot show.
+    if (verb && (live.urls.length > 0 || verb !== 'toggle')) return setBand($, verb)
     if (live.urls.length === 0) return { text: 'jr uptime · add the URLs to watch in /config under jr-uptime (separated by commas).' }
     await checkAll($)
     await $.ui.open({ id: PANE, title: 'jr uptime', rows: Math.min(30, live.urls.length * 2 + 3) })
@@ -107,6 +137,7 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
+    if (await isBandHidden($)) return below
     const list = await read($, sites)
     if (list.length === 0 || e.props.hasSurvey) return below
     const down = list.filter(s => !isUp(s.history[s.history.length - 1]?.status ?? null))

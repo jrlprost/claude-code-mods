@@ -10,6 +10,6 @@ export type JrUptimeSite = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-uptime': { sites: JrUptimeSite[] }
+    'jr-uptime': { sites: JrUptimeSite[]; isBandHidden: boolean }
   }
 }

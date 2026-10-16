@@ -6,7 +6,7 @@ Watches your sites while you work. Nothing shows while everything is up; the mom
  DOWN  api.example.com
 ```
 
-`/jruptime` shows every site:
+`/jruptime details` shows every site:
 
 ```
 jr uptime
@@ -24,7 +24,8 @@ jr uptime
 
 | Command | |
 | --- | --- |
-| `/jruptime` | Check every site now and open the list |
+| `/jruptime` | Hide or show the band (it toggles); `/jruptime hide` and `show` set it |
+| `/jruptime details` | Check every site now and open the list |
 
 ## Settings (`/config`)
 
