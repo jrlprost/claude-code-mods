@@ -29,6 +29,7 @@ test('each threshold is announced once', async () => {
 
 const machine = (on: On, rateLimits: unknown[], toasts: string[]) => {
   mock.clock(on)
+  mock.store(on)
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 1 }, rateLimits } }) as never)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: undefined }) as never)
@@ -73,4 +74,17 @@ test('crossing 80 % raises one toast', async ($, on) => {
   await $.turn.complete({ answer: '', durationMs: 1, isAborted: false, turnId: 't', text: '', reason: 'answer' } as never).catch(() => undefined)
   expect(toasts.length).toBe(1)
   expect(toasts[0]).toContain('5h window at 83%')
+})
+
+test('/jrlimits hide takes the band away, the bare command brings it back', async ($, on) => {
+  machine(on, [{ kind: 'five_hour', percentUsed: 64 }], [])
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  await $.command.run({ command: 'jrlimits', args: 'hide' } as never)
+  let ui = await $.ui.mount({ plugin: 'jr-limits', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /64%/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  await ui.unmount()
+  expect(JSON.stringify(await $.command.run({ command: 'jrlimits', args: '' } as never))).toContain('shown')
+  ui = await $.ui.mount({ plugin: 'jr-limits', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /64%/ } as never)).toBeDefined()
 })

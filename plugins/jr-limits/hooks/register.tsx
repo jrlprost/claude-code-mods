@@ -7,6 +7,32 @@ import { GRADIENTS, colorAt } from './jr/gradient'
 import { countdown, crossed, labelOf, windowsOf } from './limits'
 
 const view = atom({ plugin: 'jr-limits', key: 'view' } as const, null)
+const bandHidden = atom({ plugin: 'jr-limits', key: 'isBandHidden' } as const, false)
+const band = { isLoaded: false }
+
+/** `hide`/`off`, `show`/`on`, or a bare command, which toggles; anything else is not about the band. */
+const bandVerb = (args: string) => {
+  const arg = args.trim().toLowerCase()
+  if (arg === 'hide' || arg === 'off') return 'hide' as const
+  if (arg === 'show' || arg === 'on') return 'show' as const
+  return arg === '' ? ('toggle' as const) : null
+}
+
+/** Hidden or shown is one choice for every session, kept across restarts. */
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
+  const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? 'jr limits · hidden (/jrlimits to bring it back)' : 'jr limits · shown' }
+}
 const PANE = 'jr-limits'
 const THRESHOLDS = [80, 95]
 const TICK_MS = 60_000
@@ -58,7 +84,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrlimits', description: 'Plan limits: 5-hour and 7-day windows with reset countdowns' })
+    await $.command.register({ name: 'jrlimits', description: 'Show or hide the limits band; /jrlimits details opens the full view' })
     await ensureTicking($)
     return started
   })
@@ -70,7 +96,9 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrlimits' }, async $ => {
+  on('command.run', { command: 'jrlimits' }, async ($, e) => {
+    const verb = bandVerb(e.args)
+    if (verb) return setBand($, verb)
     await ensureTicking($)
     await refresh($)
     const v = await read($, view)
@@ -105,6 +133,7 @@ export const register: Register = (on, options) => {
         void ensureTicking($)
       })
     }
+    if (await isBandHidden($)) return below
     if (!showBand || !v || v.windows.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     const shown = v.windows.slice(0, 2)

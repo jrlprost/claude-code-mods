@@ -5,6 +5,6 @@ export type JrLimitsView = { windows: JrLimitWindow[]; now: number }
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-limits': { view: JrLimitsView | null }
+    'jr-limits': { view: JrLimitsView | null; isBandHidden: boolean }
   }
 }

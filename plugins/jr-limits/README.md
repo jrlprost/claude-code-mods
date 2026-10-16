@@ -14,7 +14,9 @@ limits 5h ██████████▎····· 64% 1h12   7d ████
 
 | Command | |
 | --- | --- |
-| `/jrlimits` | Every window in a pane, with its exact reset time |
+| `/jrlimits` | Hide the band above the prompt, or bring it back |
+| `/jrlimits hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jrlimits details` | Every window in a pane, with its exact reset time |
 
 ## Settings (`/config`)
 
