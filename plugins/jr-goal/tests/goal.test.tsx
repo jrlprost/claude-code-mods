@@ -43,6 +43,7 @@ test('the band shows goal, progress and next step, above what was there', async 
   await $.command.run({ command: 'jrgoal', args: 'done 1' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-goal', surface, component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as never)
+    expect(bandRow(await ui.drawn())).toEqual({ isOneRow: true, isRight: true })
     const drawn = JSON.stringify(await ui.drawn())
     expect(drawn).toContain('Ship the billing page')
     expect(drawn).toContain('1/2')
@@ -70,3 +71,16 @@ test('/jrgoal hide takes the band away and keeps what is below, show brings it b
   expect(drawn).toContain('Ship the billing page')
   await ui.unmount()
 })
+
+type Drawn = { type?: string; props?: Record<string, unknown>; children?: unknown[] }
+/** The band's own row (first child of the stack): one row, no column inside, no line break. */
+function bandRow(tree: unknown) {
+  const row = ((tree as Drawn).children ?? [])[0] as Drawn
+  const isOneRow = (n: unknown): boolean => {
+    if (typeof n === 'string') return !n.includes('\n')
+    const d = n as Drawn
+    if (d?.type === 'Box' && d.props?.flexDirection === 'column') return false
+    return (d?.children ?? []).every(isOneRow)
+  }
+  return { isOneRow: isOneRow(row), isRight: row?.props?.justifyContent === 'flex-end' }
+}

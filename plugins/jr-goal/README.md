@@ -3,8 +3,10 @@
 One goal per project, broken into steps you tick off, always in view above the prompt.
 
 ```
-◆ goal 2/5 ████······ Ship the billing page · next: Wire Stripe webhooks
+                     goal Ship the billing page ███··· 2/5 · next: Wire Stripe webhooks
 ```
+
+One quiet row, right-aligned, out of the way of your eye.
 
 ## Commands
 

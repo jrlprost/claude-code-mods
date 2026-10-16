@@ -3,7 +3,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { JrGoal } from '../types'
 import { applyCommand, progress } from './goal'
-import { gauge, gradientText } from './jr/draw'
+import { gauge } from './jr/draw'
 import { GRADIENTS } from './jr/gradient'
 
 const goal = atom({ plugin: 'jr-goal', key: 'goal' } as const, null)
@@ -70,7 +70,13 @@ export const register: Register = (on, options) => {
         void ensureLoaded($)
       })
     }
-    if (await isBandHidden($)) return below
+    // Never write state while drawing: the saved choice is loaded just after.
+    if (!bandState.isLoaded) {
+      $.clock.after(0, () => {
+        void isBandHidden($)
+      })
+    }
+    if (await read($, bandHidden)) return below
     const g = await read($, goal)
     if (!showBand || !g || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
@@ -79,19 +85,20 @@ export const register: Register = (on, options) => {
     const upcoming = g.steps.find(s => !s.isDone)
     return (
       <Box flexDirection="column">
-        <Text wrap="truncate-end">
-          <Text color="#ff8c42">{'◆ '}</Text>
-          {gradientText(Text, 'goal ', GRADIENTS.brand)}
-          {g.steps.length > 0 && (
-            <Text>
-              <Text bold>{`${progress(g)} `}</Text>
-              {gauge(Text, ratio, 10, GRADIENTS.money)}
-              <Text>{' '}</Text>
-            </Text>
-          )}
-          <Text>{g.goal}</Text>
-          {upcoming && <Text dimColor>{` · next: ${upcoming.text}`}</Text>}
-        </Text>
+        <Box justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            <Text dimColor>{'goal '}</Text>
+            <Text>{g.goal}</Text>
+            {g.steps.length > 0 && (
+              <Text>
+                <Text>{' '}</Text>
+                {gauge(Text, ratio, 6, GRADIENTS.money)}
+                <Text>{` ${progress(g)}`}</Text>
+              </Text>
+            )}
+            {upcoming && <Text dimColor>{` · next: ${upcoming.text}`}</Text>}
+          </Text>
+        </Box>
         {below}
       </Box>
     )
