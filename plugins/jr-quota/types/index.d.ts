@@ -12,6 +12,6 @@ export type JrQuotaView = { balances: JrQuotaBalance[]; checkedAt: number }
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-quota': { view: JrQuotaView | null }
+    'jr-quota': { view: JrQuotaView | null; isBandHidden: boolean }
   }
 }

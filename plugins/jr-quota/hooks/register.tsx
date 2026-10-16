@@ -7,6 +7,32 @@ import { GRADIENTS } from './jr/gradient'
 import { failureText, PROVIDERS } from './providers'
 
 const view = atom({ plugin: 'jr-quota', key: 'view' } as const, null)
+const bandHidden = atom({ plugin: 'jr-quota', key: 'isBandHidden' } as const, false)
+const band = { isLoaded: false }
+
+/** `hide`/`off`, `show`/`on`, or a bare command, which toggles; anything else is not about the band. */
+const bandVerb = (args: string) => {
+  const arg = args.trim().toLowerCase()
+  if (arg === 'hide' || arg === 'off') return 'hide' as const
+  if (arg === 'show' || arg === 'on') return 'show' as const
+  return arg === '' ? ('toggle' as const) : null
+}
+
+/** Hidden or shown is one choice for every session, kept across restarts. */
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
+  const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? 'jr quota · hidden (/jrquota to bring it back)' : 'jr quota · shown' }
+}
 const PANE = 'jr-quota'
 const EVERY_MS = 10 * 60_000
 
@@ -61,12 +87,14 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrquota', description: 'Balances of your other AI and data APIs (OpenRouter, Firecrawl, DeepSeek)' })
+    await $.command.register({ name: 'jrquota', description: 'Show or hide the low-balance band; /jrquota details shows every balance' })
     await ensurePolling($)
     return started
   })
 
-  on('command.run', { command: 'jrquota' }, async $ => {
+  on('command.run', { command: 'jrquota' }, async ($, e) => {
+    const verb = bandVerb(e.args)
+    if (verb) return setBand($, verb)
     live.isPolling ? await check($) : await ensurePolling($)
     const v = await read($, view)
     if (!v || v.balances.length === 0) {
@@ -105,6 +133,7 @@ export const register: Register = (on, options) => {
         void ensurePolling($)
       })
     }
+    if (await isBandHidden($)) return below
     const lows = v?.balances.filter(b => b.isLow) ?? []
     if (lows.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)

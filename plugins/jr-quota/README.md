@@ -21,7 +21,9 @@ Services without a key are skipped.
 
 | Command | |
 | --- | --- |
-| `/jrquota` | Check now and show every balance in a pane |
+| `/jrquota` | Hide the band above the prompt, or bring it back |
+| `/jrquota hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jrquota details` | Check now and show every balance in a pane |
 
 ## Settings (`/config`)
 
