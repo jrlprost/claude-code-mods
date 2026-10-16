@@ -3,6 +3,6 @@ export type JrCommitCoachNudge = { lines: number; untracked: number; advice: str
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-commit-coach': { nudge: JrCommitCoachNudge | null }
+    'jr-commit-coach': { nudge: JrCommitCoachNudge | null; isBandHidden: boolean }
   }
 }

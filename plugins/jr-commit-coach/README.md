@@ -14,6 +14,7 @@ jr commit coach · 364 lines uncommitted, 1 new file: commit in small steps, e.g
 - The split groups the changes by top-level folder, biggest first.
 - The toast comes once, then again only when the pile has grown by half. The band stays while the pile stays over the threshold and leaves after you commit.
 - Silent outside a git repository.
+- `/jrcommit` hides or shows the band, in every session and across restarts; `/jrcommit on` and `/jrcommit off` set it.
 
 ## Settings (`/config`)
 
@@ -30,4 +31,4 @@ jr commit coach · 364 lines uncommitted, 1 new file: commit in small steps, e.g
 
 ## Access
 
-Runs `git diff --numstat HEAD` and `git ls-files --others --exclude-standard` in the session's folder after each turn. Never commits anything. Sends nothing over the network.
+Runs `git diff --numstat HEAD` and `git ls-files --others --exclude-standard` in the session's folder after each turn. Never commits anything. Sends nothing over the network. Remembers whether the band is hidden.

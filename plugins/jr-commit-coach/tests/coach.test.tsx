@@ -1,4 +1,4 @@
-import { test, expect } from 'claude-code/testing'
+import { test, expect, mock } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 import { advice, pending, splitByFolder } from '../hooks/coach'
@@ -18,6 +18,10 @@ test('the advice names the biggest groups', async () => {
 })
 
 const machine = (on: On, numstat: string, toasts: string[]) => {
+  mock.clock(on)
+  mock.store(on)
+  on('command.register', () => ({ value: undefined }) as never)
+  on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('session.root', () => ({ value: '/w' }) as never)
   on('turn.complete', () => ({ text: '' }) as never)
   on('process.run', ($, e) => {
@@ -75,4 +79,24 @@ test('a repository whose config can run a program is left alone: git never runs'
   await $.turn.complete({ answer: '', durationMs: 1, isAborted: false, turnId: 't', text: '', reason: 'answer' } as never)
   // Only config listings ran: never a diff or ls-files in that repository.
   expect(ran.every(argv => argv.includes('config'))).toBe(true)
+})
+
+test('/jrcommit on|off and the bare command hide and bring back the band', async ($, on) => {
+  machine(on, NUMSTAT, [])
+  await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
+  await $.turn.complete(END as never)
+  const mount = () => $.ui.mount({ plugin: 'jr-commit-coach', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
+  const said = await $.command.run({ command: 'jrcommit', args: 'off' } as never)
+  expect(JSON.stringify(said)).toContain('hidden')
+  let ui = await mount()
+  expect(await ui.find({ text: /uncommitted/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrcommit', args: '' } as never)
+  ui = await mount()
+  expect(await ui.find({ text: /uncommitted/ } as never)).toBeDefined()
+  await ui.unmount()
+  await $.command.run({ command: 'jrcommit', args: '' } as never)
+  ui = await mount()
+  expect(await ui.find({ text: /uncommitted/ } as never)).toBeUndefined()
 })
