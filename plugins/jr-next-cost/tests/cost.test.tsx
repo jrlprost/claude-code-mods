@@ -39,39 +39,59 @@ const machine = (on: On) => {
 const BAND = { component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as const
 const DONE = { answer: '', durationMs: 1, isAborted: false, turnId: 't', text: '', reason: 'answer' } as const
 
-test('warm after a reply, then cold, on terminal and desktop', async ($, on) => {
+/** Rows the mod drew above `below`, the last child of its column. */
+const rowsAbove = (tree: unknown) => {
+  const t = tree as { type: string; props?: { flexDirection?: string }; children?: unknown[] }
+  return t.type === 'Box' && t.props?.flexDirection === 'column' ? (t.children ?? []).length - 1 : 0
+}
+
+test('hidden on a fresh install', async ($, on) => {
+  machine(on)
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  await $.turn.complete(DONE as never)
+  const ui = await $.ui.mount({ plugin: 'jr-next-cost', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /next/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+})
+
+test('shown, one quiet row: warm after a reply, then cold, on terminal and desktop', async ($, on) => {
   const c = machine(on)
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  await $.command.run({ command: 'jrnextcost', args: 'show' } as never)
   await $.turn.complete(DONE as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-next-cost', surface, ...BAND } as never)
-    expect(await ui.find({ text: /≈ \$0\.10/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /cache warm/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /^\$0\.10$/ } as never)).toBeDefined()
+    expect(await ui.find({ text: / · \$2\.50 cold/ } as never)).toBeDefined()
     expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+    expect(rowsAbove(await ui.drawn())).toBe(1)
     await ui.unmount()
   }
   for (let i = 0; i < 70; i++) await c.advance(5_000)
   const ui = await $.ui.mount({ plugin: 'jr-next-cost', surface: 'terminal', ...BAND } as never)
-  expect(await ui.find({ text: /≈ \$2\.50/ } as never)).toBeDefined()
-  expect(await ui.find({ text: /cache cold/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /^\$2\.50$/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /^ · cold$/ } as never)).toBeDefined()
 })
 
-test('/jrnextcost on|off and the bare command hide and bring back the band', async ($, on) => {
+test('/jrnextcost toggles, on and off set it', async ($, on) => {
   machine(on)
   await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
   await $.turn.complete(DONE as never)
-  const mount = () => $.ui.mount({ plugin: 'jr-next-cost', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
-  const said = await $.command.run({ command: 'jrnextcost', args: 'off' } as never)
-  expect(JSON.stringify(said)).toContain('hidden')
+  const mount = () => $.ui.mount({ plugin: 'jr-next-cost', surface: 'terminal', ...BAND } as never)
+  expect(JSON.stringify(await $.command.run({ command: 'jrnextcost', args: '' } as never))).toContain('shown')
   let ui = await mount()
-  expect(await ui.find({ text: /cache warm/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /cold/ } as never)).toBeDefined()
+  await ui.unmount()
+  expect(JSON.stringify(await $.command.run({ command: 'jrnextcost', args: '' } as never))).toContain('hidden')
+  ui = await mount()
+  expect(await ui.find({ text: /cold/ } as never)).toBeUndefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
   await ui.unmount()
-  await $.command.run({ command: 'jrnextcost', args: '' } as never)
+  await $.command.run({ command: 'jrnextcost', args: 'on' } as never)
   ui = await mount()
-  expect(await ui.find({ text: /cache warm/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /cold/ } as never)).toBeDefined()
   await ui.unmount()
-  await $.command.run({ command: 'jrnextcost', args: '' } as never)
+  await $.command.run({ command: 'jrnextcost', args: 'off' } as never)
   ui = await mount()
-  expect(await ui.find({ text: /cache warm/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /cold/ } as never)).toBeUndefined()
 })

@@ -1,7 +1,7 @@
 {
   "name": "jr-next-cost",
-  "version": "0.2.0",
-  "description": "What the next prompt costs before you send it: the context it resends, at the current model's price, read from a warm cache or written to a cold one, at API rates.",
+  "version": "0.3.0",
+  "description": "What the next prompt costs before you send it, on /jrnextcost: the context it resends at the current model's price, read from a warm cache or written to a cold one, at API rates.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",

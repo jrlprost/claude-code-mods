@@ -1,28 +1,32 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import { gradientText } from './jr/draw'
-import { GRADIENTS, colorAt, formatTokens } from './jr/gradient'
+import { GRADIENTS, colorAt } from './jr/gradient'
 import { nextCost, priceOf, usd } from './prices'
 import type { Price } from './prices'
 
 const next = atom({ plugin: 'jr-next-cost', key: 'next' } as const, null)
-const bandHidden = atom({ plugin: 'jr-next-cost', key: 'isBandHidden' } as const, false)
+// Hidden until the person asks for it.
+const bandHidden = atom({ plugin: 'jr-next-cost', key: 'isBandHidden' } as const, true)
 const commands = { isRegistered: false }
 const band = { isLoaded: false }
 
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrnextcost', description: 'Show or hide the next-prompt cost band: /jrnextcost toggles, /jrnextcost on or off' })
+  await $.command.register({ name: 'jrnextcost', description: 'Show or hide the next-prompt cost (hidden by default): /jrnextcost toggles, /jrnextcost on or off' })
 }
 
-/** True while the band is hidden: one choice for every session, read from the store once per load. */
+/** Reads the saved choice once per load of the mod; outside a drawing, which cannot write state. */
+async function loadBand($: EngineInterface) {
+  if (band.isLoaded) return
+  band.isLoaded = true
+  if ((await $.store.get('isBandHidden')) === false) await update($, bandHidden, () => false)
+}
+
+/** True while the band is hidden (until asked for): one choice for every session. */
 async function isBandHidden($: EngineInterface) {
-  if (!band.isLoaded) {
-    band.isLoaded = true
-    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
-  }
+  await loadBand($)
   return read($, bandHidden)
 }
 
@@ -57,6 +61,7 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, nextHook) => {
     const started = await nextHook(e)
     await ensureCommand($)
+    await loadBand($)
     await ensureTicking($)
     return started
   })
@@ -71,11 +76,12 @@ export const register: Register = (on, options) => {
 
   on('command.run', { command: 'jrnextcost' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
+    await loadBand($)
     const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : arg === '' ? !(await isBandHidden($)) : null
     if (hide === null) return { text: 'jr next cost · usage: /jrnextcost toggles the band, /jrnextcost on or off' }
     await $.store.set('isBandHidden', hide)
     await update($, bandHidden, () => hide)
-    return { text: hide ? 'jr next cost · hidden (/jrnextcost to bring it back)' : 'jr next cost · shown' }
+    return { text: hide ? 'jr next cost · hidden (/jrnextcost to bring it back)' : 'jr next cost · shown above the prompt (/jrnextcost to hide it)' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, nextHook) => {
@@ -86,31 +92,27 @@ export const register: Register = (on, options) => {
         void ensureTicking($)
       })
     }
-    if (!commands.isRegistered) {
+    if (!commands.isRegistered || !band.isLoaded) {
       $.clock.after(0, () => {
         void ensureCommand($)
+        void loadBand($)
       })
     }
-    if (await isBandHidden($)) return below
+    if (await read($, bandHidden)) return below
     const price = override ?? (n ? priceOf(n.model) : null)
     if (!n || !price || n.tokens <= 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
-    const left = n.lastAt === null ? 0 : n.lastAt + live.ttlMin * 60_000 - n.now
-    const isWarm = left > 0
+    const isWarm = n.lastAt !== null && n.lastAt + live.ttlMin * 60_000 > n.now
     const cost = nextCost(n.tokens, price, isWarm)
-    const cold = nextCost(n.tokens, price, false)
+    // One quiet row on the right. The cache countdown itself is jr-cache-clock's.
     return (
       <Box flexDirection="column">
-        <Box>
-          {gradientText(Text, 'next ', GRADIENTS.brand)}
-          <Text bold color={colorAt(GRADIENTS.heat, Math.min(1, cost / 2))}>{`≈ ${usd(cost)}`}</Text>
-          <Text dimColor>{` to resend ${formatTokens(n.tokens)} · `}</Text>
-          {isWarm ? (
-            <Text color="#2cb67d">{`cache warm ${Math.floor(left / 60_000)}:${String(Math.floor((left % 60_000) / 1000)).padStart(2, '0')}`}</Text>
-          ) : (
-            <Text color="#ff8c42">{'cache cold'}</Text>
-          )}
-          {isWarm && <Text dimColor>{` · ${usd(cold)} once cold`}</Text>}
+        <Box justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            <Text dimColor>{'next '}</Text>
+            <Text color={colorAt(GRADIENTS.heat, Math.min(1, cost / 2))}>{usd(cost)}</Text>
+            <Text dimColor>{isWarm ? ` · ${usd(nextCost(n.tokens, price, false))} cold` : ' · cold'}</Text>
+          </Text>
         </Box>
         {below}
       </Box>
