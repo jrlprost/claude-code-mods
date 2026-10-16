@@ -1,6 +1,6 @@
 {
   "name": "jr-stripemrr",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Your Stripe MRR and today's revenue above the prompt, refreshed every 15 minutes; /jrmrr adds the last 30 days as a sparkline.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

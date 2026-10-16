@@ -39,6 +39,7 @@ test('money and sparkline read well', async () => {
 
 const machine = (on: On, urls: string[]) => {
   mock.clock(on, { now: NOW })
+  mock.store(on)
   on('command.register', () => ({ value: undefined }) as never)
   on('ui.open', () => ({ value: { isPlaced: true } }) as never)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
@@ -65,7 +66,7 @@ test('with a key, the band shows MRR and today, and /jrmrr the 30 days', { optio
     expect(await band.find({ text: /49\.90 €/ } as never)).toBeDefined()
     await band.unmount()
   }
-  await $.command.run({ command: 'jrmrr', args: '' } as never)
+  await $.command.run({ command: 'jrmrr', args: 'details' } as never)
   const pane = await $.ui.mount({ plugin: 'jr-stripemrr', surface: 'terminal', component: 'Pane', requestId: 'jr-stripemrr', props: {} } as never)
   expect(await pane.find({ text: /last 30 days/ } as never)).toBeDefined()
 })
@@ -74,4 +75,29 @@ test('without a key, /jrmrr explains where to put one', async ($, on) => {
   machine(on, [])
   const answer = await $.command.run({ command: 'jrmrr', args: '' } as never)
   expect(JSON.stringify(answer)).toContain('restricted key')
+})
+
+test('/jrmrr hide takes the band away, the bare command toggles it, on brings it back', { options: { apiKey: 'rk_test_x' } }, async ($, on) => {
+  machine(on, [])
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>below</Text>
+  })
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  const shows = async () => {
+    const band = await $.ui.mount({ plugin: 'jr-stripemrr', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 } } as never)
+    const seen = (await band.find({ text: /87 €/ } as never)) !== undefined
+    expect(await band.find({ text: /below/ } as never)).toBeDefined()
+    await band.unmount()
+    return seen
+  }
+  expect(await shows()).toBe(true)
+  expect(JSON.stringify(await $.command.run({ command: 'jrmrr', args: 'hide' } as never))).toContain('hidden')
+  expect(await shows()).toBe(false)
+  await $.command.run({ command: 'jrmrr', args: '' } as never)
+  expect(await shows()).toBe(true)
+  await $.command.run({ command: 'jrmrr', args: '' } as never)
+  expect(await shows()).toBe(false)
+  await $.command.run({ command: 'jrmrr', args: 'on' } as never)
+  expect(await shows()).toBe(true)
 })

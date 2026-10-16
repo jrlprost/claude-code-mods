@@ -12,6 +12,6 @@ export type JrStripeFigures = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-stripemrr': { figures: JrStripeFigures | null }
+    'jr-stripemrr': { figures: JrStripeFigures | null; isBandHidden: boolean }
   }
 }
