@@ -3,9 +3,11 @@
 Keeps your Mac awake while Claude works, and tells you before it falls asleep. One system for every Claude Code session on the machine: the mode you pick in one session applies to all of them, and the Mac stays awake as long as at least one of them needs it.
 
 ```
-awake ☕ held by 2 sessions · mode working
-awake 💤 Mac sleeps in 0:48 · /jrawake session
+▲ Mac sleeps in 0:48 · /jrawake on
+                                                    awake · working · held by 2
 ```
+
+The warning shows whenever the Mac is about to sleep. The mode line on the right is hidden by default: `/jrawake show` turns it on.
 
 ## Modes
 
@@ -21,7 +23,7 @@ Awake means `caffeinate -i` (system idle sleep prevented). Turn on **Keep the di
 
 ## Warning before sleep
 
-The mod reads your sleep setting (`pmset -g`) and the time since your last keyboard or pointer event. When the Mac is about to sleep and nothing holds it awake, a toast says so a minute before (configurable) and the band counts down from five minutes.
+The mod reads your sleep setting (`pmset -g`) and the time since your last keyboard or pointer event. When the Mac is about to sleep and nothing holds it awake, a toast and a warning row above the prompt say so a minute before (configurable).
 
 ## Commands
 
@@ -31,7 +33,7 @@ The mod reads your sleep setting (`pmset -g`) and the time since your last keybo
 | `/jrawake working` | Awake while Claude works |
 | `/jrawake session` (or `on`) | Awake while any session is open |
 | `/jrawake off` | Let the Mac sleep |
-| `/jrawake hide` / `/jrawake show` | Hide or show the band, in every session; the Mac is still kept awake |
+| `/jrawake show` / `/jrawake hide` | Show or hide the mode line (hidden by default), in every session; the Mac is still kept awake and the warning still shows |
 
 ## Settings (`/config`)
 
@@ -40,7 +42,7 @@ The mod reads your sleep setting (`pmset -g`) and the time since your last keybo
 | Default mode | working | Used until `/jrawake` sets one |
 | Keep the display on too | off | Adds `caffeinate -d` |
 | Warn before sleep (s) | 60 | When the toast fires |
-| Show the band | on | Shown only while the Mac is held awake or about to sleep |
+| Show the band | on | Off: no warning row and no mode line |
 
 ## Install
 

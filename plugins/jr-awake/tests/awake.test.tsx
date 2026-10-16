@@ -45,7 +45,7 @@ test('stale heartbeats from closed sessions are ignored', async () => {
   expect(workingSessions(beats, now).map(b => b.id)).toEqual(['a'])
 })
 
-const machine = (on: On, pmset: string, spawned: string[][]) => {
+const machine = (on: On, pmset: string, spawned: string[][], idleSeconds = 420) => {
   mock.clock(on)
   mock.store(on)
   on('session.id', () => ({ value: 's1' }) as never)
@@ -55,7 +55,7 @@ const machine = (on: On, pmset: string, spawned: string[][]) => {
   on('ui.toast', () => ({ value: undefined }) as never)
   on('process.run', ($, e) => {
     const argv = (e as unknown as { argv: string[] }).argv
-    return { value: { exitCode: 0, stdout: argv[0] === 'pmset' ? pmset : '420\n', stderr: '' } } as never
+    return { value: { exitCode: 0, stdout: argv[0] === 'pmset' ? pmset : `${idleSeconds}\n`, stderr: '' } } as never
   })
   on('process.spawn', async function* ($, e) {
     spawned.push([...(e as unknown as { argv: string[] }).argv])
@@ -80,12 +80,41 @@ test('a prompt holds the Mac awake with caffeinate in working mode', async ($, o
   expect(spawned).toEqual([['caffeinate', '-i']])
 })
 
-test('the band warns when the Mac is about to sleep', async ($, on) => {
+/** Rows the mod drew above `below`, the last child of its column. */
+const rowsAbove = (tree: unknown) => {
+  const t = tree as { type: string; props?: { flexDirection?: string }; children?: unknown[] }
+  return t.type === 'Box' && t.props?.flexDirection === 'column' ? (t.children ?? []).length - 1 : 0
+}
+
+test('hidden on a fresh install: nothing drawn while sleep is not near', async ($, on) => {
   machine(on, PMSET_FREE, [])
   await $.session.start(start)
   const ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
-  expect(await ui.find({ text: /Mac sleeps in 3:00/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /awake|sleeps/ } as never)).toBeUndefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+})
+
+test('about to sleep: one alert row on the left, even while hidden', async ($, on) => {
+  machine(on, PMSET_FREE, [], 560)
+  await $.session.start(start)
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({ plugin: 'jr-awake', surface, ...BAND } as never)
+    expect(await ui.find({ text: /^Mac sleeps in 0:40$/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /\/jrawake on/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /below/ } as never)).toBeDefined()
+    expect(rowsAbove(await ui.drawn())).toBe(1)
+    await ui.unmount()
+  }
+})
+
+test('shown: one quiet row with the shared mode', async ($, on) => {
+  machine(on, PMSET_FREE, [])
+  await $.session.start(start)
+  await $.command.run({ command: 'jrawake', args: 'show' } as never)
+  const ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /^awake · $/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /^working$/ } as never)).toBeDefined()
+  expect(rowsAbove(await ui.drawn())).toBe(1)
 })
 
 test('/jrawake session is shared: the mode is stored for every session', async ($, on) => {
@@ -95,16 +124,16 @@ test('/jrawake session is shared: the mode is stored for every session', async (
   expect(JSON.stringify(answer)).toContain('mode session (all sessions)')
 })
 
-test('/jrawake hide takes the band away and keeps what is below, show brings it back', async ($, on) => {
+test('/jrawake show brings the line, hide takes it away and keeps what is below', async ($, on) => {
   machine(on, PMSET_FREE, [])
   await $.session.start(start)
+  await $.command.run({ command: 'jrawake', args: 'show' } as never)
+  let ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
+  expect(await ui.find({ text: /^working$/ } as never)).toBeDefined()
+  await ui.unmount()
   const answer = await $.command.run({ command: 'jrawake', args: 'hide' } as never)
   expect(JSON.stringify(answer)).toContain('still kept awake')
-  let ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
-  expect(await ui.find({ text: /Mac sleeps in/ } as never)).toBeUndefined()
-  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
-  await ui.unmount()
-  await $.command.run({ command: 'jrawake', args: 'show' } as never)
   ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
-  expect(await ui.find({ text: /Mac sleeps in 3:00/ } as never)).toBeDefined()
+  expect(await ui.find({ text: /^working$/ } as never)).toBeUndefined()
+  expect(await ui.find({ text: /below/ } as never)).toBeDefined()
 })

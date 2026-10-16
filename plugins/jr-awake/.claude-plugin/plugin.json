@@ -1,6 +1,6 @@
 {
   "name": "jr-awake",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
@@ -31,7 +31,7 @@
     "showBand": {
       "type": "boolean",
       "title": "Show the band",
-      "description": "A line above the prompt while the Mac is held awake or about to sleep.",
+      "description": "The warning above the prompt when the Mac is about to sleep, and the mode line once /jrawake show turns it on.",
       "default": true
     }
   }

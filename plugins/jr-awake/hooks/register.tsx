@@ -3,21 +3,18 @@ import type { EngineInterface, HookStream, ProcessSpawnChunk, ProcessSpawnResult
 
 import type { JrAwakeMode, JrAwakePower, JrAwakeSessionBeat } from '../types'
 import { BEAT_STALE_MS, formatCountdown, MODES, parsePmset, secondsToSleep, shouldHold } from './power'
-import { gradientText } from './jr/draw'
-import { GRADIENTS, colorAt } from './jr/gradient'
 
 const view = atom({ plugin: 'jr-awake', key: 'view' } as const, null)
-const bandHidden = atom({ plugin: 'jr-awake', key: 'isBandHidden' } as const, false)
+// Hidden until the person asks for it; the warning before sleep shows regardless.
+const bandHidden = atom({ plugin: 'jr-awake', key: 'isBandHidden' } as const, true)
 
 const bandState = { isLoaded: false }
 
-/** True while the band is hidden; the saved choice is read once per load of the mod. */
-async function isBandHidden($: EngineInterface) {
-  if (!bandState.isLoaded) {
-    bandState.isLoaded = true
-    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
-  }
-  return read($, bandHidden)
+/** Reads the saved choice once per load of the mod; outside a drawing, which cannot write state. */
+async function loadBand($: EngineInterface) {
+  if (bandState.isLoaded) return
+  bandState.isLoaded = true
+  if ((await $.store.get('isBandHidden')) === false) await update($, bandHidden, () => false)
 }
 
 /** Hides or shows the band for every session, kept across restarts. */
@@ -131,7 +128,8 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrawake', description: 'Keep the Mac awake: /jrawake working | session | off | status | hide | show' })
+    await $.command.register({ name: 'jrawake', description: 'Keep the Mac awake: /jrawake working | session | off | status | show | hide (the line is hidden by default)' })
+    await loadBand($)
     await ensureStarted($, fallbackMode, keepDisplay, warnAt)
     return started
   })
@@ -165,8 +163,9 @@ export const register: Register = (on, options) => {
     await ensureStarted($, fallbackMode, keepDisplay, warnAt)
     const word = e.args.trim().toLowerCase()
     if (word === 'hide' || word === 'show') {
-      const answer = await setBand($, word === 'hide', 'jr awake band', '/jrawake show')
-      return word === 'hide' ? { text: `${answer.text}; the Mac is still kept awake` } : answer
+      await loadBand($)
+      const answer = await setBand($, word === 'hide', 'jr awake line', '/jrawake show')
+      return word === 'hide' ? { text: `${answer.text}; the Mac is still kept awake, and the warning before sleep still shows` } : answer
     }
     const arg = e.args.trim() as JrAwakeMode | 'on' | 'status' | ''
     const mode: JrAwakeMode | null = arg === 'on' ? 'session' : MODES.includes(arg as JrAwakeMode) ? (arg as JrAwakeMode) : null
@@ -187,27 +186,37 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const v = await read($, view)
-    if (!v && !live.isTicking) {
+    if ((!v && !live.isTicking) || !bandState.isLoaded) {
       $.clock.after(0, () => {
+        void loadBand($)
         void ensureStarted($, fallbackMode, keepDisplay, warnAt)
       })
     }
-    if (await isBandHidden($)) return below
     if (!showBand || !v || e.props.hasSurvey) return below
-    // Quiet unless the Mac is held awake or about to sleep.
-    const soon = v.sleepIn !== null && v.sleepIn <= 5 * 60
-    if (!v.holders && !soon) return below
     const { Box, Text } = $.ui.resolve(e)
+    // About to sleep: an alert on the left, shown even while the line is hidden.
+    if (v.sleepIn !== null && v.sleepIn <= warnAt) {
+      return (
+        <Box flexDirection="column">
+          <Text wrap="truncate-end">
+            <Text color="#ef4565">{'▲ '}</Text>
+            <Text>{`Mac sleeps in ${formatCountdown(v.sleepIn)}`}</Text>
+            <Text dimColor>{' · /jrawake on'}</Text>
+          </Text>
+          {below}
+        </Box>
+      )
+    }
+    if (await read($, bandHidden)) return below
+    // Otherwise one quiet row on the right: the shared mode, and who holds the Mac awake.
     return (
       <Box flexDirection="column">
-        <Box>
-          {gradientText(Text, 'awake ', GRADIENTS.brand)}
-          {v.holders > 0 && <Text color="#2cb67d">{`☕ held by ${v.holders} session${v.holders > 1 ? 's' : ''}`}</Text>}
-          {v.holders > 0 && <Text dimColor>{` · mode ${v.mode}`}</Text>}
-          {soon && v.sleepIn !== null && (
-            <Text color={colorAt(GRADIENTS.heat, 1 - v.sleepIn / 300)} bold>{`💤 Mac sleeps in ${formatCountdown(v.sleepIn)}`}</Text>
-          )}
-          {soon && <Text dimColor>{' · /jrawake session'}</Text>}
+        <Box justifyContent="flex-end">
+          <Text wrap="truncate-end">
+            <Text dimColor>{'awake · '}</Text>
+            <Text color={v.holders > 0 ? '#2cb67d' : undefined}>{v.mode}</Text>
+            {v.holders > 0 && <Text dimColor>{` · held by ${v.holders}`}</Text>}
+          </Text>
         </Box>
         {below}
       </Box>
