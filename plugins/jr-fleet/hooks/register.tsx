@@ -9,6 +9,32 @@ import { GRADIENTS } from './jr/gradient'
 const PANE = 'jr-fleet'
 const BEAT_MS = 15_000
 const fleet = atom({ plugin: 'jr-fleet', key: 'fleet' } as const, null)
+const bandHidden = atom({ plugin: 'jr-fleet', key: 'isBandHidden' } as const, false)
+const band = { isLoaded: false }
+
+/** `hide`/`off`, `show`/`on`, or a bare command, which toggles; anything else is not about the band. */
+const bandVerb = (args: string) => {
+  const arg = args.trim().toLowerCase()
+  if (arg === 'hide' || arg === 'off') return 'hide' as const
+  if (arg === 'show' || arg === 'on') return 'show' as const
+  return arg === '' ? ('toggle' as const) : null
+}
+
+/** Hidden or shown is one choice for every session, kept across restarts. */
+async function isBandHidden($: EngineInterface) {
+  if (!band.isLoaded) {
+    band.isLoaded = true
+    if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+  }
+  return read($, bandHidden)
+}
+
+async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
+  const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
+  await $.store.set('isBandHidden', hide)
+  await update($, bandHidden, () => hide)
+  return { text: hide ? 'jr fleet · hidden (/jrfleet to bring it back)' : 'jr fleet · shown' }
+}
 const live: { me: JrFleetBeat | null; dir: string; home: string; isBeating: boolean } = { me: null, dir: '', home: '', isBeating: false }
 
 async function ensureMe($: EngineInterface) {
@@ -71,7 +97,7 @@ async function setState($: EngineInterface, state: JrFleetState) {
 async function ensureBeating($: EngineInterface) {
   if (live.isBeating) return
   live.isBeating = true
-  await $.command.register({ name: 'jrfleet', description: 'Every Claude Code session on this machine, and which ones wait for you' })
+  await $.command.register({ name: 'jrfleet', description: 'Show or hide the fleet band; /jrfleet details lists every session' })
   await beat($)
   $.clock.every(BEAT_MS, () => {
     void beat($)
@@ -105,7 +131,9 @@ export const register: Register = on => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrfleet' }, async $ => {
+  on('command.run', { command: 'jrfleet' }, async ($, e) => {
+    const verb = bandVerb(e.args)
+    if (verb) return setBand($, verb)
     await ensureBeating($)
     await scan($)
     await $.ui.open({ id: PANE, title: 'jr fleet', rows: 14 })
@@ -140,6 +168,7 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
+    if (await isBandHidden($)) return below
     const f = await read($, fleet)
     const others = f?.sessions.filter(x => x.id !== f.self) ?? []
     if (!f || others.length === 0 || e.props.hasSurvey) return below

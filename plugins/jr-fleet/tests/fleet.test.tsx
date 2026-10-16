@@ -22,6 +22,7 @@ test('paths under home are shortened', async () => {
 // A tiny file system in memory, with another session already beating.
 const machine = (on: On, files: Map<string, string>) => {
   mock.clock(on, { now: NOW })
+  mock.store(on)
   on('env.get', () => ({ value: '/Users/x' }) as never)
   on('session.id', () => ({ value: 'me' }) as never)
   on('session.cwd', () => ({ value: '/Users/x/tokenkarma' }) as never)
@@ -55,7 +56,7 @@ test('this session beats, sees the other one waiting, and says so', async ($, on
     expect(await band.find({ text: /1 waiting for you: acme/ } as never)).toBeDefined()
     await band.unmount()
   }
-  await $.command.run({ command: 'jrfleet', args: '' } as never)
+  await $.command.run({ command: 'jrfleet', args: 'details' } as never)
   const pane = await $.ui.mount({ plugin: 'jr-fleet', surface: 'terminal', component: 'Pane', requestId: 'jr-fleet', props: {} } as never)
   expect(await pane.find({ text: /this one/ } as never)).toBeDefined()
   expect(await pane.find({ text: /~\/tokenkarma/ } as never)).toBeDefined()
@@ -66,4 +67,19 @@ test('alone on the machine, no band', async ($, on) => {
   await $.session.start({ cwd: '/Users/x/tokenkarma', surface: 'terminal', isInteractive: true })
   const band = await $.ui.mount({ plugin: 'jr-fleet', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as never)
   expect(await band.find({ text: /fleet/ } as never)).toBeUndefined()
+})
+
+test('/jrfleet hide takes the band away, the bare command brings it back', async ($, on) => {
+  const files = new Map<string, string>([['/Users/x/.claude/jr-fleet/acme.json', JSON.stringify(beat('acme', 'waiting', 120_000))]])
+  machine(on, files)
+  await $.session.start({ cwd: '/Users/x/tokenkarma', surface: 'terminal', isInteractive: true })
+  const props = { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 }
+  await $.command.run({ command: 'jrfleet', args: 'hide' } as never)
+  let band = await $.ui.mount({ plugin: 'jr-fleet', surface: 'terminal', component: 'AbovePrompt', props } as never)
+  expect(await band.find({ text: /waiting for you/ } as never)).toBeUndefined()
+  expect(await band.find({ text: /below/ } as never)).toBeDefined()
+  await band.unmount()
+  expect(JSON.stringify(await $.command.run({ command: 'jrfleet', args: '' } as never))).toContain('shown')
+  band = await $.ui.mount({ plugin: 'jr-fleet', surface: 'terminal', component: 'AbovePrompt', props } as never)
+  expect(await band.find({ text: /1 waiting for you: acme/ } as never)).toBeDefined()
 })

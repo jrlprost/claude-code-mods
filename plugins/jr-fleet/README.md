@@ -6,7 +6,7 @@ When several Claude Code sessions run at once, jr-fleet tells you which ones are
 fleet 3 sessions · 1 waiting for you: acme
 ```
 
-`/jrfleet` lists them:
+`/jrfleet details` lists them:
 
 ```
 jr fleet   3 sessions · 1 working · 1 waiting for you
@@ -27,7 +27,9 @@ Every session with jr-fleet writes a small file to `~/.claude/jr-fleet/<session 
 
 | Command | |
 | --- | --- |
-| `/jrfleet` | List every session on the machine |
+| `/jrfleet` | Hide the band above the prompt, or bring it back |
+| `/jrfleet hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jrfleet details` | List every session on the machine |
 
 ## Install
 

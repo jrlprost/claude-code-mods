@@ -16,6 +16,6 @@ export type JrFleetBeat = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'jr-fleet': { fleet: { sessions: JrFleetBeat[]; self: string; home: string; at: number } | null }
+    'jr-fleet': { fleet: { sessions: JrFleetBeat[]; self: string; home: string; at: number } | null; isBandHidden: boolean }
   }
 }
