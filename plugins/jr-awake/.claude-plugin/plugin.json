@@ -1,11 +1,19 @@
 {
   "name": "jr-awake",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep.",
-  "author": { "name": "jrlprost" },
+  "author": {
+    "name": "jrlprost"
+  },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",
-  "keywords": ["claude-code-mod", "jr", "caffeinate", "sleep", "macos"],
+  "keywords": [
+    "claude-code-mod",
+    "jr",
+    "caffeinate",
+    "sleep",
+    "macos"
+  ],
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
@@ -13,7 +21,11 @@
       "type": "string",
       "title": "Default mode",
       "description": "working: awake while Claude works in any session. session: awake while any session is open. off. /jrawake changes it for every session.",
-      "options": ["working", "session", "off"],
+      "options": [
+        "working",
+        "session",
+        "off"
+      ],
       "default": "working"
     },
     "keepDisplay": {

@@ -13,8 +13,8 @@ const bandState = { isLoaded: false }
 /** Reads the saved choice once per load of the mod; outside a drawing, which cannot write state. */
 async function loadBand($: EngineInterface) {
   if (bandState.isLoaded) return
-  bandState.isLoaded = true
   if ((await $.store.get('isBandHidden')) === false) await update($, bandHidden, () => false)
+  bandState.isLoaded = true
 }
 
 /** Hides or shows the band for every session, kept across restarts. */
@@ -186,9 +186,8 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const v = await read($, view)
-    if ((!v && !live.isTicking) || !bandState.isLoaded) {
+    if (!v && !live.isTicking) {
       $.clock.after(0, () => {
-        void loadBand($)
         void ensureStarted($, fallbackMode, keepDisplay, warnAt)
       })
     }
