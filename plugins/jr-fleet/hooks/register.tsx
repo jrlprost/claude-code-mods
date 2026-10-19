@@ -129,7 +129,15 @@ export const register: Register = on => {
 
   on('session.end', async ($, e, next) => {
     if (live.me) await $.process.run(['rm', '-f', `${live.dir}/${live.me.id}.json`])
-    return next(e)
+    const ended = await next(e)
+    // A /clear starts a new conversation with empty state and no session.start: load again once it has begun.
+    if (e.reason === 'clear') {
+      band.isLoaded = false
+      $.clock.after(1000, () => {
+        void isBandHidden($)
+      })
+    }
+    return ended
   })
 
   on('command.run', { command: 'jrfleet' }, async ($, e) => {
