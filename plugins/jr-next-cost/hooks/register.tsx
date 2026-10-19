@@ -87,11 +87,6 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, nextHook) => {
     const below = await nextHook(e)
     const n = await read($, next)
-    if (!live.isTicking) {
-      $.clock.after(0, () => {
-        void ensureTicking($)
-      })
-    }
     if (!commands.isRegistered) {
       $.clock.after(0, () => {
         void ensureCommand($)
