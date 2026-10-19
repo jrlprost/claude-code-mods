@@ -76,6 +76,18 @@ export const register: Register = (on, options) => {
   live.key = String(options.apiKey ?? '')
   const showBand = options.showBand !== false
 
+  // A /clear starts a new conversation with empty state and no session.start: load again once it has begun.
+  on('session.end', async ($, e, next) => {
+    const ended = await next(e)
+    if (e.reason === 'clear') {
+      band.isLoaded = false
+      $.clock.after(1000, () => {
+        void isBandHidden($)
+      })
+    }
+    return ended
+  })
+
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
