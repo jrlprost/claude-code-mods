@@ -18,8 +18,8 @@ const bandState = { isLoaded: false }
 /** True while the band is hidden; the saved choice is read once per load of the mod. */
 async function isBandHidden($: EngineInterface) {
   if (!bandState.isLoaded) {
-    bandState.isLoaded = true
     if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+    bandState.isLoaded = true
   }
   return read($, bandHidden)
 }
@@ -176,6 +176,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    await isBandHidden($)
     await $.command.register({ name: 'jrtime', description: 'Billable time: categories, ratios, hourly rate, export; /jrtime hide or show toggles the band' })
     await ensureRecording($)
     await refresh($)
@@ -237,12 +238,6 @@ export const register: Register = (on, options) => {
     if (!b && !live.isSampling) {
       $.clock.after(0, () => {
         void ensureRecording($).then(() => refresh($))
-      })
-    }
-    // Never write state while drawing: the saved choice is loaded just after.
-    if (!bandState.isLoaded) {
-      $.clock.after(0, () => {
-        void isBandHidden($)
       })
     }
     if (await read($, bandHidden)) return below
