@@ -21,8 +21,8 @@ const bandVerb = (args: string) => {
 
 async function isBandHidden($: EngineInterface) {
   if (!band.isLoaded) {
-    band.isLoaded = true
     if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+    band.isLoaded = true
   }
   return read($, bandHidden)
 }
@@ -73,6 +73,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    await isBandHidden($)
     await $.command.register({ name: 'jroutage', description: 'Show or hide the outage band; /jroutage details checks Claude, GitHub, npm and Vercel now' })
     await ensurePolling($)
     return started
@@ -113,12 +114,6 @@ export const register: Register = (on, options) => {
     if (!live.isPolling) {
       $.clock.after(0, () => {
         void ensurePolling($)
-      })
-    }
-    // Never write state while drawing: the saved choice is loaded just after.
-    if (!band.isLoaded) {
-      $.clock.after(0, () => {
-        void isBandHidden($)
       })
     }
     if (await read($, bandHidden)) return below

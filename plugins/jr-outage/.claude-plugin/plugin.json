@@ -1,11 +1,18 @@
 {
   "name": "jr-outage",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Is it them or is it me? The status of Claude, GitHub, npm and Vercel, checked every 10 minutes: /jroutage shows them all, a band and a toast appear only when one is degraded.",
-  "author": { "name": "jrlprost" },
+  "author": {
+    "name": "jrlprost"
+  },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",
-  "keywords": ["claude-code-mod", "jr", "status", "outage"],
+  "keywords": [
+    "claude-code-mod",
+    "jr",
+    "status",
+    "outage"
+  ],
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
