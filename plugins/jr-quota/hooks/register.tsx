@@ -129,11 +129,6 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const v = await read($, view)
-    if (!live.isPolling) {
-      $.clock.after(0, () => {
-        void ensurePolling($)
-      })
-    }
     if (await read($, bandHidden)) return below
     const lows = v?.balances.filter(b => b.isLow) ?? []
     if (lows.length === 0 || e.props.hasSurvey) return below
