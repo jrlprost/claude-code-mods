@@ -25,8 +25,8 @@ const bandVerb = (args: string) => {
 
 async function isBandHidden($: EngineInterface) {
   if (!band.isLoaded) {
-    band.isLoaded = true
     if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+    band.isLoaded = true
   }
   return read($, bandHidden)
 }
@@ -84,6 +84,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    await isBandHidden($)
     await ensureStarted($)
     return started
   })
@@ -137,12 +138,6 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    // Never write state while drawing: the saved choice is loaded just after.
-    if (!band.isLoaded) {
-      $.clock.after(0, () => {
-        void isBandHidden($)
-      })
-    }
     if (await read($, bandHidden)) return below
     const list = await read($, sites)
     if (list.length === 0 || e.props.hasSurvey) return below
