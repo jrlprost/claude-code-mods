@@ -82,6 +82,18 @@ export const register: Register = (on, options) => {
   live.urls = parseUrls(String(options.urls ?? ''))
   const showWhenUp = options.showWhenUp === true
 
+  // A /clear starts a new conversation with empty state and no session.start: load again once it has begun.
+  on('session.end', async ($, e, next) => {
+    const ended = await next(e)
+    if (e.reason === 'clear') {
+      band.isLoaded = false
+      $.clock.after(1000, () => {
+        void isBandHidden($)
+      })
+    }
+    return ended
+  })
+
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
