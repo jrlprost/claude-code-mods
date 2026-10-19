@@ -66,11 +66,6 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    if (!live.isLoaded) {
-      $.clock.after(0, () => {
-        void ensureLoaded($)
-      })
-    }
     if (await read($, bandHidden)) return below
     const g = await read($, goal)
     if (!showBand || !g || e.props.hasSurvey) return below
