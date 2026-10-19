@@ -21,8 +21,8 @@ const bandVerb = (args: string) => {
 /** Hidden or shown is one choice for every session, kept across restarts. */
 async function isBandHidden($: EngineInterface) {
   if (!band.isLoaded) {
-    band.isLoaded = true
     if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+    band.isLoaded = true
   }
   return read($, bandHidden)
 }
@@ -143,6 +143,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    await isBandHidden($)
     await $.command.register({ name: 'jrcontext', description: 'Show or hide the context band; /jrcontext details opens the full bar' })
     await refresh($, true)
     return started
@@ -178,12 +179,6 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    // Never write state while drawing: the saved choice is loaded just after.
-    if (!band.isLoaded) {
-      $.clock.after(0, () => {
-        void isBandHidden($)
-      })
-    }
     if (await read($, bandHidden)) return below
     const now = await read($, fill)
     // Installed or reloaded mid-session, the mod saw no session.start: read the figures once now.
