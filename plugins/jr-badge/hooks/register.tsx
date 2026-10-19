@@ -12,8 +12,8 @@ const live = { isScheduled: false, isLoaded: false }
 /** Hidden or shown is one choice for every session, kept across restarts; read outside a drawing, which cannot write state. */
 async function ensureLoaded($: EngineInterface) {
   if (live.isLoaded) return
-  live.isLoaded = true
   if ((await $.store.get('isHidden')) === false) await update($, isHidden, () => false)
+  live.isLoaded = true
 }
 
 async function git($: EngineInterface, cwd: string, args: string[]) {
