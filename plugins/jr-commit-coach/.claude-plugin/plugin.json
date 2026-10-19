@@ -1,6 +1,6 @@
 {
   "name": "jr-commit-coach",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Nudges you toward small atomic commits: when uncommitted changes pass a threshold, a band and a toast suggest a split by folder.",
   "author": {
     "name": "jrlprost"
