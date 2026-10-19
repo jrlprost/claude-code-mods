@@ -49,11 +49,6 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'AbovePrompt' }, ($, e, next) => {
-    if (!boot.isDone) {
-      $.clock.after(0, () => {
-        void ensureReady($)
-      })
-    }
     return next(e)
   })
 
