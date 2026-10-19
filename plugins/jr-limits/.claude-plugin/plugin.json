@@ -1,6 +1,6 @@
 {
   "name": "jr-limits",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Plan limits in one quiet row above the prompt: the 5-hour and 7-day fill and when the fullest resets, an alert from 80 %, a toast at 80 % and 95 %. /jrlimits hides or shows it, /jrlimits details opens the gauges.",
   "author": {
     "name": "jrlprost"

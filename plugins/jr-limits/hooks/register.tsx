@@ -130,11 +130,6 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const v = await read($, view)
-    if (!v && !live.isTicking) {
-      $.clock.after(0, () => {
-        void ensureTicking($)
-      })
-    }
     if (await read($, bandHidden)) return below
     if (!showBand || !v || v.windows.length === 0 || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
