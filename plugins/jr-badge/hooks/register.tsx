@@ -7,7 +7,7 @@ import { safeGit } from './jr/git'
 const badge = atom({ plugin: 'jr-badge', key: 'badge' } as const, null)
 // Hidden until the person asks for it.
 const isHidden = atom({ plugin: 'jr-badge', key: 'isHidden' } as const, true)
-const live = { isScheduled: false, isLoaded: false }
+const live = { isLoaded: false }
 
 /** Hidden or shown is one choice for every session, kept across restarts; read outside a drawing, which cannot write state. */
 async function ensureLoaded($: EngineInterface) {
@@ -69,14 +69,6 @@ export const register: Register = on => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const b = await read($, badge)
-    // Installed mid-session: no session.start, so load the choice and the badge after this draw.
-    if ((!b || !live.isLoaded) && !live.isScheduled) {
-      live.isScheduled = true
-      $.clock.after(0, () => {
-        void ensureLoaded($)
-        void refresh($)
-      })
-    }
     if (await read($, isHidden)) return below
     if (!b || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
