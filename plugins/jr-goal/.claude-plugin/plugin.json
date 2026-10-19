@@ -1,6 +1,6 @@
 {
   "name": "jr-goal",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A goal per project with steps you tick off, shown above the prompt with a progress gauge. /jrgoal to set it.",
   "author": {
     "name": "jrlprost"
