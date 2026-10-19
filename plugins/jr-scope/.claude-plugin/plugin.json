@@ -1,11 +1,18 @@
 {
   "name": "jr-scope",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Warns when a turn writes sensitive files nobody asked for (lockfiles, manifests, CI, .env, migrations, infra) or too many files at once.",
-  "author": { "name": "jrlprost" },
+  "author": {
+    "name": "jrlprost"
+  },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",
-  "keywords": ["claude-code-mod", "jr", "scope", "review"],
+  "keywords": [
+    "claude-code-mod",
+    "jr",
+    "scope",
+    "review"
+  ],
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
