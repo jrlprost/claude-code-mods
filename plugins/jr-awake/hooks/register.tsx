@@ -186,11 +186,6 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
     const v = await read($, view)
-    if (!v && !live.isTicking) {
-      $.clock.after(0, () => {
-        void ensureStarted($, fallbackMode, keepDisplay, warnAt)
-      })
-    }
     if (!showBand || !v || e.props.hasSurvey) return below
     const { Box, Text } = $.ui.resolve(e)
     // About to sleep: an alert on the left, shown even while the line is hidden.
