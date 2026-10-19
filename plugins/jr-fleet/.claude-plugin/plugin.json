@@ -1,11 +1,18 @@
 {
   "name": "jr-fleet",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Every Claude Code session on this machine at a glance: which ones are working and which ones wait for you, in a band above the prompt (/jrfleet hides or shows it) and in /jrfleet details.",
-  "author": { "name": "jrlprost" },
+  "author": {
+    "name": "jrlprost"
+  },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",
-  "keywords": ["claude-code-mod", "jr", "sessions", "fleet"],
+  "keywords": [
+    "claude-code-mod",
+    "jr",
+    "sessions",
+    "fleet"
+  ],
   "license": "MIT",
   "types": "./types/index.d.ts"
 }

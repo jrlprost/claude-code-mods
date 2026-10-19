@@ -23,8 +23,8 @@ const bandVerb = (args: string) => {
 /** Hidden or shown is one choice for every session, kept across restarts. */
 async function isBandHidden($: EngineInterface) {
   if (!band.isLoaded) {
-    band.isLoaded = true
     if ((await $.store.get('isBandHidden')) === true) await update($, bandHidden, () => true)
+    band.isLoaded = true
   }
   return read($, bandHidden)
 }
@@ -110,6 +110,7 @@ const WORDS: Record<JrFleetState, string> = { working: 'working', waiting: 'wait
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    await isBandHidden($)
     await ensureBeating($)
     return started
   })
@@ -168,12 +169,6 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    // Never write state while drawing: the saved choice is loaded just after.
-    if (!band.isLoaded) {
-      $.clock.after(0, () => {
-        void isBandHidden($)
-      })
-    }
     if (await read($, bandHidden)) return below
     const f = await read($, fleet)
     if (!f || f.sessions.length === 0 || e.props.hasSurvey) return below
