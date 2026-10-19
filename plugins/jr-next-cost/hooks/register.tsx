@@ -58,6 +58,19 @@ export const register: Register = (on, options) => {
   live.ttlMin = Number(options.ttlMinutes ?? 5) || 5
   const override: Price | null = Number(options.inputPrice) > 0 ? { input: Number(options.inputPrice), cacheRead: Number(options.cacheReadPrice) || Number(options.inputPrice) / 10 } : null
 
+  // A /clear starts a new conversation with empty state and no session.start: load again once it has begun.
+  on('session.end', async ($, e, nextHook) => {
+    const ended = await nextHook(e)
+    if (e.reason === 'clear') {
+      band.isLoaded = false
+      $.clock.after(1000, () => {
+        void loadBand($)
+        void refresh($)
+      })
+    }
+    return ended
+  })
+
   on('session.start', async ($, e, nextHook) => {
     const started = await nextHook(e)
     await ensureCommand($)
