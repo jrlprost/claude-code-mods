@@ -137,7 +137,15 @@ export const register: Register = (on, options) => {
   on('session.end', async ($, e, next) => {
     await hold($, false, keepDisplay)
     if (live.id) await $.store.delete(BEAT_PREFIX + live.id)
-    return next(e)
+    const ended = await next(e)
+    // A /clear starts a new conversation with empty state and no session.start: load again once it has begun.
+    if (e.reason === 'clear') {
+      bandState.isLoaded = false
+      $.clock.after(1000, () => {
+        void loadBand($)
+      })
+    }
+    return ended
   })
 
   // Claude starts working: hold the Mac awake for the turn in "working" mode.

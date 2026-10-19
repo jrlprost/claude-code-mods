@@ -1,6 +1,6 @@
 {
   "name": "jr-awake",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep.",
   "author": {
     "name": "jrlprost"
