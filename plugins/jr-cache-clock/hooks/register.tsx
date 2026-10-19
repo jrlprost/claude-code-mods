@@ -62,6 +62,18 @@ export const register: Register = (on, options) => {
   live.ttlMin = Number(options.ttlMinutes ?? 5) || 5
   live.warn = options.warnBeforeExpiry !== false
 
+  // A /clear starts a new conversation with empty state and no session.start: load again once it has begun.
+  on('session.end', async ($, e, next) => {
+    const ended = await next(e)
+    if (e.reason === 'clear') {
+      band.isLoaded = false
+      $.clock.after(1000, () => {
+        void loadBand($)
+      })
+    }
+    return ended
+  })
+
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await ensureCommand($)
