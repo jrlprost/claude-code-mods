@@ -20,8 +20,8 @@ async function ensureCommand($: EngineInterface) {
 /** Reads the saved choice once per load of the mod; outside a drawing, which cannot write state. */
 async function loadBand($: EngineInterface) {
   if (band.isLoaded) return
-  band.isLoaded = true
   if ((await $.store.get('isBandHidden')) === false) await update($, bandHidden, () => false)
+  band.isLoaded = true
 }
 
 /** True while the band is hidden (until asked for): one choice for every session. */
@@ -92,10 +92,9 @@ export const register: Register = (on, options) => {
         void ensureTicking($)
       })
     }
-    if (!commands.isRegistered || !band.isLoaded) {
+    if (!commands.isRegistered) {
       $.clock.after(0, () => {
         void ensureCommand($)
-        void loadBand($)
       })
     }
     if (await read($, bandHidden)) return below

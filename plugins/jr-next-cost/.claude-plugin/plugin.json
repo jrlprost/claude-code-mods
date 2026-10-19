@@ -1,11 +1,18 @@
 {
   "name": "jr-next-cost",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "What the next prompt costs before you send it, on /jrnextcost: the context it resends at the current model's price, read from a warm cache or written to a cold one, at API rates.",
-  "author": { "name": "jrlprost" },
+  "author": {
+    "name": "jrlprost"
+  },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",
-  "keywords": ["claude-code-mod", "jr", "cost", "prompt-cache"],
+  "keywords": [
+    "claude-code-mod",
+    "jr",
+    "cost",
+    "prompt-cache"
+  ],
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
@@ -13,7 +20,10 @@
       "type": "string",
       "title": "Cache lifetime (minutes)",
       "description": "5 for the default cache, 60 if your setup uses the one-hour cache.",
-      "options": ["5", "60"],
+      "options": [
+        "5",
+        "60"
+      ],
       "default": "5"
     },
     "inputPrice": {
