@@ -42,6 +42,19 @@ async function refresh($: EngineInterface) {
 }
 
 export const register: Register = on => {
+  // A /clear starts a new conversation with empty state and no session.start: load again once it has begun.
+  on('session.end', async ($, e, next) => {
+    const ended = await next(e)
+    if (e.reason === 'clear') {
+      live.isLoaded = false
+      $.clock.after(1000, () => {
+        void ensureLoaded($)
+        void refresh($)
+      })
+    }
+    return ended
+  })
+
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await $.command.register({ name: 'jrbadge', description: 'Show or hide the project badge (hidden by default): /jrbadge toggles, /jrbadge on or off' })
