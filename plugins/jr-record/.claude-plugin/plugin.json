@@ -1,6 +1,6 @@
 {
   "name": "jr-record",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Recording mode for demos and screen shares: /jrrec masks emails, money amounts, keys, phone numbers and IPs on screen. Claude still reads the real text.",
   "author": {
     "name": "jrlprost"

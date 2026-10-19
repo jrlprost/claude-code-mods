@@ -25,7 +25,7 @@ async function setBand($: EngineInterface, hide: boolean, name: string, command:
   await update($, bandHidden, () => hide)
   return { text: hide ? `${name} · hidden (${command} to bring it back)` : `${name} · shown` }
 }
-const scheduled = { load: false, command: false }
+const scheduled = { command: false }
 
 async function registerCommand($: EngineInterface) {
   if (scheduled.command) return
@@ -76,13 +76,6 @@ export const register: Register = on => {
   // Installed mid-session: read the saved mode on the first draw.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const below = await next(e)
-    if (!(await read($, isLoaded)) && !scheduled.load) {
-      scheduled.load = true
-      $.clock.after(0, () => {
-        void load($)
-        void registerCommand($)
-      })
-    }
     if (await read($, bandHidden)) return below
     const current = await read($, mode)
     if (current === 'off' || e.props.hasSurvey) return below
