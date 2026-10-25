@@ -8,6 +8,7 @@ export const CATALOGUE: readonly WelcomeEntry[] = [
   { name: 'jr-fleet', group: 'shown', command: '/jrfleet', what: 'your sessions, and the ones waiting for you' },
   { name: 'jr-limits', group: 'shown', command: '/jrlimits', what: '5-hour and 7-day plan limits' },
   { name: 'jr-time', group: 'shown', command: '/jrtime', what: 'billable time today' },
+  { name: 'jr-sysinfo', group: 'shown', command: '/jrsys', what: 'free disk and RAM, CPU and swap' },
   { name: 'jr-badge', group: 'hidden', command: '/jrbadge', what: 'project, branch and folder' },
   { name: 'jr-cache-clock', group: 'hidden', command: '/jrcache', what: 'prompt cache countdown' },
   { name: 'jr-next-cost', group: 'hidden', command: '/jrnextcost', what: 'what the next prompt costs' },
