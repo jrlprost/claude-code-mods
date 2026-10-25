@@ -18,6 +18,10 @@ Anything that ships to production comes to you for a yes, even when your permiss
 
 Previews (`vercel deploy` without `--prod`, `netlify deploy` without `--prod`) and pushes to feature branches pass.
 
+## When nobody would be asked
+
+In auto mode the classifier answers permission questions on its own, and in `dontAsk` mode they are refused unseen; in a headless run (`claude -p`) there is nobody to ask. There the command is refused instead, and Claude is told to hand it to you: run it yourself at the prompt with `! <command>`. The mode is read from each prompt and each finished tool, so a switch with shift+tab counts from the next one.
+
 ## No deploys on Friday
 
 Turn it on in `/config`: on Fridays (local time), production deploys are refused outright. When something really has to ship, the refusal tells Claude to ask you first and then prefix the command with `JR_FRIDAY_DEPLOY=yes`, which lets it through to the usual confirmation.
@@ -36,4 +40,4 @@ Turn it on in `/config`: on Fridays (local time), production deploys are refused
 
 ## Access
 
-Reads the command of each Bash call when its permission is decided. Runs `git branch --show-current` for a bare `git push`. Writes nothing, sends nothing over the network.
+Reads the command of each Bash call when its permission is decided, and the permission mode from each prompt and finished tool. Runs `git branch --show-current` for a bare `git push`. Writes nothing, sends nothing over the network.
