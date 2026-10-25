@@ -2,6 +2,12 @@ import { test, expect, mock } from 'claude-code/testing'
 
 import { isBarePush, isFriday, productionAction } from '../hooks/deploy'
 
+/** A prompt in `mode`, as the session raises it: the guard reads the mode from it. */
+const prompt = async ($: { classic: { UserPromptSubmit: (e: never) => Promise<unknown> } }, on: (...args: never[]) => unknown, mode: string) => {
+  on(...(['classic.UserPromptSubmit', () => ({})] as never[]))
+  await $.classic.UserPromptSubmit({ prompt: 'ship it', permission_mode: mode } as never)
+}
+
 test('production deploys are recognised', async () => {
   expect(productionAction('vercel deploy --prod')).toBe('Vercel production deploy')
   expect(productionAction('npx vercel --prod --yes')).toBe('Vercel production deploy')
@@ -37,6 +43,7 @@ test('a production deploy is put to the person, even when rules allowed it', asy
   mock.clock(on, { now: new Date(2026, 9, 15, 10, 0).getTime() })
   on('tool.check', () => ({ decision: 'allow' }) as never)
   on('process.run', () => ({ value: { exitCode: 0, stdout: 'feature\n', stderr: '' } }) as never)
+  await prompt($ as never, on as never, 'default')
   const deploy = await $.tool.check({ tool: 'Bash', input: { command: 'vercel --prod' }, approver: 'person' } as never)
   expect(deploy.decision).toBe('ask')
   expect(deploy.reason).toContain('Vercel production deploy')
@@ -48,6 +55,7 @@ test('a bare push on main is put to the person', async ($, on) => {
   mock.clock(on)
   on('tool.check', () => ({ decision: 'allow' }) as never)
   on('process.run', () => ({ value: { exitCode: 0, stdout: 'main\n', stderr: '' } }) as never)
+  await prompt($ as never, on as never, 'default')
   const push = await $.tool.check({ tool: 'Bash', input: { command: 'git push' }, approver: 'person' } as never)
   expect(push.decision).toBe('ask')
 })
@@ -55,6 +63,7 @@ test('a bare push on main is put to the person', async ($, on) => {
 test('with no Friday deploys on, a Friday deploy is refused unless overridden', { options: { noFridayDeploys: true } }, async ($, on) => {
   mock.clock(on, { now: new Date(2026, 9, 16, 15, 0).getTime() })
   on('tool.check', () => ({ decision: 'allow' }) as never)
+  await prompt($ as never, on as never, 'default')
   const friday = await $.tool.check({ tool: 'Bash', input: { command: 'fly deploy' }, approver: 'person' } as never)
   expect(friday.decision).toBe('deny')
   expect(friday.reason).toContain('JR_FRIDAY_DEPLOY=yes')
@@ -65,8 +74,7 @@ test('with no Friday deploys on, a Friday deploy is refused unless overridden', 
 test('in auto mode, where nobody is asked, a production push is refused and handed to the person', async ($, on) => {
   mock.clock(on)
   on('tool.check', () => ({ decision: 'ask' }) as never)
-  on('classic.UserPromptSubmit', () => ({}) as never)
-  await $.classic.UserPromptSubmit({ prompt: 'push it', permission_mode: 'auto' } as never)
+  await prompt($ as never, on as never, 'auto')
   const push = await $.tool.check({ tool: 'Bash', input: { command: 'git push origin main' }, approver: 'person' } as never)
   expect(push.decision).toBe('deny')
   expect(push.reason).toContain('`! git push origin main`')
@@ -81,4 +89,20 @@ test('where nobody can be asked at all, a production deploy is refused', async (
   const deploy = await $.tool.check({ tool: 'Bash', input: { command: 'vercel --prod' } } as never)
   expect(deploy.decision).toBe('deny')
   expect(deploy.reason).toContain('nobody can be asked')
+})
+
+test('before any event has said the mode, a production push is refused (fail closed)', async ($, on) => {
+  mock.clock(on)
+  on('tool.check', () => ({ decision: 'ask' }) as never)
+  const push = await $.tool.check({ tool: 'Bash', input: { command: 'git push origin main' }, approver: 'person' } as never)
+  expect(push.decision).toBe('deny')
+  expect(push.reason).toContain('not known yet')
+  expect(push.reason).toContain('`! git push origin main`')
+})
+
+test('an unknown mode is treated as one where nobody is asked', async ($, on) => {
+  mock.clock(on)
+  on('tool.check', () => ({ decision: 'allow' }) as never)
+  await prompt($ as never, on as never, 'someFutureMode')
+  expect((await $.tool.check({ tool: 'Bash', input: { command: 'fly deploy' }, approver: 'person' } as never)).decision).toBe('deny')
 })
