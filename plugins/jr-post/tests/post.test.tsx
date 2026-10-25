@@ -31,11 +31,11 @@ const machine = (on: On, forks: string[], copies: string[], reply: object) => {
   return clock as never as { advance: (ms: number) => Promise<void> }
 }
 
-test('/jrpost French writes from the session, shows the post and copies it', async ($, on) => {
+test('/jr-post French writes from the session, shows the post and copies it', async ($, on) => {
   const forks: string[] = []
   const copies: string[] = []
   const clock = machine(on, forks, copies, { isAnswered: true, text: 'Today I shipped a billable-time tracker for my coding sessions.', usage: {} })
-  await $.command.run({ command: 'jrpost', args: 'French' } as never)
+  await $.command.run({ command: 'jr-post', args: 'French' } as never)
   await clock.advance(10)
   expect(forks[0]).toContain('in French')
   expect(copies).toEqual(['Today I shipped a billable-time tracker for my coding sessions.'])
@@ -48,7 +48,7 @@ test('/jrpost French writes from the session, shows the post and copies it', asy
 
 test('nothing to fork: the pane says why', async ($, on) => {
   const clock = machine(on, [], [], { isAnswered: false, reason: 'nothing-to-fork', usage: {} })
-  await $.command.run({ command: 'jrpost', args: '' } as never)
+  await $.command.run({ command: 'jr-post', args: '' } as never)
   await clock.advance(10)
   const ui = await $.ui.mount({ plugin: 'jr-post', surface: 'terminal', component: 'Pane', requestId: 'jr-post', props: {} } as never)
   expect(await ui.find({ text: /nothing has happened in this session yet/ } as never)).toBeDefined()

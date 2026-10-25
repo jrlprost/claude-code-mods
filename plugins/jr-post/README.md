@@ -1,6 +1,6 @@
 # jr-post
 
-At the end of a session, `/jrpost` drafts a short "what I built today" post from what actually happened in it, shows it in a pane and copies it to your clipboard.
+At the end of a session, `/jr-post` drafts a short "what I built today" post from what actually happened in it, shows it in a pane and copies it to your clipboard.
 
 ```
 jr post   LinkedIn · English · 74 words · copied
@@ -17,15 +17,15 @@ prompts overlap.
 
 - Written from the session's own conversation: concrete, first person, 60 to 140 words.
 - Plain style by design: no hype words, no em dashes, at most two hashtags, AI is not mentioned unless the work was about it.
-- `/jrpost French` writes it in French this once; set your default language and platform in `/config`.
+- `/jr-post French` writes it in French this once; set your default language and platform in `/config`.
 - Nothing is published: you paste it where you want.
 
 ## Commands
 
 | Command | |
 | --- | --- |
-| `/jrpost` | Draft a post in your default language |
-| `/jrpost <language>` | Draft it in another language |
+| `/jr-post` | Draft a post in your default language |
+| `/jr-post <language>` | Draft it in another language |
 
 In the pane: `c` copies again, `r` writes another version.
 

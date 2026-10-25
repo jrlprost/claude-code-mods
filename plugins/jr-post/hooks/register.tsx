@@ -12,7 +12,7 @@ const commands = { isRegistered: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrpost', description: 'Draft a "what I built today" post from this session: /jrpost [language]' })
+  await $.command.register({ name: 'jr-post', description: 'Draft a "what I built today" post from this session: /jr-post [language]' })
 }
 
 async function copy($: EngineInterface) {
@@ -54,7 +54,7 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrpost' }, async ($, e) => {
+  on('command.run', { command: 'jr-post' }, async ($, e) => {
     const language = e.args.trim() || defaultLanguage
     await $.ui.open({ id: PANE, title: 'jr post', rows: 16 })
     $.clock.after(0, () => {
@@ -74,7 +74,7 @@ export const register: Register = (on, options) => {
     )
     if (post.status === 'writing') return <Box flexDirection="column">{header}<Text dimColor>Writing from this session…</Text></Box>
     if (post.status === 'failed') return <Box flexDirection="column">{header}<Text color="#ef4565">{`No post: ${post.reason ?? 'no answer'}.`}</Text></Box>
-    if (post.status === 'idle') return <Box flexDirection="column">{header}<Text dimColor>Run /jrpost to write one.</Text></Box>
+    if (post.status === 'idle') return <Box flexDirection="column">{header}<Text dimColor>Run /jr-post to write one.</Text></Box>
     return (
       <Box flexDirection="column">
         {header}

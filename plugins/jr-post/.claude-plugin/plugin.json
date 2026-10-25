@@ -1,7 +1,7 @@
 {
   "name": "jr-post",
-  "version": "0.1.0",
-  "description": "/jrpost: a short \"what I built today\" post drafted from this session, shown in a pane and copied to your clipboard.",
+  "version": "0.2.0",
+  "description": "/jr-post: a short \"what I built today\" post drafted from this session, shown in a pane and copied to your clipboard.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",
@@ -12,7 +12,7 @@
     "language": {
       "type": "string",
       "title": "Language",
-      "description": "Default language of the post; /jrpost <language> overrides it once.",
+      "description": "Default language of the post; /jr-post <language> overrides it once.",
       "default": "English"
     },
     "platform": {
