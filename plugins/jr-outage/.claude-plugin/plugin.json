@@ -1,7 +1,7 @@
 {
   "name": "jr-outage",
-  "version": "0.3.3",
-  "description": "Is it them or is it me? The status of Claude, GitHub, npm and Vercel, checked every 10 minutes: /jroutage shows them all, a band and a toast appear only when one is degraded.",
+  "version": "0.4.0",
+  "description": "Is it them or is it me? The status of Claude, GitHub, npm and Vercel, checked every 10 minutes: /jr-outage shows them all, a band and a toast appear only when one is degraded.",
   "author": {
     "name": "jrlprost"
   },

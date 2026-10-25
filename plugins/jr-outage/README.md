@@ -3,7 +3,7 @@
 Is it them or is it me? jr-outage checks the public status pages of the services a build depends on, every 10 minutes.
 
 ```
-▲ GitHub Partial outage of Actions · /jroutage details
+▲ GitHub Partial outage of Actions · /jr-outage details
 ```
 
 One row on the left, only while there is something to act on.
@@ -15,8 +15,8 @@ One row on the left, only while there is something to act on.
 
 | Command | |
 | --- | --- |
-| `/jroutage` | Hide or show the band (it toggles); `/jroutage hide` and `show` set it |
-| `/jroutage details` | Check now and show every service in a pane |
+| `/jr-outage` | Hide or show the band (it toggles); `/jr-outage hide` and `show` set it |
+| `/jr-outage details` | Check now and show every service in a pane |
 
 ## Settings (`/config`)
 

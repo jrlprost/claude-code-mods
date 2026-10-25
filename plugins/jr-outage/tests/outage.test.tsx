@@ -54,14 +54,14 @@ test('an incident shows in the band and the pane, and toasts once', async ($, on
     expect(await band.find({ text: /below/ } as never)).toBeDefined()
     await band.unmount()
   }
-  const said = await $.command.run({ command: 'jroutage', args: 'details' } as never)
+  const said = await $.command.run({ command: 'jr-outage', args: 'details' } as never)
   expect(JSON.stringify(said)).toContain('GitHub: Partial outage of Actions')
   const pane = await $.ui.mount({ plugin: 'jr-outage', surface: 'terminal', component: 'Pane', requestId: 'jr-outage', props: { bodyColumns: 80 } } as never)
   expect(await pane.find({ text: /All Systems Operational/ } as never)).toBeDefined()
   expect(toasts.length).toBe(1)
 })
 
-test('/jroutage hide takes the band away, the bare command toggles it, on brings it back', async ($, on) => {
+test('/jr-outage hide takes the band away, the bare command toggles it, on brings it back', async ($, on) => {
   machine(on, [])
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const shows = async () => {
@@ -72,13 +72,13 @@ test('/jroutage hide takes the band away, the bare command toggles it, on brings
     return seen
   }
   expect(await shows()).toBe(true)
-  expect(JSON.stringify(await $.command.run({ command: 'jroutage', args: 'hide' } as never))).toContain('hidden')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-outage', args: 'hide' } as never))).toContain('hidden')
   expect(await shows()).toBe(false)
-  await $.command.run({ command: 'jroutage', args: '' } as never)
+  await $.command.run({ command: 'jr-outage', args: '' } as never)
   expect(await shows()).toBe(true)
-  await $.command.run({ command: 'jroutage', args: '' } as never)
+  await $.command.run({ command: 'jr-outage', args: '' } as never)
   expect(await shows()).toBe(false)
-  await $.command.run({ command: 'jroutage', args: 'on' } as never)
+  await $.command.run({ command: 'jr-outage', args: 'on' } as never)
   expect(await shows()).toBe(true)
 })
 

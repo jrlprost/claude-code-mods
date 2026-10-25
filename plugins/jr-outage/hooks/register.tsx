@@ -8,7 +8,7 @@ import { COLOR, degraded, serviceOf, SERVICES } from './services'
 const view = atom({ plugin: 'jr-outage', key: 'view' } as const, null)
 const bandHidden = atom({ plugin: 'jr-outage', key: 'isBandHidden' } as const, false)
 
-// The band can be hidden: /jroutage hide, show, or the bare command to toggle. One choice for
+// The band can be hidden: /jr-outage hide, show, or the bare command to toggle. One choice for
 // every session, kept across restarts.
 const band = { isLoaded: false }
 
@@ -31,7 +31,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr outage · band hidden (/jroutage to bring it back)' : 'jr outage · band shown' }
+  return { text: hide ? 'jr outage · band hidden (/jr-outage to bring it back)' : 'jr outage · band shown' }
 }
 const PANE = 'jr-outage'
 const EVERY_MS = 10 * 60_000
@@ -87,12 +87,12 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
-    await $.command.register({ name: 'jroutage', description: 'Show or hide the outage band; /jroutage details checks Claude, GitHub, npm and Vercel now' })
+    await $.command.register({ name: 'jr-outage', description: 'Show or hide the outage band; /jr-outage details checks Claude, GitHub, npm and Vercel now' })
     await ensurePolling($)
     return started
   })
 
-  on('command.run', { command: 'jroutage' }, async ($, e) => {
+  on('command.run', { command: 'jr-outage' }, async ($, e) => {
     const verb = bandVerb(e.args)
     if (verb) return setBand($, verb)
     live.isPolling ? await check($) : await ensurePolling($)
@@ -139,7 +139,7 @@ export const register: Register = (on, options) => {
               <Text color={COLOR[s.indicator]}>{s.description}</Text>
             </Text>
           ))}
-          <Text dimColor>{' · /jroutage details'}</Text>
+          <Text dimColor>{' · /jr-outage details'}</Text>
         </Text>
         {below}
       </Box>
