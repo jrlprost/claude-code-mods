@@ -51,7 +51,7 @@ const machine = (on: On, urls: string[]) => {
   })
 }
 
-test('with a key, the band shows MRR and today, and /jrmrr the 30 days', { options: { apiKey: 'rk_test_x' } }, async ($, on) => {
+test('with a key, the band shows MRR and today, and /jr-stripemrr the 30 days', { options: { apiKey: 'rk_test_x' } }, async ($, on) => {
   const urls: string[] = []
   machine(on, urls)
   on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
@@ -67,18 +67,18 @@ test('with a key, the band shows MRR and today, and /jrmrr the 30 days', { optio
     expect(await band.find({ text: /49\.90 €/ } as never)).toBeDefined()
     await band.unmount()
   }
-  await $.command.run({ command: 'jrmrr', args: 'details' } as never)
+  await $.command.run({ command: 'jr-stripemrr', args: 'details' } as never)
   const pane = await $.ui.mount({ plugin: 'jr-stripemrr', surface: 'terminal', component: 'Pane', requestId: 'jr-stripemrr', props: {} } as never)
   expect(await pane.find({ text: /last 30 days/ } as never)).toBeDefined()
 })
 
-test('without a key, /jrmrr explains where to put one', async ($, on) => {
+test('without a key, /jr-stripemrr explains where to put one', async ($, on) => {
   machine(on, [])
-  const answer = await $.command.run({ command: 'jrmrr', args: '' } as never)
+  const answer = await $.command.run({ command: 'jr-stripemrr', args: '' } as never)
   expect(JSON.stringify(answer)).toContain('restricted key')
 })
 
-test('/jrmrr hide takes the band away, the bare command toggles it, on brings it back', { options: { apiKey: 'rk_test_x' } }, async ($, on) => {
+test('/jr-stripemrr hide takes the band away, the bare command toggles it, on brings it back', { options: { apiKey: 'rk_test_x' } }, async ($, on) => {
   machine(on, [])
   on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
     const { Text } = $.ui.resolve(e)
@@ -93,13 +93,13 @@ test('/jrmrr hide takes the band away, the bare command toggles it, on brings it
     return seen
   }
   expect(await shows()).toBe(true)
-  expect(JSON.stringify(await $.command.run({ command: 'jrmrr', args: 'hide' } as never))).toContain('hidden')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-stripemrr', args: 'hide' } as never))).toContain('hidden')
   expect(await shows()).toBe(false)
-  await $.command.run({ command: 'jrmrr', args: '' } as never)
+  await $.command.run({ command: 'jr-stripemrr', args: '' } as never)
   expect(await shows()).toBe(true)
-  await $.command.run({ command: 'jrmrr', args: '' } as never)
+  await $.command.run({ command: 'jr-stripemrr', args: '' } as never)
   expect(await shows()).toBe(false)
-  await $.command.run({ command: 'jrmrr', args: 'on' } as never)
+  await $.command.run({ command: 'jr-stripemrr', args: 'on' } as never)
   expect(await shows()).toBe(true)
 })
 

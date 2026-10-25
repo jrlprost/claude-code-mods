@@ -1,7 +1,7 @@
 {
   "name": "jr-stripemrr",
-  "version": "0.3.2",
-  "description": "Your Stripe MRR and today's revenue above the prompt, refreshed every 15 minutes; /jrmrr adds the last 30 days as a sparkline.",
+  "version": "0.4.0",
+  "description": "Your Stripe MRR and today's revenue above the prompt, refreshed every 15 minutes; /jr-stripemrr adds the last 30 days as a sparkline.",
   "author": {
     "name": "jrlprost"
   },

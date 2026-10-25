@@ -8,7 +8,7 @@ Your Stripe numbers above the prompt, so you see the business while you build it
 
 One quiet row, right-aligned, out of the way of your eye.
 
-`/jrmrr details` opens the detail:
+`/jr-stripemrr details` opens the detail:
 
 ```
 jr mrr   updated 14:05
@@ -21,7 +21,7 @@ MRR         today     last 30 days
 - **MRR** adds up active (and past-due) subscriptions, every item's price × quantity brought to a month: yearly ÷ 12, weekly × 52 ÷ 12, every N months ÷ N. Discounts and coupons are not taken off.
 - **Revenue** is succeeded charges minus refunds, per local day.
 - When your account uses several currencies, the figures are in the one most used; the others are left out.
-- Figures refresh every 15 minutes, and when you open `/jrmrr details`.
+- Figures refresh every 15 minutes, and when you open `/jr-stripemrr details`.
 
 ## Setup
 
@@ -31,8 +31,8 @@ Create a **restricted key** in the Stripe dashboard (Developers → API keys →
 
 | Command | |
 | --- | --- |
-| `/jrmrr` | Hide or show the band (it toggles); `/jrmrr hide` and `show` set it |
-| `/jrmrr details` | Open MRR, today and the 30-day sparkline |
+| `/jr-stripemrr` | Hide or show the band (it toggles); `/jr-stripemrr hide` and `show` set it |
+| `/jr-stripemrr details` | Open MRR, today and the 30-day sparkline |
 
 ## Settings (`/config`)
 

@@ -14,7 +14,7 @@ const API = 'https://api.stripe.com/v1'
 const figures = atom({ plugin: 'jr-stripemrr', key: 'figures' } as const, null)
 const bandHidden = atom({ plugin: 'jr-stripemrr', key: 'isBandHidden' } as const, false)
 
-// The band can be hidden: /jrmrr hide, show, or the bare command to toggle. One choice for
+// The band can be hidden: /jr-stripemrr hide, show, or the bare command to toggle. One choice for
 // every session, kept across restarts.
 const band = { isLoaded: false }
 
@@ -37,7 +37,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr mrr · band hidden (/jrmrr to bring it back)' : 'jr mrr · band shown' }
+  return { text: hide ? 'jr mrr · band hidden (/jr-stripemrr to bring it back)' : 'jr mrr · band shown' }
 }
 const live = { isStarted: false, key: '' }
 
@@ -78,7 +78,7 @@ async function refresh($: EngineInterface) {
 async function ensureStarted($: EngineInterface) {
   if (live.isStarted) return
   live.isStarted = true
-  await $.command.register({ name: 'jrmrr', description: 'Show or hide the MRR band; /jrmrr details opens revenue today, MRR and the last 30 days' })
+  await $.command.register({ name: 'jr-stripemrr', description: 'Show or hide the MRR band; /jr-stripemrr details opens revenue today, MRR and the last 30 days' })
   if (!live.key) return
   await refresh($)
   $.clock.every(REFRESH_MS, () => {
@@ -114,7 +114,7 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrmrr' }, async ($, e) => {
+  on('command.run', { command: 'jr-stripemrr' }, async ($, e) => {
     await ensureStarted($)
     const verb = bandVerb(e.args)
     // Not set up yet: the bare command says how, instead of toggling a band that cannot show.
