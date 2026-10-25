@@ -1,7 +1,7 @@
 {
   "name": "jr-time",
-  "version": "0.3.2",
-  "description": "Billable time per project: every minute of a session sorted into categories, a ratio per category, an hourly rate, and an amount. /jrtime to adjust, export to CSV or Markdown.",
+  "version": "0.4.0",
+  "description": "Billable time per project: every minute of a session sorted into categories, a ratio per category, an hourly rate, and an amount. /jr-time to adjust, export to CSV or Markdown.",
   "author": {
     "name": "jrlprost"
   },

@@ -138,7 +138,7 @@ async function applyMessage($: EngineInterface, message: JrTimeMessage) {
   await refresh($)
 }
 
-/** `/jrtime client Acme`, `/jrtime rate 90`, `/jrtime rate default 60`, `/jrtime currency $`, `/jrtime export`. */
+/** `/jr-time client Acme`, `/jr-time rate 90`, `/jr-time rate default 60`, `/jr-time currency $`, `/jr-time export`. */
 async function runCommand($: EngineInterface, args: string) {
   const [verb = '', ...rest] = args.trim().split(/\s+/).filter(Boolean)
   const project = live.log?.project ?? ''
@@ -154,7 +154,7 @@ async function runCommand($: EngineInterface, args: string) {
   } else if (verb === 'export') {
     return `jr time · exported ${await exportReport($)}.csv and .md`
   } else if (verb) {
-    return 'jr time · usage: /jrtime, /jrtime client <name>, /jrtime rate <per hour>, /jrtime rate default <per hour>, /jrtime currency <symbol>, /jrtime export, /jrtime hide, /jrtime show'
+    return 'jr time · usage: /jr-time, /jr-time client <name>, /jr-time rate <per hour>, /jr-time rate default <per hour>, /jr-time currency <symbol>, /jr-time export, /jr-time hide, /jr-time show'
   } else {
     return null
   }
@@ -163,12 +163,12 @@ async function runCommand($: EngineInterface, args: string) {
   return `jr time · ${project}: client ${s.clients[project] ?? project}, ${s.rates[project] ?? s.defaultRate} ${s.currency}/h`
 }
 
-/** What `/jrtime` answers: today's figure, then how to read and adjust the billing. */
+/** What `/jr-time` answers: today's figure, then how to read and adjust the billing. */
 async function openedText($: EngineInterface) {
   const b = await read($, band)
   const today = b ? `today ${formatHours(b.billableMs)} billable on ${b.project}${b.hasRate ? `, ${formatMoney(b.amount, b.currency)}` : ''}` : 'nothing recorded yet'
-  const rate = b?.hasRate ? '' : ' · no rate yet: /jrtime rate 80'
-  return `jr time opened · ${today}${rate} · in the pane, click it, then ↑↓ pick a category, ←→ change its ratio, tab switch day/week/month, e export · /jrtime client <name> · /jrtime rate <per hour>`
+  const rate = b?.hasRate ? '' : ' · no rate yet: /jr-time rate 80'
+  return `jr time opened · ${today}${rate} · in the pane, click it, then ↑↓ pick a category, ←→ change its ratio, tab switch day/week/month, e export · /jr-time client <name> · /jr-time rate <per hour>`
 }
 
 export const register: Register = (on, options) => {
@@ -190,7 +190,7 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
-    await $.command.register({ name: 'jrtime', description: 'Billable time: categories, ratios, hourly rate, export; /jrtime hide or show toggles the band' })
+    await $.command.register({ name: 'jr-time', description: 'Billable time: categories, ratios, hourly rate, export; /jr-time hide or show toggles the band' })
     await ensureRecording($)
     await refresh($)
     return started
@@ -220,10 +220,10 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrtime' }, async ($, e) => {
+  on('command.run', { command: 'jr-time' }, async ($, e) => {
     await ensureRecording($)
     const word = e.args.trim().toLowerCase()
-    if (word === 'hide' || word === 'show') return setBand($, word === 'hide', 'jr time band', '/jrtime show')
+    if (word === 'hide' || word === 'show') return setBand($, word === 'hide', 'jr time band', '/jr-time show')
     const answer = await runCommand($, e.args)
     if (answer) return { text: answer }
     await refresh($)
@@ -265,10 +265,10 @@ export const register: Register = (on, options) => {
             {b.hasRate ? (
               <Text>
                 <Text color="#2cb67d">{formatMoney(b.amount, b.currency)}</Text>
-                <Text dimColor>{' · /jrtime'}</Text>
+                <Text dimColor>{' · /jr-time'}</Text>
               </Text>
             ) : (
-              <Text dimColor>{'set a rate: /jrtime rate 80'}</Text>
+              <Text dimColor>{'set a rate: /jr-time rate 80'}</Text>
             )}
           </Text>
         </Box>

@@ -30,9 +30,9 @@ test('a prompt and a turn show up as billable time, and a rate turns them into m
   await $.prompt.submit({ text: 'fix the bug', origin: { kind: 'composer' }, wait: false } as never)
   await (clock as never as { advance: (ms: number) => Promise<void> }).advance(12 * MIN)
   await $.turn.complete({ answer: 'done', durationMs: 12 * MIN, isAborted: false, turnId: 't1', text: '', reason: 'answer' } as never)
-  const set = await $.command.run({ command: 'jrtime', args: 'rate 120' } as never)
+  const set = await $.command.run({ command: 'jr-time', args: 'rate 120' } as never)
   expect(JSON.stringify(set)).toContain('120 €/h')
-  await $.command.run({ command: 'jrtime', args: '' } as never)
+  await $.command.run({ command: 'jr-time', args: '' } as never)
 
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = (await $.ui.mount({ plugin: 'jr-time', surface, component: 'Pane', requestId: 'jr-time', props: {} } as never)) as never as {
@@ -75,24 +75,24 @@ test('the band is one quiet row on the right: billable time, then the amount or 
     const ui = await $.ui.mount({ plugin: 'jr-time', surface, component: 'AbovePrompt', props } as never)
     const row = bandRow((await ui.drawn()) as never)
     expect(row.justify).toBe('flex-end')
-    expect(row.text).toBe('0h00 billable · set a rate: /jrtime rate 80')
+    expect(row.text).toBe('0h00 billable · set a rate: /jr-time rate 80')
     expect(await ui.find({ text: /below/ } as never)).toBeDefined()
     await ui.unmount()
   }
-  await $.command.run({ command: 'jrtime', args: 'rate 80' } as never)
+  await $.command.run({ command: 'jr-time', args: 'rate 80' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-time', surface, component: 'AbovePrompt', props } as never)
-    expect(bandRow((await ui.drawn()) as never).text).toBe('0h00 billable · 0 € · /jrtime')
+    expect(bandRow((await ui.drawn()) as never).text).toBe('0h00 billable · 0 € · /jr-time')
     await ui.unmount()
   }
 })
 
-test('/jrtime says how to detail and adjust the billing', async ($, on) => {
+test('/jr-time says how to detail and adjust the billing', async ($, on) => {
   machine(on, [])
   await $.session.start(start)
-  const answer = JSON.stringify(await $.command.run({ command: 'jrtime', args: '' } as never))
+  const answer = JSON.stringify(await $.command.run({ command: 'jr-time', args: '' } as never))
   expect(answer).toContain('today 0h00 billable on tokenkarma')
-  expect(answer).toContain('no rate yet: /jrtime rate 80')
+  expect(answer).toContain('no rate yet: /jr-time rate 80')
   expect(answer).toContain('←→ change its ratio')
   expect(answer).toContain('e export')
 })
@@ -101,7 +101,7 @@ test('installed mid-session, with no session.start, the first prompt starts reco
   const clock = machine(on, [])
   await $.prompt.submit({ text: 'go', origin: { kind: 'composer' }, wait: false } as never)
   await (clock as never as { advance: (ms: number) => Promise<void> }).advance(3 * MIN)
-  const opened = await $.command.run({ command: 'jrtime', args: '' } as never)
+  const opened = await $.command.run({ command: 'jr-time', args: '' } as never)
   expect(JSON.stringify(opened)).toContain('jr time opened')
   const ui = (await $.ui.mount({ plugin: 'jr-time', surface: 'terminal', component: 'Pane', requestId: 'jr-time', props: {} } as never)) as never as {
     drawn: (s: object) => Promise<unknown>
@@ -109,7 +109,7 @@ test('installed mid-session, with no session.start, the first prompt starts reco
   expect(JSON.stringify(await ui.drawn({ in: 'time' }))).toContain('tokenkarma')
 })
 
-test('/jrtime hide takes the band away and keeps what is below, show brings it back', async ($, on) => {
+test('/jr-time hide takes the band away and keeps what is below, show brings it back', async ($, on) => {
   machine(on, [])
   on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
     const { Text } = $.ui.resolve(e)
@@ -117,13 +117,13 @@ test('/jrtime hide takes the band away and keeps what is below, show brings it b
   })
   await $.session.start(start)
   const BAND = { plugin: 'jr-time', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as const
-  const answer = await $.command.run({ command: 'jrtime', args: 'hide' } as never)
+  const answer = await $.command.run({ command: 'jr-time', args: 'hide' } as never)
   expect(JSON.stringify(answer)).toContain('hidden')
   let ui = await $.ui.mount(BAND as never)
   expect(await ui.find({ text: /billable/ } as never)).toBeUndefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
   await ui.unmount()
-  await $.command.run({ command: 'jrtime', args: 'show' } as never)
+  await $.command.run({ command: 'jr-time', args: 'show' } as never)
   ui = await $.ui.mount(BAND as never)
   expect(await ui.find({ text: /billable/ } as never)).toBeDefined()
 })

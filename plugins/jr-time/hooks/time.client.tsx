@@ -1,4 +1,4 @@
-// The /jrtime pane, drawn on the surface so it reads raw keys.
+// The /jr-time pane, drawn on the surface so it reads raw keys.
 // up/down pick a line, left/right change its value (ratio, minutes or hourly rate),
 // tab switches today / week / month, e exports, esc closes.
 // The terminal hands keys over only after a click, so the pane opens with a focus zone at the bottom.
