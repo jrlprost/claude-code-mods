@@ -31,7 +31,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr quota · hidden (/jrquota to bring it back)' : 'jr quota · shown' }
+  return { text: hide ? 'jr quota · hidden (/jr-quota to bring it back)' : 'jr quota · shown' }
 }
 const PANE = 'jr-quota'
 const EVERY_MS = 10 * 60_000
@@ -101,12 +101,12 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
-    await $.command.register({ name: 'jrquota', description: 'Show or hide the low-balance band; /jrquota details shows every balance' })
+    await $.command.register({ name: 'jr-quota', description: 'Show or hide the low-balance band; /jr-quota details shows every balance' })
     await ensurePolling($)
     return started
   })
 
-  on('command.run', { command: 'jrquota' }, async ($, e) => {
+  on('command.run', { command: 'jr-quota' }, async ($, e) => {
     const verb = bandVerb(e.args)
     if (verb) return setBand($, verb)
     live.isPolling ? await check($) : await ensurePolling($)
@@ -151,7 +151,7 @@ export const register: Register = (on, options) => {
         <Text wrap="truncate-end">
           <Text color="#ef4565">{'▲ '}</Text>
           <Text>{lows.map(b => `${b.label} ${b.text}`).join(' · ')}</Text>
-          <Text dimColor>{' · /jrquota details'}</Text>
+          <Text dimColor>{' · /jr-quota details'}</Text>
         </Text>
         {below}
       </Box>

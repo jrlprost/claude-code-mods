@@ -54,23 +54,23 @@ test('a low balance shows in the band and the pane, and toasts once', async ($, 
     expect(await band.find({ text: /below/ } as never)).toBeDefined()
     await band.unmount()
   }
-  const opened = await $.command.run({ command: 'jrquota', args: 'details' } as never)
+  const opened = await $.command.run({ command: 'jr-quota', args: 'details' } as never)
   expect(JSON.stringify(opened)).toContain('jr quota opened')
   const pane = await $.ui.mount({ plugin: 'jr-quota', surface: 'terminal', component: 'Pane', requestId: 'jr-quota', props: { bodyColumns: 80 } } as never)
   expect(await pane.find({ text: /120 credits left/ } as never)).toBeDefined()
   expect(toasts.length).toBe(1)
 })
 
-test('/jrquota hide takes the band away, the bare command brings it back', async ($, on) => {
+test('/jr-quota hide takes the band away, the bare command brings it back', async ($, on) => {
   machine(on, [])
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const props = { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 120 }
-  await $.command.run({ command: 'jrquota', args: 'hide' } as never)
+  await $.command.run({ command: 'jr-quota', args: 'hide' } as never)
   let band = await $.ui.mount({ plugin: 'jr-quota', surface: 'terminal', component: 'AbovePrompt', props } as never)
   expect(await band.find({ text: /credits left/ } as never)).toBeUndefined()
   expect(await band.find({ text: /below/ } as never)).toBeDefined()
   await band.unmount()
-  expect(JSON.stringify(await $.command.run({ command: 'jrquota', args: '' } as never))).toContain('shown')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-quota', args: '' } as never))).toContain('shown')
   band = await $.ui.mount({ plugin: 'jr-quota', surface: 'terminal', component: 'AbovePrompt', props } as never)
   expect(await band.find({ text: /Firecrawl 120 credits left/ } as never)).toBeDefined()
 })

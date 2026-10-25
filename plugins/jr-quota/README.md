@@ -1,6 +1,6 @@
 # jr-quota
 
-The balances of the other paid APIs you use, in one place, checked every 10 minutes. A one-row band and a toast appear only when one runs low: `▲ OpenRouter $2.10 left · /jrquota details`.
+The balances of the other paid APIs you use, in one place, checked every 10 minutes. A one-row band and a toast appear only when one runs low: `▲ OpenRouter $2.10 left · /jr-quota details`.
 
 ```
 jr quota
@@ -21,9 +21,9 @@ Services without a key are skipped.
 
 | Command | |
 | --- | --- |
-| `/jrquota` | Hide the band above the prompt, or bring it back |
-| `/jrquota hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
-| `/jrquota details` | Check now and show every balance in a pane |
+| `/jr-quota` | Hide the band above the prompt, or bring it back |
+| `/jr-quota hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jr-quota details` | Check now and show every balance in a pane |
 
 ## Settings (`/config`)
 
