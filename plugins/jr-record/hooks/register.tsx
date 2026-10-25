@@ -30,7 +30,7 @@ const scheduled = { command: false }
 async function registerCommand($: EngineInterface) {
   if (scheduled.command) return
   scheduled.command = true
-  await $.command.register({ name: 'jrrec', description: 'Recording mode: mask emails, money, keys and phone numbers on screen (on, off, strict; hide or show the band)' })
+  await $.command.register({ name: 'jr-record', description: 'Recording mode: mask emails, money, keys and phone numbers on screen (on, off, strict; hide or show the band)' })
 }
 
 /** The mode survives sessions: a recording setup stays masked until you turn it off. */
@@ -68,15 +68,15 @@ export const register: Register = on => {
     return started
   })
 
-  on('command.run', { command: 'jrrec' }, async ($, e) => {
+  on('command.run', { command: 'jr-record' }, async ($, e) => {
     if (!(await read($, isLoaded))) await load($)
     const word = e.args.trim().toLowerCase()
     if (word === 'hide' || word === 'show') {
-      const answer = await setBand($, word === 'hide', 'jr rec band', '/jrrec show')
-      return word === 'hide' && (await read($, mode)) !== 'off' ? { text: `${answer.text}; masking stays active, /jrrec off to stop it` } : answer
+      const answer = await setBand($, word === 'hide', 'jr rec band', '/jr-record show')
+      return word === 'hide' && (await read($, mode)) !== 'off' ? { text: `${answer.text}; masking stays active, /jr-record off to stop it` } : answer
     }
     const chosen = parseMode(e.args, await read($, mode))
-    if (!chosen) return { text: 'jr rec · usage: /jrrec, /jrrec on, /jrrec off, /jrrec strict, /jrrec hide, /jrrec show' }
+    if (!chosen) return { text: 'jr rec · usage: /jr-record, /jr-record on, /jr-record off, /jr-record strict, /jr-record hide, /jr-record show' }
     await setMode($, chosen)
     return {
       text:
@@ -98,7 +98,7 @@ export const register: Register = on => {
         <Text wrap="truncate-end">
           <Text color="#ef4565" bold>{'● REC '}</Text>
           <Text>{current === 'strict' ? 'masking on, strict' : 'masking on'}</Text>
-          <Text dimColor>{' · /jrrec off'}</Text>
+          <Text dimColor>{' · /jr-record off'}</Text>
         </Text>
         {below}
       </Box>

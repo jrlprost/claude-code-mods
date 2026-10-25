@@ -1,9 +1,9 @@
 # jr-record
 
-Recording mode for demos, screen shares and videos. `/jrrec` masks what you would not want on screen, everywhere the transcript draws text: your prompts, Claude's replies, command output, tool calls and their results.
+Recording mode for demos, screen shares and videos. `/jr-record` masks what you would not want on screen, everywhere the transcript draws text: your prompts, Claude's replies, command output, tool calls and their results.
 
 ```
-● REC masking on · /jrrec off
+● REC masking on · /jr-record off
 
 Sent the invoice to █████: █████ due on the 30th.
 STRIPE_SECRET_KEY=█████
@@ -25,11 +25,11 @@ Only the drawing changes. Claude still reads the real text, your files are untou
 
 | Command | |
 | --- | --- |
-| `/jrrec` | Toggle on and off |
-| `/jrrec on` | Mask emails, money, keys, phones, IPs |
-| `/jrrec strict` | Also home paths and long numbers |
-| `/jrrec off` | Show everything again |
-| `/jrrec hide` / `/jrrec show` | Hide or show the REC band, in every session; masking stays active |
+| `/jr-record` | Toggle on and off |
+| `/jr-record on` | Mask emails, money, keys, phones, IPs |
+| `/jr-record strict` | Also home paths and long numbers |
+| `/jr-record off` | Show everything again |
+| `/jr-record hide` / `/jr-record show` | Hide or show the REC band, in every session; masking stays active |
 
 ## Install
 

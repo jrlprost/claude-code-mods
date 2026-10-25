@@ -30,7 +30,7 @@ test('tool inputs and outputs keep their shape', async () => {
   expect(maskValue({ command: 'curl -H "x" jane@acme.io', n: 3, list: ['a@b.co'] }, 'on')).toEqual({ command: 'curl -H "x" █████', n: 3, list: ['█████'] })
 })
 
-test('/jrrec alone toggles, words pick a mode, anything else is refused', async () => {
+test('/jr-record alone toggles, words pick a mode, anything else is refused', async () => {
   expect(parseMode('', 'off')).toBe('on')
   expect(parseMode('', 'strict')).toBe('off')
   expect(parseMode('strict', 'off')).toBe('strict')
@@ -55,7 +55,7 @@ const machine = (on: On) => {
 test('on screen only: an assistant reply is masked while recording, and the band says so', async ($, on) => {
   machine(on)
   await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrrec', args: 'on' } as never)
+  await $.command.run({ command: 'jr-record', args: 'on' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const reply = await $.ui.mount({
       plugin: 'jr-record',
@@ -74,11 +74,11 @@ test('on screen only: an assistant reply is masked while recording, and the band
   }
 })
 
-test('/jrrec hide takes the band away while masking stays on, show brings it back', async ($, on) => {
+test('/jr-record hide takes the band away while masking stays on, show brings it back', async ($, on) => {
   machine(on)
   await $.session.start({ cwd: '/w', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrrec', args: 'on' } as never)
-  const answer = await $.command.run({ command: 'jrrec', args: 'hide' } as never)
+  await $.command.run({ command: 'jr-record', args: 'on' } as never)
+  const answer = await $.command.run({ command: 'jr-record', args: 'hide' } as never)
   expect(JSON.stringify(answer)).toContain('masking stays active')
   const BAND = { plugin: 'jr-record', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 4, bodyColumns: 80 } } as const
   let band = await $.ui.mount(BAND as never)
@@ -88,7 +88,7 @@ test('/jrrec hide takes the band away while masking stays on, show brings it bac
   const reply = await $.ui.mount({ plugin: 'jr-record', surface: 'terminal', component: 'AssistantMessage', props: { text: 'Mail jane@acme.io', isFirstOfReply: true } } as never)
   expect(JSON.stringify(await reply.drawn())).not.toContain('jane@acme.io')
   await reply.unmount()
-  await $.command.run({ command: 'jrrec', args: 'show' } as never)
+  await $.command.run({ command: 'jr-record', args: 'show' } as never)
   band = await $.ui.mount(BAND as never)
   expect(await band.find({ text: /REC/ } as never)).toBeDefined()
 })
