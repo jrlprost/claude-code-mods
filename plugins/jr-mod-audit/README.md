@@ -1,6 +1,6 @@
 # jr-mod-audit
 
-A mod runs inside your session and can reach your files, your network and your shell. `/jrmodaudit` looks at one before you install it.
+A mod runs inside your session and can reach your files, your network and your shell. `/jr-mod-audit` looks at one before you install it.
 
 ```
 jr mod audit  someone/claude-mods
@@ -30,9 +30,9 @@ A red verdict is a reason to read the code, not proof of harm: a mod that checks
 
 | Command | |
 | --- | --- |
-| `/jrmodaudit owner/repo` | Shallow-clone a GitHub repository and audit every plugin in it |
-| `/jrmodaudit https://…` | Any git URL |
-| `/jrmodaudit ~/path` | A folder on your machine |
+| `/jr-mod-audit owner/repo` | Shallow-clone a GitHub repository and audit every plugin in it |
+| `/jr-mod-audit https://…` | Any git URL |
+| `/jr-mod-audit ~/path` | A folder on your machine |
 
 Clones go to `/tmp/jr-mod-audit`.
 

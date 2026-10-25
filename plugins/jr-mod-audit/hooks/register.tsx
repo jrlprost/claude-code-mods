@@ -17,7 +17,7 @@ const registered = { command: false }
 async function registerCommand($: EngineInterface) {
   if (registered.command) return
   registered.command = true
-  await $.command.register({ name: 'jrmodaudit', description: 'Audit a mod before installing it: /jrmodaudit owner/repo, a git URL or a folder' })
+  await $.command.register({ name: 'jr-mod-audit', description: 'Audit a mod before installing it: /jr-mod-audit owner/repo, a git URL or a folder' })
 }
 
 const RISK_COLOR = { green: '#2cb67d', amber: '#f4d35e', red: '#ef4565' } as const
@@ -109,7 +109,7 @@ export const register: Register = on => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrmodaudit' }, async ($, e) => {
+  on('command.run', { command: 'jr-mod-audit' }, async ($, e) => {
     await update($, report, (): JrModAuditReport => ({ target: e.args.trim(), status: 'running', plugins: [] }))
     await $.ui.open({ id: PANE, title: 'jr mod audit', rows: 24 })
     // Everything in the report comes from the audited repository: printable text only.
@@ -121,7 +121,7 @@ export const register: Register = on => {
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const { Box, Text } = $.ui.resolve(e)
     const r = await read($, report)
-    if (!r) return <Text dimColor>Run /jrmodaudit owner/repo to audit a mod.</Text>
+    if (!r) return <Text dimColor>Run /jr-mod-audit owner/repo to audit a mod.</Text>
     return (
       <Box flexDirection="column">
         <Box>

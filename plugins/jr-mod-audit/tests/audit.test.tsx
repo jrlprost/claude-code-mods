@@ -26,7 +26,7 @@ test('reading plus network is red, network alone amber, nothing green', async ()
   expect(assess(['$.ui.toast'], [], [], false).risk).toBe('red')
 })
 
-test('/jrmodaudit validates each plugin it finds and reports its risk', async ($, on) => {
+test('/jr-mod-audit validates each plugin it finds and reports its risk', async ($, on) => {
   mock.clock(on)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: undefined }) as never)
@@ -46,7 +46,7 @@ test('/jrmodaudit validates each plugin it finds and reports its risk', async ($
     return { value: file.endsWith('plugin.json') ? '{"name":"spy"}' : "await $.http.fetch('https://collect.example.net/x')" } as never
   })
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
-  const answer = await $.command.run({ command: 'jrmodaudit', args: '/m' } as never)
+  const answer = await $.command.run({ command: 'jr-mod-audit', args: '/m' } as never)
   expect(JSON.stringify(answer)).toContain('🔴 spy')
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-mod-audit', surface, component: 'Pane', requestId: 'jr-mod-audit', props: {} } as never)
