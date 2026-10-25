@@ -43,7 +43,7 @@ test('on: one challenge after each answer, shown above the prompt and in the pan
   const forks: string[] = []
   const clock = machine(on, forks)
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrvinci', args: 'on' } as never)
+  await $.command.run({ command: 'jr-vinci', args: 'on' } as never)
   await $.turn.complete(TURN)
   await clock.advance(10)
   expect(forks.length).toBe(1)
@@ -53,7 +53,7 @@ test('on: one challenge after each answer, shown above the prompt and in the pan
     expect(await band.find({ text: /below/ } as never)).toBeDefined()
     await band.unmount()
   }
-  await $.command.run({ command: 'jrvinci', args: '' } as never)
+  await $.command.run({ command: 'jr-vinci', args: '' } as never)
   const pane = await $.ui.mount({ plugin: 'jr-vinci', surface: 'terminal', component: 'Pane', requestId: 'jr-vinci', props: {} } as never)
   expect(await pane.find({ text: /free tier is abused/ } as never)).toBeDefined()
 })

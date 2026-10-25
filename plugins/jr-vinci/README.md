@@ -6,18 +6,18 @@ A sparring partner that pushes back. When it is on, after each of Claude's answe
 ⚔ vinci  Who pays when the free tier is abused by scripted sign-ups?
 ```
 
-- Off by default. `/jrvinci on` starts it, `/jrvinci off` stops it; the choice is kept across sessions.
+- Off by default. `/jr-vinci on` starts it, `/jr-vinci off` stops it; the choice is kept across sessions.
 - One sentence, no praise, in the language of the conversation. When nothing deserves a challenge, nothing is shown.
-- `/jrvinci` opens the history of this session's challenges.
+- `/jr-vinci` opens the history of this session's challenges.
 - It runs after the answer, never inside it: your turn is not slowed down.
 
 ## Commands
 
 | Command | |
 | --- | --- |
-| `/jrvinci on` | Start challenging after each answer |
-| `/jrvinci off` | Stop |
-| `/jrvinci` | Open the history |
+| `/jr-vinci on` | Start challenging after each answer |
+| `/jr-vinci off` | Stop |
+| `/jr-vinci` | Open the history |
 
 ## Cost
 

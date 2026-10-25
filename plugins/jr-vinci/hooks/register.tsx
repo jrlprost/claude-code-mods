@@ -15,7 +15,7 @@ const boot = { isDone: false }
 async function ensureReady($: EngineInterface) {
   if (boot.isDone) return
   boot.isDone = true
-  await $.command.register({ name: 'jrvinci', description: 'Sparring partner: /jrvinci on, /jrvinci off, /jrvinci to see the challenges' })
+  await $.command.register({ name: 'jr-vinci', description: 'Sparring partner: /jr-vinci on, /jr-vinci off, /jr-vinci to see the challenges' })
   if ((await $.store.get('isOn')) === true) await update($, isOn, () => true)
 }
 
@@ -53,7 +53,7 @@ export const register: Register = on => {
     return done
   })
 
-  on('command.run', { command: 'jrvinci' }, async ($, e) => {
+  on('command.run', { command: 'jr-vinci' }, async ($, e) => {
     await ensureReady($)
     const arg = e.args.trim()
     if (arg === 'on' || arg === 'off') {
@@ -99,7 +99,7 @@ export const register: Register = on => {
         <Box>
           <Text color="#ff5ca8">{'⚔ '}</Text>
           {gradientText(Text, 'jr vinci', GRADIENTS.brand)}
-          <Text dimColor>{isEnabled ? '   on · one challenge after each answer' : '   off · /jrvinci on to start'}</Text>
+          <Text dimColor>{isEnabled ? '   on · one challenge after each answer' : '   off · /jr-vinci on to start'}</Text>
         </Box>
         {list.length === 0 && <Text dimColor>No challenge yet.</Text>}
         {[...list].reverse().map(item => (
