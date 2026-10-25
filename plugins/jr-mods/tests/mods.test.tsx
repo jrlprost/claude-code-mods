@@ -58,7 +58,7 @@ type Ui = {
 type Engine = { command: { run: (e: never) => Promise<unknown> }; ui: { mount: (e: never) => Promise<unknown> } }
 
 const open = async ($: Engine, surface: 'terminal' | 'desktop') => {
-  await $.command.run({ command: 'jrmods', args: '' } as never)
+  await $.command.run({ command: 'jr-mods', args: '' } as never)
   return (await $.ui.mount({ plugin: 'jr-mods', surface, component: 'Pane', requestId: 'jr-mods', props: {} } as never)) as Ui
 }
 

@@ -47,20 +47,20 @@ test('the first session opens the welcome once, the next one does not', async ($
   expect(opened).toEqual(['jr-mods-welcome'])
 })
 
-test('/jrmods welcome reopens it, listing only the installed mods', async ($, on) => {
+test('/jr-mods welcome reopens it, listing only the installed mods', async ($, on) => {
   const opened: string[] = []
   const clock = machine(on, opened)
   await $.session.start(start)
   await clock.advance(10)
-  const answer = await $.command.run({ command: 'jrmods', args: 'welcome' } as never)
+  const answer = await $.command.run({ command: 'jr-mods', args: 'welcome' } as never)
   expect(JSON.stringify(answer)).toContain('welcome opened')
   expect(opened).toEqual(['jr-mods-welcome', 'jr-mods-welcome'])
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-mods', surface, component: 'Pane', requestId: 'jr-mods-welcome', props: { bodyColumns: 100 } } as never)
-    expect(await ui.find({ text: /\/jrcontext/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /\/jr-context/ } as never)).toBeDefined()
     expect(await ui.find({ text: /your billing/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /\/jrbadge/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /\/jrfleet/ } as never)).toBeUndefined()
+    expect(await ui.find({ text: /\/jr-badge/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /\/jr-fleet/ } as never)).toBeUndefined()
     expect(await ui.find({ text: /Only when there is something to say/ } as never)).toBeUndefined()
     await ui.unmount()
   }

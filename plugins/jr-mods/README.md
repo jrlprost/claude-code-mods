@@ -1,6 +1,6 @@
 # jr-mods
 
-`/jrmods` opens every installed plugin and mod in one list, so turning several on or off takes a few keys instead of a command each.
+`/jr-mods` opens every installed plugin and mod in one list, so turning several on or off takes a few keys instead of a command each.
 
 ```
 jr mods    mods 3   plugins 22                   17 on · 8 off
@@ -25,7 +25,7 @@ The terminal hands keys to the list only after a click on it, so the list opens 
 
 ## Welcome
 
-The first session after install opens a welcome pane once; `/jrmods welcome` opens it again. For the jr mods you have installed, it lists what shows by default, what one command brings up, and what appears only when there is something to say, with each command, and how to read your billing with `/jrtime`.
+The first session after install opens a welcome pane once; `/jr-mods welcome` opens it again. For the jr mods you have installed, it lists what shows by default, what one command brings up, and what appears only when there is something to say, with each command, and how to read your billing with `/jr-time`.
 
 Changes go through `claude plugin enable` and `claude plugin disable`. Run `/reload-plugins` to load them in the current session.
 

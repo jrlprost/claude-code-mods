@@ -1,4 +1,4 @@
-// The /jrmods list, drawn on the surface itself so it reads raw keys:
+// The /jr-mods list, drawn on the surface itself so it reads raw keys:
 // left/right (or h/l, tab) switch between mods and plugins, up/down (or j/k) move,
 // space ticks, a/n tick all or none of the tab, enter applies every change at once.
 // The terminal hands the keys to the list only after a click on it, so the list opens with a

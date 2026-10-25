@@ -30,7 +30,7 @@ async function onboard($: EngineInterface) {
   try {
     await openWelcome($)
   } catch {
-    // One attempt only: /jrmods welcome opens it again.
+    // One attempt only: /jr-mods welcome opens it again.
   }
 }
 
@@ -60,7 +60,7 @@ async function loadItems($: EngineInterface) {
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'jrmods', description: 'Turn plugins and mods on or off: space ticks, enter applies. /jrmods welcome: what each jr mod shows' })
+    await $.command.register({ name: 'jr-mods', description: 'Turn plugins and mods on or off: space ticks, enter applies. /jr-mods welcome: what each jr mod shows' })
     const started = await next(e)
     $.clock.after(0, () => {
       void onboard($)
@@ -68,7 +68,7 @@ export const register: Register = on => {
     return started
   })
 
-  on('command.run', { command: 'jrmods' }, async ($, e) => {
+  on('command.run', { command: 'jr-mods' }, async ($, e) => {
     if (e.args.trim() === 'welcome') {
       if (!(await openWelcome($))) return { text: 'jr-mods: could not list plugins (claude plugin list failed).' }
       return { text: 'jr-mods: welcome opened.' }
@@ -107,7 +107,7 @@ export const register: Register = on => {
     const { Client } = $.ui.resolve(e) as unknown as { Client?: (p: Record<string, unknown>) => never }
     const { Text } = $.ui.resolve(e)
     const list = await read($, items)
-    if (!Client) return <Text>Open /jrmods in the terminal or the desktop app to toggle plugins.</Text>
+    if (!Client) return <Text>Open /jr-mods in the terminal or the desktop app to toggle plugins.</Text>
     return <Client key="list" module="./list.client.tsx" props={{ items: list }} height="100%" flexGrow={1} />
   })
 
