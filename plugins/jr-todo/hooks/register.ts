@@ -8,12 +8,12 @@ const commands = { isRegistered: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrtodo', description: 'Capture a task instantly, no model call: /jrtodo <task>' })
+  await $.command.register({ name: 'jr-todo', description: 'Capture a task instantly, no model call: /jr-todo <task>' })
 }
 
 /** Files the task where the settings say; returns the line shown to you. */
 async function capture($: EngineInterface, task: string, o: TodoOptions) {
-  if (!task) return 'jr todo · usage: /jrtodo <task>'
+  if (!task) return 'jr todo · usage: /jr-todo <task>'
   const root = await $.session.root()
   const plan = planFor(task, o, root)
   if (plan.kind === 'missing') return `jr todo · the ${o.target} target needs ${plan.what}: set it in /config`
@@ -58,5 +58,5 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrtodo' }, async ($, e) => ({ text: await capture($, e.args.trim(), o) }))
+  on('command.run', { command: 'jr-todo' }, async ($, e) => ({ text: await capture($, e.args.trim(), o) }))
 }

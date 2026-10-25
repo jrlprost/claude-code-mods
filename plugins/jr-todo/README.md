@@ -3,7 +3,7 @@
 Capture a task the moment you think of it, without leaving Claude Code and without spending a model call.
 
 ```
-/jrtodo renew the domain before Friday
+/jr-todo renew the domain before Friday
 jr todo · ✓ "renew the domain before Friday" → TODO.md
 ```
 
@@ -36,7 +36,7 @@ The task is handed to your command as one quoted argument, so its text is never 
 
 | Command | |
 | --- | --- |
-| `/jrtodo <task>` | File the task in the configured target |
+| `/jr-todo <task>` | File the task in the configured target |
 
 When a target refuses the task (bad token, missing team), nothing is saved and the reason is shown.
 
@@ -48,4 +48,4 @@ When a target refuses the task (bad token, missing team), nothing is saved and t
 
 ## Access
 
-Depending on the target you choose: appends to one markdown file; or sends the task text to Todoist, Linear or Notion with your token; or runs `gh issue create`, `open things:///…`, `osascript` (Reminders) or your own command. Nothing happens until you type `/jrtodo`.
+Depending on the target you choose: appends to one markdown file; or sends the task text to Todoist, Linear or Notion with your token; or runs `gh issue create`, `open things:///…`, `osascript` (Reminders) or your own command. Nothing happens until you type `/jr-todo`.

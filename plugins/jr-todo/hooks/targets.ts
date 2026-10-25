@@ -1,4 +1,4 @@
-// Where /jrtodo sends a task, and how. Every target is built here as plain data, so it can be tested
+// Where /jr-todo sends a task, and how. Every target is built here as plain data, so it can be tested
 // without the network; register.ts carries it out.
 
 export const TARGETS = ['markdown', 'todoist', 'linear', 'notion', 'github', 'things', 'reminders', 'custom'] as const
@@ -76,7 +76,7 @@ export const planFor = (task: string, o: TodoOptions, root: string): Plan => {
         describe: 'Notion',
       }
     case 'github':
-      return { kind: 'process', argv: ['gh', 'issue', 'create', '--title', task, '--body', 'Captured with /jrtodo'], describe: 'a GitHub issue in this repository' }
+      return { kind: 'process', argv: ['gh', 'issue', 'create', '--title', task, '--body', 'Captured with /jr-todo'], describe: 'a GitHub issue in this repository' }
     case 'things':
       return { kind: 'process', argv: ['open', `things:///add?title=${encodeURIComponent(task)}`], describe: 'Things' }
     case 'reminders':
@@ -89,7 +89,7 @@ export const planFor = (task: string, o: TodoOptions, root: string): Plan => {
     case 'custom':
       if (!o.command.includes('{task}')) return { kind: 'missing', what: 'a custom command containing {task}' }
       // {task} becomes a quoted shell argument: the task text is never parsed as shell code.
-      return { kind: 'process', argv: ['sh', '-c', o.command.replaceAll('{task}', '"$1"'), 'jrtodo', task], describe: 'your command' }
+      return { kind: 'process', argv: ['sh', '-c', o.command.replaceAll('{task}', '"$1"'), 'jr-todo', task], describe: 'your command' }
     default: {
       const file = o.file ? (o.file.startsWith('/') ? o.file : `${root}/${o.file}`) : `${root}/TODO.md`
       return { kind: 'append', file, line: `- [ ] ${task}`, describe: file.split('/').pop() ?? 'TODO.md' }

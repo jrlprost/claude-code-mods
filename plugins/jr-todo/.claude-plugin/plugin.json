@@ -1,7 +1,7 @@
 {
   "name": "jr-todo",
-  "version": "0.1.0",
-  "description": "/jrtodo <task>: capture a task instantly, with no model call, to TODO.md, Todoist, Linear, Notion, a GitHub issue, Things, Apple Reminders, or your own command.",
+  "version": "0.2.0",
+  "description": "/jr-todo <task>: capture a task instantly, with no model call, to TODO.md, Todoist, Linear, Notion, a GitHub issue, Things, Apple Reminders, or your own command.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",

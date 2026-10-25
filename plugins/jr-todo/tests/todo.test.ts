@@ -32,7 +32,7 @@ test('missing credentials are named, nothing is sent', async () => {
 
 test('the task never becomes shell code', async () => {
   const custom = planFor('x"; rm -rf ~; echo "', { ...base, target: 'custom', command: 'tasks add {task}' }, '/r')
-  expect(custom).toEqual({ kind: 'process', argv: ['sh', '-c', 'tasks add "$1"', 'jrtodo', 'x"; rm -rf ~; echo "'], describe: 'your command' })
+  expect(custom).toEqual({ kind: 'process', argv: ['sh', '-c', 'tasks add "$1"', 'jr-todo', 'x"; rm -rf ~; echo "'], describe: 'your command' })
   const reminders = planFor('call "Bob"', { ...base, target: 'reminders' }, '/r') as { argv: string[] }
   expect(reminders.argv[reminders.argv.length - 1]).toBe('call "Bob"')
   expect(reminders.argv.slice(0, -1).join(' ')).not.toContain('Bob')
@@ -58,16 +58,16 @@ const machine = (on: On, files: Record<string, string>) => {
   })
 }
 
-test('/jrtodo appends to TODO.md, creating it when needed', async ($, on) => {
+test('/jr-todo appends to TODO.md, creating it when needed', async ($, on) => {
   const files: Record<string, string> = {}
   machine(on, files)
-  const first = await $.command.run({ command: 'jrtodo', args: 'call the accountant' } as never)
-  await $.command.run({ command: 'jrtodo', args: 'renew the domain' } as never)
+  const first = await $.command.run({ command: 'jr-todo', args: 'call the accountant' } as never)
+  await $.command.run({ command: 'jr-todo', args: 'renew the domain' } as never)
   expect(files['/work/app/TODO.md']).toBe('- [ ] call the accountant\n- [ ] renew the domain\n')
   expect(JSON.stringify(first)).toContain('✓')
 })
 
-test('/jrtodo with nothing shows the usage', async ($, on) => {
+test('/jr-todo with nothing shows the usage', async ($, on) => {
   machine(on, {})
-  expect(JSON.stringify(await $.command.run({ command: 'jrtodo', args: ' ' } as never))).toContain('usage')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-todo', args: ' ' } as never))).toContain('usage')
 })
