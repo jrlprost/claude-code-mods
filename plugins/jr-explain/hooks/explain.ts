@@ -1,7 +1,9 @@
 // Plain-English explanations of shell commands, from a table first.
+import { printable } from './jr/text'
 
 export type Risk = 'low' | 'medium' | 'high'
-export type Explanation = { what: string; risk: Risk }
+/** `isGuess`: written by a model, so steerable by the command it reads; never shown as low risk. */
+export type Explanation = { what: string; risk: Risk; isGuess?: true }
 
 const TABLE: { test: RegExp; what: string; risk: Risk }[] = [
   { test: /\b(curl|wget)\b[^|]*\|\s*(sudo\s+)?(ba|z)?sh\b/, what: 'downloads a script from the internet and runs it', risk: 'high' },
@@ -55,13 +57,39 @@ export const explainCommand = (command: string): Explanation | null => {
 
 export const RISK_MARK: Record<Risk, string> = { low: '🟢 low risk', medium: '🟡 medium risk', high: '🔴 high risk' }
 
-/** The toast shown beside the permission dialog. */
-export const toastFor = (e: Explanation) => `${RISK_MARK[e.risk]} · ${e.what}`
+const mark = (e: Explanation) => `${RISK_MARK[e.risk]}${e.isGuess ? ' (a guess)' : ''}`
 
-export const reasonFor = (e: Explanation, previous?: string) => `${e.what}. ${RISK_MARK[e.risk]}.${previous ? ` (${previous})` : ''}`
+/** The toast shown beside the permission dialog, naming the command it explains. */
+export const toastFor = (e: Explanation, command: string) =>
+  `${mark(e)} · ${printable(e.what, 160)} · $ ${printable(command.replace(/\s+/g, ' ').trim(), 80)}`
 
-/** Reads the model's one-line answer: "<explanation> | <low|medium|high>". */
-export const parseModelAnswer = (text: string): Explanation | null => {
+export const reasonFor = (e: Explanation, previous?: string) => `${printable(e.what, 160)}. ${mark(e)}.${previous ? ` (${previous})` : ''}`
+
+/** The command without its shell comments, which a model would read as instructions. */
+export const stripComments = (command: string) =>
+  command
+    .split('\n')
+    .map(line => line.replace(/(^|\s)#.*$/, '$1').trimEnd())
+    .filter(Boolean)
+    .join('\n')
+
+/** True when the answer repeats four words in a row from the command: text the command planted. */
+export const echoesCommand = (answer: string, command: string) => {
+  const words = (t: string) => t.toLowerCase().match(/[a-z0-9']+/g) ?? []
+  const said = ` ${words(answer).join(' ')} `
+  const cmd = words(command)
+  for (let i = 0; i + 4 <= cmd.length; i++) if (said.includes(` ${cmd.slice(i, i + 4).join(' ')} `)) return true
+  return false
+}
+
+/**
+ * Reads the model's one-line answer: "<explanation> | <low|medium|high>". A model can be steered
+ * by the command it explains, so its risk is never below medium, its text is made printable and
+ * marked as a guess, and an answer that echoes the command is refused.
+ */
+export const parseModelAnswer = (text: string, command = ''): Explanation | null => {
   const m = text.trim().match(/^(.+?)\s*\|\s*(low|medium|high)\s*$/i)
-  return m ? { what: m[1]!.replace(/\.$/, ''), risk: m[2]!.toLowerCase() as Risk } : null
+  if (!m || echoesCommand(m[1]!, command)) return null
+  const risk = m[2]!.toLowerCase() === 'high' ? 'high' : 'medium'
+  return { what: printable(m[1]!.replace(/\.$/, ''), 160), risk, isGuess: true }
 }

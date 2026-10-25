@@ -1,7 +1,7 @@
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Explanation } from './explain'
-import { explainCommand, parseModelAnswer, reasonFor, toastFor } from './explain'
+import { explainCommand, parseModelAnswer, reasonFor, stripComments, toastFor } from './explain'
 
 const cache = new Map<string, Explanation | null>()
 
@@ -11,11 +11,11 @@ async function askModel($: EngineInterface, model: string, command: string): Pro
   const answer = await $.model.complete({
     model,
     system: 'You explain shell commands to a non-developer. Answer with one short plain-English clause saying what the command does, then " | ", then its risk: low, medium or high. Nothing else.',
-    prompt: command.slice(0, 2000),
+    prompt: stripComments(command).slice(0, 2000),
     maxTokens: 60,
     timeoutMs: 5000,
   })
-  const explanation = answer.isAnswered ? parseModelAnswer(answer.text) : null
+  const explanation = answer.isAnswered ? parseModelAnswer(answer.text, command) : null
   cache.set(command, explanation)
   return explanation
 }
@@ -32,7 +32,9 @@ export const register: Register = (on, options) => {
     const command = (e.input as { command?: string }).command ?? ''
     const explanation = explainCommand(command) ?? (useModel ? await askModel($, model, command) : null)
     if (!explanation) return verdict
-    if (e.tool_use_id) $.ui.toast(toastFor(explanation), { timeoutMs: 15_000 })
+    // A toast cannot be taken back early (a newer one only covers it), so it names its command
+    // and stays a fixed 15 seconds.
+    if (e.tool_use_id) $.ui.toast(toastFor(explanation, command), { timeoutMs: 15_000 })
     return { ...verdict, reason: reasonFor(explanation, verdict.reason) }
   })
 }
