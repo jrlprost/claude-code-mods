@@ -3,7 +3,7 @@
 Tells you when a turn reaches further than you asked: it writes a sensitive file your prompt never named, or changes too many files at once.
 
 ```
-▲ touched pnpm-lock.yaml (lockfile), .env (env) without being asked · /jrscope hides
+▲ touched pnpm-lock.yaml (lockfile), .env (env) without being asked · /jr-scope hides
 ```
 
 One row on the left, only while there is something to act on.
@@ -20,7 +20,7 @@ At the end of each turn, the files Claude wrote (Write, Edit, NotebookEdit) are 
 | infra | `*.tf`, `*.tfvars`, `terraform/`, `infra/`, `k8s/`, `helm/`, `Dockerfile`, `docker-compose*.yml` |
 
 A sensitive file is fine when the prompt names it (its file name or its path). The warning shows as a toast and stays above the prompt until the next turn.
-- `/jrscope` hides or shows the band, in every session and across restarts; `/jrscope on` and `/jrscope off` set it.
+- `/jr-scope` hides or shows the band, in every session and across restarts; `/jr-scope on` and `/jr-scope off` set it.
 
 ## Settings (`/config`)
 

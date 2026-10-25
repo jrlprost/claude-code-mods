@@ -11,7 +11,7 @@ const band = { isLoaded: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrscope', description: 'Show or hide the scope warning band: /jrscope toggles, /jrscope on or off' })
+  await $.command.register({ name: 'jr-scope', description: 'Show or hide the scope warning band: /jr-scope toggles, /jr-scope on or off' })
 }
 
 /** True while the band is hidden: one choice for every session, read from the store once per load. */
@@ -84,13 +84,13 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrscope' }, async ($, e) => {
+  on('command.run', { command: 'jr-scope' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
     const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : arg === '' ? !(await isBandHidden($)) : null
-    if (hide === null) return { text: 'jr scope · usage: /jrscope toggles the band, /jrscope on or off' }
+    if (hide === null) return { text: 'jr scope · usage: /jr-scope toggles the band, /jr-scope on or off' }
     await $.store.set('isBandHidden', hide)
     await update($, bandHidden, () => hide)
-    return { text: hide ? 'jr scope · hidden (/jrscope to bring it back)' : 'jr scope · shown' }
+    return { text: hide ? 'jr scope · hidden (/jr-scope to bring it back)' : 'jr scope · shown' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
@@ -109,7 +109,7 @@ export const register: Register = (on, options) => {
         <Text wrap="truncate-end">
           <Text color="#ff8c42">{'▲ '}</Text>
           <Text>{text}</Text>
-          <Text dimColor>{' · /jrscope hides'}</Text>
+          <Text dimColor>{' · /jr-scope hides'}</Text>
         </Text>
         {below}
       </Box>
