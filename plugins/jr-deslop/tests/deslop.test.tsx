@@ -51,7 +51,7 @@ test('a written markdown file is checked and listed in the pane, a code file is 
   expect(toasts).toEqual([])
   await $.tool.call({ tool: 'Write', file_path: '/p/notes.md', content: SLOP } as never)
   expect(toasts[0]).toContain('6 AI-writing tells in notes.md')
-  await $.command.run({ command: 'jrdeslop', args: '' } as never)
+  await $.command.run({ command: 'jr-deslop', args: '' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-deslop', surface, component: 'Pane', requestId: 'jr-deslop', props: {} } as never)
     expect(await ui.find({ text: /\/p\/notes\.md/ } as never)).toBeDefined()

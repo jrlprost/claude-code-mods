@@ -5,10 +5,10 @@ Checks the prose Claude writes for the tells of machine-written text, and tells 
 After Claude writes or edits a `.md`, `.mdx`, `.markdown`, `.txt` or `.rst` file:
 
 ```
-jr deslop · 6 AI-writing tells in launch-notes.md · /jrdeslop to see them
+jr deslop · 6 AI-writing tells in launch-notes.md · /jr-deslop to see them
 ```
 
-`/jrdeslop` lists them by file and line:
+`/jr-deslop` lists them by file and line:
 
 ```
 jr deslop   6 tells in 1 file · hints, not rules
@@ -40,8 +40,8 @@ Fenced code blocks and inline code are skipped.
 
 | Command | |
 | --- | --- |
-| `/jrdeslop` | List the tells found this session |
-| `/jrdeslop <file>` | Check one file now |
+| `/jr-deslop` | List the tells found this session |
+| `/jr-deslop <file>` | Check one file now |
 
 ## Install
 

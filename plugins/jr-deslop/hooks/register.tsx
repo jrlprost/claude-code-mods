@@ -12,7 +12,7 @@ const commands = { isRegistered: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrdeslop', description: 'Show AI-writing tells in the prose files written this session; /jrdeslop <file> scans one file' })
+  await $.command.register({ name: 'jr-deslop', description: 'Show AI-writing tells in the prose files written this session; /jr-deslop <file> scans one file' })
 }
 
 /** Scans one file and replaces its hits; returns how many it has. */
@@ -50,11 +50,11 @@ export const register: Register = on => {
     const file = (e as unknown as { file_path?: string }).file_path
     if (!file || !PROSE.test(file) || ('deny' in ran && ran.deny) || ('isError' in ran && ran.isError)) return ran
     const count = await rescan($, file)
-    if (count > 0) $.ui.toast(`jr deslop · ${count} AI-writing tell${count > 1 ? 's' : ''} in ${file.split('/').pop()} · /jrdeslop to see them`)
+    if (count > 0) $.ui.toast(`jr deslop · ${count} AI-writing tell${count > 1 ? 's' : ''} in ${file.split('/').pop()} · /jr-deslop to see them`)
     return ran
   })
 
-  on('command.run', { command: 'jrdeslop' }, async ($, e) => {
+  on('command.run', { command: 'jr-deslop' }, async ($, e) => {
     const file = e.args.trim()
     if (file) {
       const count = await rescan($, file)
