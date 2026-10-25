@@ -68,12 +68,16 @@ export const reasonFor = (e: Explanation, previous?: string) => `${printable(e.w
 /**
  * The command as the model reads it: whole, between markers, as data. Nothing is cut out, so no
  * part of it can be hidden from the model (cutting "comments" with a pattern also cuts a # inside
- * quotes, and whatever follows it). Instructions planted in it are handled after the answer: the
+ * quotes, and whatever follows it). Every < is escaped, so the command cannot close the markers. Instructions planted in it are handled after the answer: the
  * risk is never below medium, and an answer that echoes the command is refused.
  */
-export const commandPrompt = (command: string) =>
-  `<command>\n${command.slice(0, 2000).replaceAll('</command>', '<\\/command>')}\n</command>`
+export const commandPrompt = (command: string) => `<command>\n${command.replaceAll('<', '&lt;')}\n</command>`
 
+/** Longest command a model is asked about: past it, a cut command could hide its end. */
+export const MAX_MODEL_COMMAND = 2000
+
+/** What a command too long to put to the model gets instead. */
+export const TOO_LONG: Explanation = { what: 'A command too long to explain; read it before you allow it', risk: 'high' }
 /** True when the answer repeats four words in a row from the command: text the command planted. */
 export const echoesCommand = (answer: string, command: string) => {
   const words = (t: string) => t.toLowerCase().match(/[a-z0-9']+/g) ?? []

@@ -1,6 +1,6 @@
 {
   "name": "jr-explain",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Every shell command Claude asks permission for comes with a plain-English explanation and a risk level: low, medium or high.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
