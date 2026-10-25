@@ -10,7 +10,7 @@ const REFRESH_MS = 2 * 60_000
 const figures = atom({ plugin: 'jr-visitors', key: 'figures' } as const, null)
 const bandHidden = atom({ plugin: 'jr-visitors', key: 'isBandHidden' } as const, false)
 
-// The band can be hidden: /jrvisitors hide, show, or the bare command to toggle. One choice for
+// The band can be hidden: /jr-visitors hide, show, or the bare command to toggle. One choice for
 // every session, kept across restarts.
 const band = { isLoaded: false }
 
@@ -33,7 +33,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr visitors · band hidden (/jrvisitors to bring it back)' : 'jr visitors · band shown' }
+  return { text: hide ? 'jr visitors · band hidden (/jr-visitors to bring it back)' : 'jr visitors · band shown' }
 }
 const live = { isStarted: false, host: '', projectId: '', key: '' }
 
@@ -62,7 +62,7 @@ async function refresh($: EngineInterface, withPages: boolean) {
 async function ensureStarted($: EngineInterface) {
   if (live.isStarted) return
   live.isStarted = true
-  await $.command.register({ name: 'jrvisitors', description: 'Show or hide the visitors band; /jrvisitors details opens visitors now, today and top pages' })
+  await $.command.register({ name: 'jr-visitors', description: 'Show or hide the visitors band; /jr-visitors details opens visitors now, today and top pages' })
   if (!live.key || !live.projectId) return
   await refresh($, false)
   $.clock.every(REFRESH_MS, () => {
@@ -100,7 +100,7 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrvisitors' }, async ($, e) => {
+  on('command.run', { command: 'jr-visitors' }, async ($, e) => {
     await ensureStarted($)
     const verb = bandVerb(e.args)
     // Not set up yet: the bare command says how, instead of toggling a band that cannot show.
