@@ -1,6 +1,6 @@
 # jr-week
 
-`/jrweek` shows your week with Claude Code: for each day and each project, how long Claude worked, how many prompts you sent, and what it cost.
+`/jr-week` shows your week with Claude Code: for each day and each project, how long Claude worked, how many prompts you sent, and what it cost.
 
 ```
 jr week   12 Oct – 18 Oct                    [This week] [Last week] [Export]
@@ -22,7 +22,7 @@ acme               ██████·····   3h01       41    $5.02
 
 | Command | |
 | --- | --- |
-| `/jrweek` | Open the week |
+| `/jr-week` | Open the week |
 
 In the pane: `t` this week, `l` last week, `e` export the shown week as Markdown to `~/Downloads`.
 

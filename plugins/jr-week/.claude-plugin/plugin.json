@@ -1,7 +1,7 @@
 {
   "name": "jr-week",
-  "version": "0.1.0",
-  "description": "/jrweek: your week with Claude Code, per day and per project: time Claude worked, prompts and cost, with gradient bars and a Markdown export.",
+  "version": "0.2.0",
+  "description": "/jr-week: your week with Claude Code, per day and per project: time Claude worked, prompts and cost, with gradient bars and a Markdown export.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",

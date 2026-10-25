@@ -14,7 +14,7 @@ const ready = { isCommand: false }
 async function ensureCommand($: EngineInterface) {
   if (ready.isCommand) return
   ready.isCommand = true
-  await $.command.register({ name: 'jrweek', description: 'This week with Claude: time, prompts and cost per day and project' })
+  await $.command.register({ name: 'jr-week', description: 'This week with Claude: time, prompts and cost per day and project' })
 }
 
 async function refresh($: EngineInterface, back: number) {
@@ -62,7 +62,7 @@ export const register: Register = on => {
     return ran
   })
 
-  on('command.run', { command: 'jrweek' }, async $ => {
+  on('command.run', { command: 'jr-week' }, async $ => {
     await refresh($, 0)
     await $.ui.open({ id: PANE, title: 'jr week', focus: true, closeOnEscape: true, rows: 20 })
     return { text: 'jr week opened.' }

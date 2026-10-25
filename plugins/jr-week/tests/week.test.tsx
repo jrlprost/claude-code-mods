@@ -43,12 +43,12 @@ const machine = (on: On) => {
   return clock
 }
 
-test('a prompt, a tool call and a turn show up in /jrweek, on terminal and desktop', async ($, on) => {
+test('a prompt, a tool call and a turn show up in /jr-week, on terminal and desktop', async ($, on) => {
   machine(on)
   await $.prompt.submit({ text: 'go', origin: { kind: 'composer' }, wait: false } as never)
   await $.tool.call({ tool: 'Bash', command: 'ls' } as never)
   await $.turn.complete({ answer: '', durationMs: 25 * 60_000, isAborted: false, turnId: 't', text: '', reason: 'answer' } as never)
-  await $.command.run({ command: 'jrweek', args: '' } as never)
+  await $.command.run({ command: 'jr-week', args: '' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-week', surface, component: 'Pane', requestId: 'jr-week', props: { bodyColumns: 100 } } as never)
     expect(await ui.find({ text: /tokenkarma/ } as never)).toBeDefined()
