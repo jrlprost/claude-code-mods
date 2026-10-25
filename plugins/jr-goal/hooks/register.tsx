@@ -62,15 +62,15 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
-    await $.command.register({ name: 'jrgoal', description: 'Project goal and steps: /jrgoal <goal>, step <text>, done <n>, clear, hide, show' })
+    await $.command.register({ name: 'jr-goal', description: 'Project goal and steps: /jr-goal <goal>, step <text>, done <n>, clear, hide, show' })
     await ensureLoaded($)
     return started
   })
 
-  on('command.run', { command: 'jrgoal' }, async ($, e) => {
+  on('command.run', { command: 'jr-goal' }, async ($, e) => {
     await ensureLoaded($)
     const word = e.args.trim().toLowerCase()
-    if (word === 'hide' || word === 'show') return setBand($, word === 'hide', 'jr goal band', '/jrgoal show')
+    if (word === 'hide' || word === 'show') return setBand($, word === 'hide', 'jr goal band', '/jr-goal show')
     const result = applyCommand(await read($, goal), e.args, await $.clock.now())
     if (result.goal) await $.store.set(live.project, result.goal)
     else await $.store.delete(live.project)

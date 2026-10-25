@@ -1,17 +1,17 @@
 import type { JrGoal } from '../types'
 
 export const USAGE =
-  'jr goal · usage: /jrgoal <goal>, /jrgoal step <text>, /jrgoal done <n>, /jrgoal undo <n>, /jrgoal clear, /jrgoal (show)'
+  'jr goal · usage: /jr-goal <goal>, /jr-goal step <text>, /jr-goal done <n>, /jr-goal undo <n>, /jr-goal clear, /jr-goal (show)'
 
-/** Applies one /jrgoal command to the current goal: the new goal (null when cleared) and what to say. */
+/** Applies one /jr-goal command to the current goal: the new goal (null when cleared) and what to say. */
 export const applyCommand = (current: JrGoal | null, args: string, now: number): { goal: JrGoal | null; text: string } => {
   const trimmed = args.trim()
   const [verb = '', ...rest] = trimmed.split(/\s+/)
   const arg = rest.join(' ')
-  if (!trimmed) return { goal: current, text: current ? describe(current) : 'jr goal · no goal yet: /jrgoal <goal>' }
+  if (!trimmed) return { goal: current, text: current ? describe(current) : 'jr goal · no goal yet: /jr-goal <goal>' }
   if (verb === 'clear') return { goal: null, text: 'jr goal · cleared' }
   if (verb === 'step') {
-    if (!current) return { goal: current, text: 'jr goal · set a goal first: /jrgoal <goal>' }
+    if (!current) return { goal: current, text: 'jr goal · set a goal first: /jr-goal <goal>' }
     if (!arg) return { goal: current, text: USAGE }
     const goal = { ...current, steps: [...current.steps, { text: arg, isDone: false }], updatedAt: now }
     return { goal, text: `jr goal · step ${goal.steps.length} added` }

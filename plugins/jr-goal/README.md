@@ -12,13 +12,13 @@ One quiet row, right-aligned, out of the way of your eye.
 
 | Command | |
 | --- | --- |
-| `/jrgoal <goal>` | Set the goal for this project (replaces the previous one) |
-| `/jrgoal step <text>` | Add a step |
-| `/jrgoal done <n>` | Tick step n |
-| `/jrgoal undo <n>` | Untick step n |
-| `/jrgoal` | Show the goal and its steps |
-| `/jrgoal clear` | Remove the goal |
-| `/jrgoal hide` / `/jrgoal show` | Hide or show the band, in every session; the goal is kept |
+| `/jr-goal <goal>` | Set the goal for this project (replaces the previous one) |
+| `/jr-goal step <text>` | Add a step |
+| `/jr-goal done <n>` | Tick step n |
+| `/jr-goal undo <n>` | Untick step n |
+| `/jr-goal` | Show the goal and its steps |
+| `/jr-goal clear` | Remove the goal |
+| `/jr-goal hide` / `/jr-goal show` | Hide or show the band, in every session; the goal is kept |
 
 The goal is kept per project (the session's root folder) and comes back in every session opened there.
 

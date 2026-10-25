@@ -37,10 +37,10 @@ const machine = (on: On) => {
 test('the band shows goal, progress and next step, above what was there', async ($, on) => {
   machine(on)
   await $.session.start({ cwd: '/work/shop', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrgoal', args: 'Ship the billing page' } as never)
-  await $.command.run({ command: 'jrgoal', args: 'step Design the form' } as never)
-  await $.command.run({ command: 'jrgoal', args: 'step Wire Stripe' } as never)
-  await $.command.run({ command: 'jrgoal', args: 'done 1' } as never)
+  await $.command.run({ command: 'jr-goal', args: 'Ship the billing page' } as never)
+  await $.command.run({ command: 'jr-goal', args: 'step Design the form' } as never)
+  await $.command.run({ command: 'jr-goal', args: 'step Wire Stripe' } as never)
+  await $.command.run({ command: 'jr-goal', args: 'done 1' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-goal', surface, component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as never)
     expect(bandRow(await ui.drawn())).toEqual({ isOneRow: true, isRight: true })
@@ -53,19 +53,19 @@ test('the band shows goal, progress and next step, above what was there', async 
   }
 })
 
-test('/jrgoal hide takes the band away and keeps what is below, show brings it back', async ($, on) => {
+test('/jr-goal hide takes the band away and keeps what is below, show brings it back', async ($, on) => {
   machine(on)
   await $.session.start({ cwd: '/work/shop', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrgoal', args: 'Ship the billing page' } as never)
+  await $.command.run({ command: 'jr-goal', args: 'Ship the billing page' } as never)
   const band = { plugin: 'jr-goal', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 } } as const
-  const hidden = await $.command.run({ command: 'jrgoal', args: 'hide' } as never)
+  const hidden = await $.command.run({ command: 'jr-goal', args: 'hide' } as never)
   expect(JSON.stringify(hidden)).toContain('hidden')
   let ui = await $.ui.mount(band as never)
   let drawn = JSON.stringify(await ui.drawn())
   expect(drawn).not.toContain('Ship the billing page')
   expect(drawn).toContain('below')
   await ui.unmount()
-  await $.command.run({ command: 'jrgoal', args: 'show' } as never)
+  await $.command.run({ command: 'jr-goal', args: 'show' } as never)
   ui = await $.ui.mount(band as never)
   drawn = JSON.stringify(await ui.drawn())
   expect(drawn).toContain('Ship the billing page')
