@@ -30,7 +30,7 @@ Requires a Claude Code build with mods (function hooks). Built and tested on 2.1
 
 ## The mods
 
-42 mods, each installable on its own. Every band above the prompt is one row: quiet figures on the right, alerts on the left only when something needs you. Context, fleet, limits and time show by default; badge, cache, next-prompt cost and awake are hidden until you ask for them. `/jrmods welcome` lists what you have and how to show or hide it.
+43 mods, each installable on its own. Every band above the prompt is one row: quiet figures on the right, alerts on the left only when something needs you. Context, fleet, limits, time and sysinfo show by default; badge, cache, next-prompt cost and awake are hidden until you ask for them. `/jrmods welcome` lists what you have and how to show or hide it.
 
 Each band hides without turning its mod off:
 
@@ -109,6 +109,7 @@ Each band hides without turning its mod off:
 | [jr-badge](plugins/jr-badge) | A coloured badge above the prompt naming the project, its branch and folder, so you always know which window you are typing in. | `/jrbadge` |
 | [jr-done-ping](plugins/jr-done-ping) | A notification, and a sound on macOS, when a long turn finishes: work in another window and come back when Claude is done. |  |
 | [jr-awake](plugins/jr-awake) | Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep. | `/jrawake` |
+| [jr-sysinfo](plugins/jr-sysinfo) | Disk, RAM, CPU and swap above the prompt: free disk and RAM out of the total, CPU load, swap used, read every 5 minutes by a local script on macOS, Linux and Windows. No tokens. | `/jrsys` |
 
 ## Settings
 

@@ -4,7 +4,7 @@
     "name": "jrlprost"
   },
   "metadata": {
-    "description": "jr mods: 42 Claude Code mods for solo builders. Context bar, plan limits, billable time, guards, dictation, business dashboards and more."
+    "description": "jr mods: 43 Claude Code mods for solo builders. Context bar, plan limits, billable time, guards, dictation, business dashboards and more."
   },
   "plugins": [
     {
@@ -216,6 +216,11 @@
       "name": "jr-awake",
       "source": "./plugins/jr-awake",
       "description": "Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep."
+    },
+    {
+      "name": "jr-sysinfo",
+      "source": "./plugins/jr-sysinfo",
+      "description": "Disk, RAM, CPU and swap in one quiet row above the prompt, refreshed every 5 minutes by a local script on macOS, Linux and Windows. No model call, no tokens. /jrsys hides or shows it."
     }
   ]
 }
