@@ -1,6 +1,6 @@
 {
   "name": "jr-sysinfo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Disk, RAM, CPU and swap in one quiet row above the prompt, refreshed every 5 minutes by a local script on macOS, Linux and Windows. No model call, no tokens.",
   "author": {
     "name": "jrlprost"

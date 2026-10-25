@@ -25,6 +25,7 @@ const machine = (on: On, out: Record<string, string>) => {
   mock.store(on)
   on('command.register', () => ({ value: undefined }) as never)
   on('session.start', ($, e) => ({ cwd: e.cwd }))
+  on('env.get', (_$, e) => ({ value: (e as unknown as { name: string }).name === 'SystemRoot' && 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe' in out ? 'C:\\Windows' : undefined }) as never)
   on('process.run', (_$, e) => {
     const cmd = (e as unknown as { argv: string[] }).argv[0]!
     if (!(cmd in out)) throw new Error(`${cmd}: not found`)
@@ -38,8 +39,8 @@ const machine = (on: On, out: Record<string, string>) => {
 
 const BAND = { plugin: 'jr-sysinfo', surface: 'terminal', component: 'AbovePrompt', props: { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 140 } } as const
 
-test('macOS and Linux: sh reads the machine, the band shows the four figures', async ($, on) => {
-  machine(on, { sh: MAC })
+test('macOS and Linux: /bin/sh reads the machine, the band shows the four figures', async ($, on) => {
+  machine(on, { '/bin/sh': MAC })
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const band = await $.ui.mount(BAND as never)
   expect(await band.find({ text: /disk/ } as never)).toBeDefined()
@@ -50,8 +51,8 @@ test('macOS and Linux: sh reads the machine, the band shows the four figures', a
   expect(await band.find({ text: /below/ } as never)).toBeDefined()
 })
 
-test('Windows: no sh, PowerShell reads it instead', async ($, on) => {
-  machine(on, { powershell: 'disk 1000000000 500000000\r\nmem 16000000 8000000\r\nswap 0 0\r\ncpu 7\r\n' })
+test('Windows: PowerShell by its full path, never sh', async ($, on) => {
+  machine(on, { 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe': 'disk 1000000000 500000000\r\nmem 16000000 8000000\r\nswap 0 0\r\ncpu 7\r\n' })
   await $.session.start({ cwd: 'C:\\', surface: 'terminal', isInteractive: true })
   const band = await $.ui.mount(BAND as never)
   expect(await band.find({ text: /7%/ } as never)).toBeDefined()
@@ -59,7 +60,7 @@ test('Windows: no sh, PowerShell reads it instead', async ($, on) => {
 })
 
 test('/jrsys toggles the band', async ($, on) => {
-  machine(on, { sh: MAC })
+  machine(on, { '/bin/sh': MAC })
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const shows = async () => {
     const band = await $.ui.mount(BAND as never)

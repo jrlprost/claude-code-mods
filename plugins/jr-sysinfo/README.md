@@ -7,7 +7,7 @@ disk 116G/926G free · ram 5.5G/32G free · cpu 32% · swap 21.2G/22G used
 ```
 
 - Each figure turns from green to red as it fills.
-- Read when the session starts, then every 5 minutes, by a small local script: `sh` on macOS and Linux, Windows PowerShell on Windows.
+- Read when the session starts, then every 5 minutes, by a small local script: `/bin/sh` on macOS and Linux, Windows PowerShell on Windows (started by its full path under `%SystemRoot%`, never from the project folder).
 - No model call: the band costs no tokens and Claude never sees it.
 
 ## Commands

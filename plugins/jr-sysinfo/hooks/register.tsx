@@ -34,22 +34,20 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   return { text: hide ? 'jr sysinfo · band hidden (/jrsys to bring it back)' : 'jr sysinfo · band shown' }
 }
 
-// Which script this machine runs, found on the first reading: sh for macOS and Linux,
-// PowerShell when sh is missing or is a Windows one.
-const live = { isStarted: false, shell: null as 'unix' | 'windows' | null }
+// Windows is told by its SystemRoot (C:\Windows): there it runs PowerShell, never sh, which
+// could be a Git Bash one. Both start by absolute path from a system folder, never from the
+// project: Windows looks for a bare name in the working folder first, where a cloned repo could
+// hold its own sh.exe or powershell.exe.
+const live = { isStarted: false }
 
-async function runUnix($: EngineInterface) {
+async function readMachine($: EngineInterface) {
+  const root = await $.env.get('SystemRoot')
+  const isWindows = root !== undefined && /^[A-Za-z]:\\/.test(root)
+  const argv = isWindows
+    ? [`${root}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe`, '-NoProfile', '-NonInteractive', '-Command', WINDOWS_SCRIPT]
+    : ['/bin/sh', '-c', UNIX_SCRIPT]
   try {
-    const { stdout } = await $.process.run(['sh', '-c', UNIX_SCRIPT], { timeoutMs: 20_000 })
-    return parseStats(stdout)
-  } catch {
-    return null
-  }
-}
-
-async function runWindows($: EngineInterface) {
-  try {
-    const { stdout } = await $.process.run(['powershell', '-NoProfile', '-NonInteractive', '-Command', WINDOWS_SCRIPT], { timeoutMs: 20_000 })
+    const { stdout } = await $.process.run(argv, { cwd: isWindows ? root : '/', timeoutMs: 20_000 })
     return parseStats(stdout)
   } catch {
     return null
@@ -57,15 +55,7 @@ async function runWindows($: EngineInterface) {
 }
 
 async function refresh($: EngineInterface) {
-  let next = null
-  if (live.shell !== 'windows') {
-    next = await runUnix($)
-    if (next) live.shell = 'unix'
-  }
-  if (!next && live.shell !== 'unix') {
-    next = await runWindows($)
-    if (next) live.shell = 'windows'
-  }
+  const next = await readMachine($)
   if (next) await update($, stats, () => next)
 }
 
