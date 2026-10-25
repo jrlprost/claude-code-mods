@@ -14,7 +14,7 @@ const DAYS = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun']
 async function ensureCommand($: EngineInterface) {
   if (ready.isCommand) return
   ready.isCommand = true
-  await $.command.register({ name: 'jrheatmap', description: 'Your last 26 weeks with Claude as a heatmap, streaks and peak hours' })
+  await $.command.register({ name: 'jr-heatmap', description: 'Your last 26 weeks with Claude as a heatmap, streaks and peak hours' })
 }
 
 async function refresh($: EngineInterface) {
@@ -61,7 +61,7 @@ export const register: Register = on => {
     return ran
   })
 
-  on('command.run', { command: 'jrheatmap' }, async $ => {
+  on('command.run', { command: 'jr-heatmap' }, async $ => {
     await refresh($)
     await $.ui.open({ id: PANE, title: 'jr heatmap', rows: 16 })
     return { text: 'jr heatmap opened.' }

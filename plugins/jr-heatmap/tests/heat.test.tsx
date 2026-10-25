@@ -58,10 +58,10 @@ const machine = (on: On) => {
   on('prompt.submit', (_$, e) => ({ text: e.text }) as never)
 }
 
-test('/jrheatmap draws the grid and the streak, on terminal and desktop', async ($, on) => {
+test('/jr-heatmap draws the grid and the streak, on terminal and desktop', async ($, on) => {
   machine(on)
   await $.prompt.submit({ text: 'hello', origin: { kind: 'composer' }, wait: false } as never)
-  await $.command.run({ command: 'jrheatmap', args: '' } as never)
+  await $.command.run({ command: 'jr-heatmap', args: '' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-heatmap', surface, component: 'Pane', requestId: 'jr-heatmap', props: {} } as never)
     expect(await ui.find({ text: /1 prompts on 1 days/ } as never)).toBeDefined()

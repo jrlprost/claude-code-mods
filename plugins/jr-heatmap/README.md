@@ -1,6 +1,6 @@
 # jr-heatmap
 
-`/jrheatmap` draws your last 26 weeks with Claude Code as a GitHub-style grid: one square per day, coloured by how many prompts you sent, from dark violet to amber.
+`/jr-heatmap` draws your last 26 weeks with Claude Code as a GitHub-style grid: one square per day, coloured by how many prompts you sent, from dark violet to amber.
 
 ```
 jr heatmap   last 26 weeks · 1,204 prompts on 97 days
@@ -22,7 +22,7 @@ hours ▁▁▁▁▁▁▂▅██▆▅▃▅▇█▆▄▃▂▂▃▂▁  
 
 | Command | |
 | --- | --- |
-| `/jrheatmap` | Open the heatmap |
+| `/jr-heatmap` | Open the heatmap |
 
 The mod records from the moment it is installed; earlier days stay empty.
 
