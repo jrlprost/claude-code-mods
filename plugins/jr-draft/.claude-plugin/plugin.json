@@ -1,7 +1,7 @@
 {
   "name": "jr-draft",
-  "version": "0.1.1",
-  "description": "/jrdraft: a scratch pane to write your next prompt while Claude works, kept per project, sent to the prompt box when you are ready.",
+  "version": "0.2.0",
+  "description": "/jr-draft: a scratch pane to write your next prompt while Claude works, kept per project, sent to the prompt box when you are ready.",
   "author": {
     "name": "jrlprost"
   },

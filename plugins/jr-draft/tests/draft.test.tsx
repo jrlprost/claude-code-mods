@@ -25,7 +25,7 @@ test('type a draft, send it to the prompt box, and the scratch area empties', as
   const filled: string[] = []
   machine(on, filled)
   await $.session.start({ cwd: '/work/acme-site', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrdraft', args: '' } as never)
+  await $.command.run({ command: 'jr-draft', args: '' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     filled.length = 0
     const ui = (await $.ui.mount({ plugin: 'jr-draft', surface, component: 'Pane', requestId: 'jr-draft', props: {} } as never)) as never as Ui
@@ -42,7 +42,7 @@ test('type a draft, send it to the prompt box, and the scratch area empties', as
 test('a draft saved in an earlier session comes back, and Clear empties it', async ($, on) => {
   machine(on, [], { 'draft:acme-site': 'remember this one' })
   await $.session.start({ cwd: '/work/acme-site', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrdraft', args: '' } as never)
+  await $.command.run({ command: 'jr-draft', args: '' } as never)
   const ui = (await $.ui.mount({ plugin: 'jr-draft', surface: 'terminal', component: 'Pane', requestId: 'jr-draft', props: {} } as never)) as never as Ui
   expect(await ui.find({ text: /3 words/ } as never)).toBeDefined()
   await ui.press({ key: 'clear' })

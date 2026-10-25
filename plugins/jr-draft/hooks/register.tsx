@@ -15,7 +15,7 @@ const keyOf = (name: string) => `draft:${name}`
 async function ensureReady($: EngineInterface) {
   if (boot.isDone) return
   boot.isDone = true
-  await $.command.register({ name: 'jrdraft', description: 'A scratch pane to draft your next prompt while Claude works' })
+  await $.command.register({ name: 'jr-draft', description: 'A scratch pane to draft your next prompt while Claude works' })
   const root = await $.session.root()
   const name = root.split('/').pop() || root
   await update($, project, () => name)
@@ -52,7 +52,7 @@ export const register: Register = on => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrdraft' }, async $ => {
+  on('command.run', { command: 'jr-draft' }, async $ => {
     await ensureReady($)
     await $.ui.open({ id: PANE, title: 'jr draft', focus: true, closeOnEscape: true, rows: 12 })
     return { text: 'jr draft opened.' }
@@ -83,7 +83,7 @@ export const register: Register = on => {
             onSubmit={(value: string) => void save($, value).then(() => sendToPrompt($))}
           />
         ) : (
-          <Text>{text || 'Open /jrdraft in the terminal or the desktop app to type here.'}</Text>
+          <Text>{text || 'Open /jr-draft in the terminal or the desktop app to type here.'}</Text>
         )}
         <Box columnGap={2}>
           <Button key="send" label="Send to prompt box" hotkey="s" onPress={() => void sendToPrompt($)} />

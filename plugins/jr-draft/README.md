@@ -1,6 +1,6 @@
 # jr-draft
 
-While Claude works, you already know what comes next. `/jrdraft` opens a scratch pane to write it, so the thought is not lost and the prompt box stays free.
+While Claude works, you already know what comes next. `/jr-draft` opens a scratch pane to write it, so the thought is not lost and the prompt box stays free.
 
 ```
 jr draft   acme-site · 6 words · kept until you send it
@@ -19,7 +19,7 @@ jr draft   acme-site · 6 words · kept until you send it
 
 | Command | |
 | --- | --- |
-| `/jrdraft` | Open the scratch pane |
+| `/jr-draft` | Open the scratch pane |
 
 In the pane: type freely (several lines), Enter or `s` sends to the prompt box, `c` clears, Esc closes.
 
