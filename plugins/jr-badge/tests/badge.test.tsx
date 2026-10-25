@@ -52,7 +52,7 @@ test('hidden on a fresh install', async ($, on) => {
 test('shown, one row: the CLAUDE.md label and the branch, no path, what is below kept', async ($, on) => {
   machine(on)
   await $.session.start({ cwd: '/work/shop', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrbadge', args: 'show' } as never)
+  await $.command.run({ command: 'jr-badge', args: 'show' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ ...BAND, surface } as never)
     expect(await ui.find({ text: / SHOP PROD / } as never)).toBeDefined()
@@ -64,26 +64,26 @@ test('shown, one row: the CLAUDE.md label and the branch, no path, what is below
   }
 })
 
-test('/jrbadge toggles the badge, /jrbadge on and off set it', async ($, on) => {
+test('/jr-badge toggles the badge, /jr-badge on and off set it', async ($, on) => {
   machine(on)
   await $.session.start({ cwd: '/work/shop', surface: 'terminal', isInteractive: true })
-  const shown = await $.command.run({ command: 'jrbadge', args: '' } as never)
+  const shown = await $.command.run({ command: 'jr-badge', args: '' } as never)
   expect(JSON.stringify(shown)).toContain('shown')
   let ui = await $.ui.mount(BAND as never)
   expect(await ui.find({ text: /SHOP PROD/ } as never)).toBeDefined()
   await ui.unmount()
-  const hidden = await $.command.run({ command: 'jrbadge', args: '' } as never)
+  const hidden = await $.command.run({ command: 'jr-badge', args: '' } as never)
   expect(JSON.stringify(hidden)).toContain('hidden')
   ui = await $.ui.mount(BAND as never)
   expect(await ui.find({ text: /SHOP PROD/ } as never)).toBeUndefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
   await ui.unmount()
-  await $.command.run({ command: 'jrbadge', args: 'on' } as never)
+  await $.command.run({ command: 'jr-badge', args: 'on' } as never)
   ui = await $.ui.mount(BAND as never)
   expect(await ui.find({ text: /SHOP PROD/ } as never)).toBeDefined()
   await ui.unmount()
-  await $.command.run({ command: 'jrbadge', args: 'off' } as never)
-  await $.command.run({ command: 'jrbadge', args: 'off' } as never)
+  await $.command.run({ command: 'jr-badge', args: 'off' } as never)
+  await $.command.run({ command: 'jr-badge', args: 'off' } as never)
   ui = await $.ui.mount(BAND as never)
   expect(await ui.find({ text: /SHOP PROD/ } as never)).toBeUndefined()
 })

@@ -6,7 +6,7 @@ A coloured badge with the project and its branch, one quiet row on the right abo
                                                          SHOP  feature/cart
 ```
 
-Hidden by default: type `/jrbadge` to show it.
+Hidden by default: type `/jr-badge` to show it.
 
 - The colour is derived from the name, so a project keeps the same colour in every window.
 - In your home directory the badge says `HOME`.
@@ -17,7 +17,7 @@ badge: CLIENT ACME PROD #ef4565
 ```
 
 - Refreshed after every turn, so a branch switch shows up.
-- `/jrbadge` shows or hides it in every session, and the choice survives a restart. `/jrbadge on` and `/jrbadge off` set it explicitly.
+- `/jr-badge` shows or hides it in every session, and the choice survives a restart. `/jr-badge on` and `/jr-badge off` set it explicitly.
 
 ## Install
 

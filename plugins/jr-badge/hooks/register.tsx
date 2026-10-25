@@ -57,19 +57,19 @@ export const register: Register = on => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrbadge', description: 'Show or hide the project badge (hidden by default): /jrbadge toggles, /jrbadge on or off' })
+    await $.command.register({ name: 'jr-badge', description: 'Show or hide the project badge (hidden by default): /jr-badge toggles, /jr-badge on or off' })
     await ensureLoaded($)
     await refresh($)
     return started
   })
 
-  on('command.run', { command: 'jrbadge' }, async ($, e) => {
+  on('command.run', { command: 'jr-badge' }, async ($, e) => {
     await ensureLoaded($)
     const arg = e.args.trim().toLowerCase()
     const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : !(await read($, isHidden))
     await $.store.set('isHidden', hide)
     await update($, isHidden, () => hide)
-    return { text: hide ? 'jr badge · hidden (/jrbadge to bring it back)' : 'jr badge · shown above the prompt (/jrbadge to hide it)' }
+    return { text: hide ? 'jr badge · hidden (/jr-badge to bring it back)' : 'jr badge · shown above the prompt (/jr-badge to hide it)' }
   })
 
   // The branch or the folder can change during a turn.
