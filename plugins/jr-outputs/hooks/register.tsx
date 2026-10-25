@@ -43,7 +43,7 @@ async function withLineCounts($: EngineInterface) {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jroutputs', description: 'Files this session created or changed, newest first' })
+    await $.command.register({ name: 'jr-outputs', description: 'Files this session created or changed, newest first' })
     await ensureRoot($)
     return started
   })
@@ -60,7 +60,7 @@ export const register: Register = on => {
     return ran
   }).catch(($, e, next) => next(e))
 
-  on('command.run', { command: 'jroutputs' }, async $ => {
+  on('command.run', { command: 'jr-outputs' }, async $ => {
     await withLineCounts($)
     const count = (await read($, outputs)).length
     await $.ui.open({ id: PANE, title: 'jr outputs', rows: Math.min(count + 3, 30) })

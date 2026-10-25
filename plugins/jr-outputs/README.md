@@ -1,6 +1,6 @@
 # jr-outputs
 
-`/jroutputs` lists every file this session created or changed, newest first, so you know exactly what Claude touched.
+`/jr-outputs` lists every file this session created or changed, newest first, so you know exactly what Claude touched.
 
 ```
 jr outputs  2 created · 3 changed
@@ -20,7 +20,7 @@ jr outputs  2 created · 3 changed
 
 | Command | |
 | --- | --- |
-| `/jroutputs` | Open the list |
+| `/jr-outputs` | Open the list |
 
 ## Install
 

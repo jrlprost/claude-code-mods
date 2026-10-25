@@ -38,7 +38,7 @@ test('writes and edits fill the pane, newest first, with line counts', async ($,
   await $.tool.call({ tool: 'Edit', file_path: '/w/old.ts', old_string: 'a', new_string: 'b' } as never)
   await $.tool.call({ tool: 'Write', file_path: '/w/new.ts', content: 'a\nb\nc' } as never)
   await $.tool.call({ tool: 'Bash', command: 'ls' } as never)
-  const opened = await $.command.run({ command: 'jroutputs', args: '' } as never)
+  const opened = await $.command.run({ command: 'jr-outputs', args: '' } as never)
   expect(JSON.stringify(opened)).toContain('2 files this session')
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-outputs', surface, component: 'Pane', requestId: 'jr-outputs', props: {} } as never)
