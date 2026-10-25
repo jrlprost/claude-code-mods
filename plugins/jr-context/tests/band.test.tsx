@@ -64,7 +64,7 @@ test('near compaction the row becomes an alert on the left, still one row', asyn
     expectOneRow(row)
     expect(row!.props.justifyContent).toBeUndefined()
     expect(row!.text).toContain('▲ context 85%')
-    expect(row!.text).toContain('/jrcontext details')
+    expect(row!.text).toContain('/jr-context details')
     await ui.unmount()
   }
 })

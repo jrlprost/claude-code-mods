@@ -10,10 +10,10 @@ The context window in one quiet row above the Claude Code prompt, aligned to the
 - Once the window reaches the warning threshold of where compaction starts (80 % by default), the row moves to the left as an alert:
 
 ```
-▲ context 85% · compacts in 117k · /jrcontext details
+▲ context 85% · compacts in 117k · /jr-context details
 ```
 
-- `/jrcontext details` opens the full view in a pane: header, the stacked bar across the width, and the legend with each category's tokens and share.
+- `/jr-context details` opens the full view in a pane: header, the stacked bar across the width, and the legend with each category's tokens and share.
 
 ```
 ◆ context                          272k of 1.0M · compacts at 967k  27%
@@ -28,9 +28,9 @@ The context window in one quiet row above the Claude Code prompt, aligned to the
 
 | Command | |
 | --- | --- |
-| `/jrcontext` | Hide the band above the prompt, or bring it back |
-| `/jrcontext hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
-| `/jrcontext details` | Open the full bar, legend included, in a pane |
+| `/jr-context` | Hide the band above the prompt, or bring it back |
+| `/jr-context hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jr-context details` | Open the full bar, legend included, in a pane |
 
 ## Install
 

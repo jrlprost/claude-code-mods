@@ -1,7 +1,7 @@
 {
   "name": "jr-context",
-  "version": "0.5.2",
-  "description": "The context window in one quiet row above the prompt: a mini bar coloured by category, the fill and the window, turning into an alert when compaction is near. /jrcontext hides or shows it, /jrcontext details opens the full bar with its legend.",
+  "version": "0.6.0",
+  "description": "The context window in one quiet row above the prompt: a mini bar coloured by category, the fill and the window, turning into an alert when compaction is near. /jr-context hides or shows it, /jr-context details opens the full bar with its legend.",
   "author": {
     "name": "jrlprost"
   },

@@ -31,7 +31,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr context · hidden (/jrcontext to bring it back)' : 'jr context · shown' }
+  return { text: hide ? 'jr context · hidden (/jr-context to bring it back)' : 'jr context · shown' }
 }
 const PANE = 'jr-context'
 const REFRESH_EVERY_MS = 4000
@@ -118,7 +118,7 @@ function drawRow(Box: Elements['Box'], Text: Elements['Text'], now: JrContextFil
       <Box key="jr-context-row" width={width}>
         <Text wrap="truncate-end">
           <Text color={color}>{`▲ context ${now.percent}%`}</Text>
-          <Text dimColor>{` · compacts in ${formatTokens(Math.max(0, compactsAt - now.total))} · /jrcontext details`}</Text>
+          <Text dimColor>{` · compacts in ${formatTokens(Math.max(0, compactsAt - now.total))} · /jr-context details`}</Text>
         </Text>
       </Box>
     )
@@ -157,12 +157,12 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
-    await $.command.register({ name: 'jrcontext', description: 'Show or hide the context band; /jrcontext details opens the full bar' })
+    await $.command.register({ name: 'jr-context', description: 'Show or hide the context band; /jr-context details opens the full bar' })
     await refresh($, true)
     return started
   })
 
-  on('command.run', { command: 'jrcontext' }, async ($, e) => {
+  on('command.run', { command: 'jr-context' }, async ($, e) => {
     const verb = bandVerb(e.args)
     if (verb) return setBand($, verb)
     await refresh($, true)
