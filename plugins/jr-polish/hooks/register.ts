@@ -7,11 +7,11 @@ const commands = { isRegistered: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrpolish', description: 'Rewrite a rough prompt into a clear one and put it in the prompt box: /jrpolish <rough prompt>' })
+  await $.command.register({ name: 'jr-polish', description: 'Rewrite a rough prompt into a clear one and put it in the prompt box: /jr-polish <rough prompt>' })
 }
 
 async function polish($: EngineInterface, rough: string, model: string) {
-  if (!rough.trim()) return 'jr polish · usage: /jrpolish <your rough prompt>'
+  if (!rough.trim()) return 'jr polish · usage: /jr-polish <your rough prompt>'
   const reply = await $.model.complete({ model, system: SYSTEM, prompt: rough, maxTokens: 1200 })
   if (!reply.isAnswered) return `jr polish · no rewrite (${reply.reason}); your prompt is unchanged`
   const polished = cleanReply(reply.text)
@@ -39,5 +39,5 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrpolish' }, async ($, e) => ({ text: await polish($, e.args, model) }))
+  on('command.run', { command: 'jr-polish' }, async ($, e) => ({ text: await polish($, e.args, model) }))
 }

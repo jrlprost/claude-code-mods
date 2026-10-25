@@ -1,7 +1,7 @@
 {
   "name": "jr-polish",
-  "version": "0.1.0",
-  "description": "/jrpolish <rough prompt>: a small fast model rewrites it into a clear, structured prompt in the same language and puts it in your prompt box to edit and send.",
+  "version": "0.2.0",
+  "description": "/jr-polish <rough prompt>: a small fast model rewrites it into a clear, structured prompt in the same language and puts it in your prompt box to edit and send.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",

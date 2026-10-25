@@ -3,7 +3,7 @@
 Turn a rough, dictated or rushed request into a clear prompt before you send it.
 
 ```
-/jrpolish euh so fix the login thing in auth ts it breaks when the token expires and dont touch the api
+/jr-polish euh so fix the login thing in auth ts it breaks when the token expires and dont touch the api
 
 jr polish · put in the prompt box, edit it and press Enter
 
@@ -23,7 +23,7 @@ Fix the login bug in auth.ts that breaks when the token expires.
 
 | Command | |
 | --- | --- |
-| `/jrpolish <rough prompt>` | Rewrite it and put it in the prompt box |
+| `/jr-polish <rough prompt>` | Rewrite it and put it in the prompt box |
 
 ## Settings (`/config`)
 
@@ -33,7 +33,7 @@ Fix the login bug in auth.ts that breaks when the token expires.
 
 ## Cost
 
-One small-model call per `/jrpolish`, roughly the length of your prompt in and out.
+One small-model call per `/jr-polish`, roughly the length of your prompt in and out.
 
 ## Install
 
@@ -43,4 +43,4 @@ One small-model call per `/jrpolish`, roughly the length of your prompt in and o
 
 ## Access
 
-Sends the text you pass to `/jrpolish` to the model through your own Claude Code session, and fills the prompt box. Reads no files, runs nothing.
+Sends the text you pass to `/jr-polish` to the model through your own Claude Code session, and fills the prompt box. Reads no files, runs nothing.
