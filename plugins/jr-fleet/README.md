@@ -14,7 +14,7 @@ When a session finished and waits for your next prompt, the row moves to the lef
 ▲ acme waits for you · 3 sessions
 ```
 
-`/jrfleet details` lists them:
+`/jr-fleet details` lists them:
 
 ```
 jr fleet   3 sessions · 1 working · 1 waiting for you
@@ -35,9 +35,9 @@ Every session with jr-fleet writes a small file to `~/.claude/jr-fleet/<session 
 
 | Command | |
 | --- | --- |
-| `/jrfleet` | Hide the band above the prompt, or bring it back |
-| `/jrfleet hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
-| `/jrfleet details` | List every session on the machine |
+| `/jr-fleet` | Hide the band above the prompt, or bring it back |
+| `/jr-fleet hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jr-fleet details` | List every session on the machine |
 
 ## Install
 

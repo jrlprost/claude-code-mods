@@ -87,7 +87,7 @@ test('this session beats, sees the other one waiting, and says so', async ($, on
     expect(await band.find({ text: /below/ } as never)).toBeDefined()
     await band.unmount()
   }
-  await $.command.run({ command: 'jrfleet', args: 'details' } as never)
+  await $.command.run({ command: 'jr-fleet', args: 'details' } as never)
   const pane = await $.ui.mount({ plugin: 'jr-fleet', surface: 'terminal', component: 'Pane', requestId: 'jr-fleet', props: {} } as never)
   expect(await pane.find({ text: /this one/ } as never)).toBeDefined()
   expect(await pane.find({ text: /~\/tokenkarma/ } as never)).toBeDefined()
@@ -113,17 +113,17 @@ test('alone on the machine, the row still names this project', async ($, on) => 
   expect(bandRow((await band.drawn()) as never).text).toBe('tokenkarma ○')
 })
 
-test('/jrfleet hide takes the band away, the bare command brings it back', async ($, on) => {
+test('/jr-fleet hide takes the band away, the bare command brings it back', async ($, on) => {
   const files = new Map<string, string>([['/Users/x/.claude/jr-fleet/acme.json', JSON.stringify(beat('acme', 'waiting', 120_000))]])
   machine(on, files)
   await $.session.start({ cwd: '/Users/x/tokenkarma', surface: 'terminal', isInteractive: true })
   const props = { hasSurvey: false, isWorking: false, maxRows: 6, bodyColumns: 100 }
-  await $.command.run({ command: 'jrfleet', args: 'hide' } as never)
+  await $.command.run({ command: 'jr-fleet', args: 'hide' } as never)
   let band = await $.ui.mount({ plugin: 'jr-fleet', surface: 'terminal', component: 'AbovePrompt', props } as never)
   expect(await band.find({ text: /waits for you/ } as never)).toBeUndefined()
   expect(await band.find({ text: /below/ } as never)).toBeDefined()
   await band.unmount()
-  expect(JSON.stringify(await $.command.run({ command: 'jrfleet', args: '' } as never))).toContain('shown')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-fleet', args: '' } as never))).toContain('shown')
   band = await $.ui.mount({ plugin: 'jr-fleet', surface: 'terminal', component: 'AbovePrompt', props } as never)
   expect(await band.find({ text: /acme/ } as never)).toBeDefined()
 })

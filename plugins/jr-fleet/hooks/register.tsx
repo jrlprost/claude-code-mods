@@ -33,7 +33,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr fleet · hidden (/jrfleet to bring it back)' : 'jr fleet · shown' }
+  return { text: hide ? 'jr fleet · hidden (/jr-fleet to bring it back)' : 'jr fleet · shown' }
 }
 const live: { me: JrFleetBeat | null; dir: string; home: string; isBeating: boolean } = { me: null, dir: '', home: '', isBeating: false }
 
@@ -97,7 +97,7 @@ async function setState($: EngineInterface, state: JrFleetState) {
 async function ensureBeating($: EngineInterface) {
   if (live.isBeating) return
   live.isBeating = true
-  await $.command.register({ name: 'jrfleet', description: 'Show or hide the fleet band; /jrfleet details lists every session' })
+  await $.command.register({ name: 'jr-fleet', description: 'Show or hide the fleet band; /jr-fleet details lists every session' })
   await beat($)
   $.clock.every(BEAT_MS, () => {
     void beat($)
@@ -140,7 +140,7 @@ export const register: Register = on => {
     return ended
   })
 
-  on('command.run', { command: 'jrfleet' }, async ($, e) => {
+  on('command.run', { command: 'jr-fleet' }, async ($, e) => {
     const verb = bandVerb(e.args)
     if (verb) return setBand($, verb)
     await ensureBeating($)

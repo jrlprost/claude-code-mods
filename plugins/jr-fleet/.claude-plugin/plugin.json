@@ -1,7 +1,7 @@
 {
   "name": "jr-fleet",
-  "version": "0.3.2",
-  "description": "Every Claude Code session on this machine at a glance: which ones are working and which ones wait for you, in a band above the prompt (/jrfleet hides or shows it) and in /jrfleet details.",
+  "version": "0.4.0",
+  "description": "Every Claude Code session on this machine at a glance: which ones are working and which ones wait for you, in a band above the prompt (/jr-fleet hides or shows it) and in /jr-fleet details.",
   "author": {
     "name": "jrlprost"
   },
