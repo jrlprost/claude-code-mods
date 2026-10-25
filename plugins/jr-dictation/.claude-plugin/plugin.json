@@ -1,6 +1,6 @@
 {
   "name": "jr-dictation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fixes what dictation mishears (\"cloud code\" → Claude Code) before Claude reads your prompt, and shows each fix in your prompt row: red struck, green added.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",

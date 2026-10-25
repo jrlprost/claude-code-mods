@@ -4,22 +4,22 @@ For people who dictate their prompts (Wispr Flow, Superwhisper, macOS dictation)
 
 ```
 > open the cloud mdCLAUDE.md in cloud codeClaude Code and check the package jsonpackage.json
-  ✎ dictation · 3 corrections · /jrdict add to teach a word
+  ✎ dictation · 3 corrections · /jr-dictation add to teach a word
 ```
 
 (red struck: what was heard; green: what Claude reads)
 
 - About 35 built-in corrections: `cloud code` → Claude Code, `type script` → TypeScript, `package json` → package.json, `dot env` → .env, `local host` → localhost, `c l i` → CLI…
 - Only spelled-out mishears are matched, whole words only (accents included), so correct text is never touched.
-- Your own words: teach them once with `/jrdict add`, or list them in `/config`.
+- Your own words: teach them once with `/jr-dictation add`, or list them in `/config`.
 
 ## Commands
 
 | Command | |
 | --- | --- |
-| `/jrdict add acme corp => ACME` | Teach a correction (kept across sessions) |
-| `/jrdict remove acme corp` | Forget it |
-| `/jrdict list` | Show your taught words |
+| `/jr-dictation add acme corp => ACME` | Teach a correction (kept across sessions) |
+| `/jr-dictation remove acme corp` | Forget it |
+| `/jr-dictation list` | Show your taught words |
 
 ## Settings (`/config`)
 

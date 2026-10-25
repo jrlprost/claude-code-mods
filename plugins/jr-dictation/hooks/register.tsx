@@ -9,14 +9,14 @@ const edits = atom({ plugin: 'jr-dictation', key: 'edits' } as const, [])
 const LEARNED = 'learned'
 const commands = { isRegistered: false }
 
-/** Registers /jrdict once: at session start, or first thing after a mid-session install. */
+/** Registers /jr-dictation once: at session start, or first thing after a mid-session install. */
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrdict', description: 'Dictation fixes: /jrdict add <heard> => <right>, /jrdict remove <heard>, /jrdict list' })
+  await $.command.register({ name: 'jr-dictation', description: 'Dictation fixes: /jr-dictation add <heard> => <right>, /jr-dictation remove <heard>, /jr-dictation list' })
 }
 
-/** Words taught with /jrdict add, as heard → right. */
+/** Words taught with /jr-dictation add, as heard → right. */
 async function learned($: EngineInterface): Promise<Record<string, string>> {
   return ((await $.store.get(LEARNED)) as Record<string, string> | undefined) ?? {}
 }
@@ -28,13 +28,13 @@ async function dictionaryOf($: EngineInterface, extra: string, useDefaults: bool
   return [...taught, ...configured, ...(useDefaults ? DEFAULT_DICTIONARY : [])]
 }
 
-/** `/jrdict add heard => right`, `/jrdict remove heard`, `/jrdict list`. */
+/** `/jr-dictation add heard => right`, `/jr-dictation remove heard`, `/jr-dictation list`. */
 async function runCommand($: EngineInterface, args: string) {
   const [verb = 'list', ...rest] = args.trim().split(/\s+/)
   const words = await learned($)
   if (verb === 'add') {
     const pair = parsePairs(rest.join(' '))[0]
-    if (!pair) return 'jr dictation · usage: /jrdict add <what you said> => <what you meant>'
+    if (!pair) return 'jr dictation · usage: /jr-dictation add <what you said> => <what you meant>'
     await $.store.set(LEARNED, { ...words, [pair[0].toLowerCase()]: pair[1] })
     return `jr dictation · learned: "${pair[0]}" → ${pair[1]}`
   }
@@ -48,7 +48,7 @@ async function runCommand($: EngineInterface, args: string) {
   const lines = Object.entries(words).map(([heard, right]) => `  "${heard}" → ${right}`)
   return lines.length
     ? `jr dictation · learned words:\n${lines.join('\n')}\n(plus ${DEFAULT_DICTIONARY.length} built-in corrections)`
-    : `jr dictation · no learned words yet; ${DEFAULT_DICTIONARY.length} built-in corrections are on. Teach one with /jrdict add <heard> => <right>`
+    : `jr dictation · no learned words yet; ${DEFAULT_DICTIONARY.length} built-in corrections are on. Teach one with /jr-dictation add <heard> => <right>`
 }
 
 export const register: Register = (on, options) => {
@@ -71,7 +71,7 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jrdict' }, async ($, e) => ({ text: await runCommand($, e.args) }))
+  on('command.run', { command: 'jr-dictation' }, async ($, e) => ({ text: await runCommand($, e.args) }))
 
   on('prompt.submit', async ($, e, next) => {
     await ensureCommand($)
@@ -107,7 +107,7 @@ export const register: Register = (on, options) => {
           {paint('dictation', GRADIENTS.brand).map(({ char, color }) => (
             <Text color={color}>{char}</Text>
           ))}
-          <Text dimColor>{` · ${count} correction${count > 1 ? 's' : ''} · /jrdict add to teach a word`}</Text>
+          <Text dimColor>{` · ${count} correction${count > 1 ? 's' : ''} · /jr-dictation add to teach a word`}</Text>
         </Text>
       </Box>
     )

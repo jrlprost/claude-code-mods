@@ -44,11 +44,11 @@ test('the model reads the corrected prompt, and taught words apply', async ($, o
   machine(on, seen)
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   await $.prompt.submit({ text: 'run the cloud code tests', origin: { kind: 'composer' }, wait: false } as never)
-  const taught = await $.command.run({ command: 'jrdict', args: 'add acme corp => ACME' } as never)
+  const taught = await $.command.run({ command: 'jr-dictation', args: 'add acme corp => ACME' } as never)
   expect(JSON.stringify(taught)).toContain('learned')
   await $.prompt.submit({ text: 'email acme corp', origin: { kind: 'composer' }, wait: false } as never)
   expect(seen).toEqual(['run the Claude Code tests', 'email ACME'])
-  const listed = await $.command.run({ command: 'jrdict', args: 'list' } as never)
+  const listed = await $.command.run({ command: 'jr-dictation', args: 'list' } as never)
   expect(JSON.stringify(listed)).toContain('acme corp')
 })
 
