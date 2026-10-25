@@ -31,7 +31,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr limits · hidden (/jrlimits to bring it back)' : 'jr limits · shown' }
+  return { text: hide ? 'jr limits · hidden (/jr-limits to bring it back)' : 'jr limits · shown' }
 }
 const PANE = 'jr-limits'
 const THRESHOLDS = [80, 95]
@@ -99,7 +99,7 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     await isBandHidden($)
-    await $.command.register({ name: 'jrlimits', description: 'Show or hide the limits band; /jrlimits details opens the full view' })
+    await $.command.register({ name: 'jr-limits', description: 'Show or hide the limits band; /jr-limits details opens the full view' })
     await ensureTicking($)
     return started
   })
@@ -111,7 +111,7 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrlimits' }, async ($, e) => {
+  on('command.run', { command: 'jr-limits' }, async ($, e) => {
     const verb = bandVerb(e.args)
     if (verb) return setBand($, verb)
     await ensureTicking($)

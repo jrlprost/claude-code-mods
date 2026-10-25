@@ -122,15 +122,15 @@ test('crossing 80 % raises one toast', async ($, on) => {
   expect(toasts[0]).toContain('5h window at 83%')
 })
 
-test('/jrlimits hide takes the band away, the bare command brings it back', async ($, on) => {
+test('/jr-limits hide takes the band away, the bare command brings it back', async ($, on) => {
   machine(on, [{ kind: 'five_hour', percentUsed: 64 }], [])
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
-  await $.command.run({ command: 'jrlimits', args: 'hide' } as never)
+  await $.command.run({ command: 'jr-limits', args: 'hide' } as never)
   let ui = await $.ui.mount({ plugin: 'jr-limits', surface: 'terminal', ...BAND } as never)
   expect(await ui.find({ text: /64%/ } as never)).toBeUndefined()
   expect(await ui.find({ text: /below/ } as never)).toBeDefined()
   await ui.unmount()
-  expect(JSON.stringify(await $.command.run({ command: 'jrlimits', args: '' } as never))).toContain('shown')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-limits', args: '' } as never))).toContain('shown')
   ui = await $.ui.mount({ plugin: 'jr-limits', surface: 'terminal', ...BAND } as never)
   expect(await ui.find({ text: /64%/ } as never)).toBeDefined()
 })

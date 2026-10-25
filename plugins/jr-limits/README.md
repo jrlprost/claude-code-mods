@@ -13,7 +13,7 @@ Your plan limits in one quiet row above the prompt, aligned to the right: the fi
 ```
 
 - A toast when a window crosses 80 % and again at 95 %, once per window.
-- `/jrlimits details` opens every window in a pane, as gradient gauges with the exact reset time.
+- `/jr-limits details` opens every window in a pane, as gradient gauges with the exact reset time.
 - Countdowns refresh every minute.
 - Nothing is drawn when the session has no plan-limit figures (API-key sessions, or before the first reply).
 
@@ -21,9 +21,9 @@ Your plan limits in one quiet row above the prompt, aligned to the right: the fi
 
 | Command | |
 | --- | --- |
-| `/jrlimits` | Hide the band above the prompt, or bring it back |
-| `/jrlimits hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
-| `/jrlimits details` | Every window in a pane, as gauges with its exact reset time |
+| `/jr-limits` | Hide the band above the prompt, or bring it back |
+| `/jr-limits hide` · `show` | Hide it or show it explicitly (`off` and `on` work too) |
+| `/jr-limits details` | Every window in a pane, as gauges with its exact reset time |
 
 ## Settings (`/config`)
 
