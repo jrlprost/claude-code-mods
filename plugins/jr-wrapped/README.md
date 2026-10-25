@@ -1,6 +1,6 @@
 # jr-wrapped
 
-`/jrwrapped` sums up your month with Claude Code, Wrapped-style, and saves a card you can share.
+`/jr-wrapped` sums up your month with Claude Code, Wrapped-style, and saves a card you can share.
 
 ```
 JR MODS · CLAUDE WRAPPED
@@ -24,10 +24,10 @@ The persona comes from how the month went: the hour you work most, the tool Clau
 
 | Command | |
 | --- | --- |
-| `/jrwrapped` | This month |
-| `/jrwrapped last` | Last month |
-| `/jrwrapped 2026-09` or `/jrwrapped sep` | A given month |
-| `/jrwrapped export` | Save the card as `~/Downloads/claude-wrapped-<month>.svg`, plus `.png` when `rsvg-convert` or ImageMagick is installed |
+| `/jr-wrapped` | This month |
+| `/jr-wrapped last` | Last month |
+| `/jr-wrapped 2026-09` or `/jr-wrapped sep` | A given month |
+| `/jr-wrapped export` | Save the card as `~/Downloads/claude-wrapped-<month>.svg`, plus `.png` when `rsvg-convert` or ImageMagick is installed |
 
 In the pane, `e` saves the card.
 

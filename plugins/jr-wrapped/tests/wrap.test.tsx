@@ -72,18 +72,18 @@ const machine = (on: On, written: string[]) => {
   on('process.run', () => ({ value: { exitCode: 0, stdout: '', stderr: '' } }) as never)
 }
 
-test('/jrwrapped draws the card and /jrwrapped export saves SVG and PNG', async ($, on) => {
+test('/jr-wrapped draws the card and /jr-wrapped export saves SVG and PNG', async ($, on) => {
   const written: string[] = []
   machine(on, written)
   await $.prompt.submit({ text: 'hi', origin: { kind: 'composer' }, wait: false } as never)
-  await $.command.run({ command: 'jrwrapped', args: '' } as never)
+  await $.command.run({ command: 'jr-wrapped', args: '' } as never)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-wrapped', surface, component: 'Pane', requestId: 'jr-wrapped', props: {} } as never)
     expect(await ui.find({ text: /CLAUDE WRAPPED/ } as never)).toBeDefined()
     expect(await ui.find({ text: /tokenkarma/ } as never)).toBeDefined()
     await ui.unmount()
   }
-  const saved = await $.command.run({ command: 'jrwrapped', args: 'export' } as never)
+  const saved = await $.command.run({ command: 'jr-wrapped', args: 'export' } as never)
   expect(JSON.stringify(saved)).toContain('.png and .svg')
   expect(written[0]).toMatch(/^\/Users\/someone\/Downloads\/claude-wrapped-\d{4}-\d{2}\.svg$/)
 })

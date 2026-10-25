@@ -1,7 +1,7 @@
 {
   "name": "jr-wrapped",
-  "version": "0.1.0",
-  "description": "/jrwrapped: your month with Claude Code, Wrapped-style: prompts, hours, streak, busiest hour, top tools and projects, a persona, and a share card saved as SVG and PNG.",
+  "version": "0.2.0",
+  "description": "/jr-wrapped: your month with Claude Code, Wrapped-style: prompts, hours, streak, busiest hour, top tools and projects, a persona, and a share card saved as SVG and PNG.",
   "author": { "name": "jrlprost" },
   "homepage": "https://github.com/jrlprost/claude-code-mods",
   "repository": "https://github.com/jrlprost/claude-code-mods",

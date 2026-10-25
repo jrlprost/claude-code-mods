@@ -13,7 +13,7 @@ const ready = { isCommand: false }
 async function ensureCommand($: EngineInterface) {
   if (ready.isCommand) return
   ready.isCommand = true
-  await $.command.register({ name: 'jrwrapped', description: 'Your month with Claude, Wrapped-style; /jrwrapped last, /jrwrapped 2026-09, /jrwrapped export' })
+  await $.command.register({ name: 'jr-wrapped', description: 'Your month with Claude, Wrapped-style; /jr-wrapped last, /jr-wrapped 2026-09, /jr-wrapped export' })
 }
 
 async function build($: EngineInterface, arg: string) {
@@ -28,7 +28,7 @@ async function build($: EngineInterface, arg: string) {
 /** Writes the card as SVG, then as PNG when rsvg-convert or ImageMagick can draw it. */
 async function exportCard($: EngineInterface) {
   const w = await read($, view)
-  if (!w) return 'Open /jrwrapped first.'
+  if (!w) return 'Open /jr-wrapped first.'
   const home = (await $.env.get('HOME')) ?? '.'
   const base = `${home}/Downloads/claude-wrapped-${w.month}`
   await $.fs.write(`${base}.svg`, toSvg(w))
@@ -76,7 +76,7 @@ export const register: Register = on => {
     return ran
   })
 
-  on('command.run', { command: 'jrwrapped' }, async ($, e) => {
+  on('command.run', { command: 'jr-wrapped' }, async ($, e) => {
     if (e.args.trim() === 'export') {
       if (!(await read($, view))) await build($, '')
       return { text: `jr wrapped · ${await exportCard($)}` }
