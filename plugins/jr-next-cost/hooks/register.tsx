@@ -14,7 +14,7 @@ const band = { isLoaded: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrnextcost', description: 'Show or hide the next-prompt cost (hidden by default): /jrnextcost toggles, /jrnextcost on or off' })
+  await $.command.register({ name: 'jr-next-cost', description: 'Show or hide the next-prompt cost (hidden by default): /jr-next-cost toggles, /jr-next-cost on or off' })
 }
 
 /** Reads the saved choice once per load of the mod; outside a drawing, which cannot write state. */
@@ -87,14 +87,14 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrnextcost' }, async ($, e) => {
+  on('command.run', { command: 'jr-next-cost' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
     await loadBand($)
     const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : arg === '' ? !(await isBandHidden($)) : null
-    if (hide === null) return { text: 'jr next cost · usage: /jrnextcost toggles the band, /jrnextcost on or off' }
+    if (hide === null) return { text: 'jr next cost · usage: /jr-next-cost toggles the band, /jr-next-cost on or off' }
     await $.store.set('isBandHidden', hide)
     await update($, bandHidden, () => hide)
-    return { text: hide ? 'jr next cost · hidden (/jrnextcost to bring it back)' : 'jr next cost · shown above the prompt (/jrnextcost to hide it)' }
+    return { text: hide ? 'jr next cost · hidden (/jr-next-cost to bring it back)' : 'jr next cost · shown above the prompt (/jr-next-cost to hide it)' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, nextHook) => {
