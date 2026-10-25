@@ -68,25 +68,22 @@ async function exportJournal($: EngineInterface) {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrdecide', description: 'Record a decision for this project: /jrdecide <decision>' })
-    await $.command.register({ name: 'jrdecisions', description: 'Decision journal: open it, or /jrdecisions export to docs/decisions.md' })
+    await $.command.register({ name: 'jr-decisions', description: 'Decision journal: open it, /jr-decisions <decision> to record one, /jr-decisions export to docs/decisions.md', argumentHint: '[decision | export]' })
     await ensureLoaded($)
     return started
   })
 
-  on('command.run', { command: 'jrdecide' }, async ($, e) => {
-    const text = e.args.trim()
-    if (!text) return { text: 'jr decisions · usage: /jrdecide <decision>' }
-    const n = await add($, text, 'command')
-    return { text: `jr decisions · #${n} recorded` }
-  })
-
-  on('command.run', { command: 'jrdecisions' }, async ($, e) => {
+  on('command.run', { command: 'jr-decisions' }, async ($, e) => {
     await ensureLoaded($)
-    if (e.args.trim() === 'export') {
+    const text = e.args.trim()
+    if (text === 'export') {
       const { target, count, refused } = await exportJournal($)
       if (refused) return { text: `jr decisions · not written: ${refused}` }
       return { text: `jr decisions · ${count} written to ${target}` }
+    }
+    if (text) {
+      const n = await add($, text, 'command')
+      return { text: `jr decisions · #${n} recorded` }
     }
     const count = (await read($, decisions)).length
     await $.ui.open({ id: PANE, title: 'jr decisions', rows: Math.min(count + 3, 30) })
@@ -113,7 +110,7 @@ export const register: Register = on => {
           {gradientText(Text, 'jr decisions', GRADIENTS.brand)}
           <Text dimColor>{`  ${name} · ${list.length}`}</Text>
         </Text>
-        {list.length === 0 && <Text dimColor>No decisions yet. /jrdecide &lt;decision&gt;, or start a prompt with "decision:".</Text>}
+        {list.length === 0 && <Text dimColor>No decisions yet. /jr-decisions &lt;decision&gt;, or start a prompt with "decision:".</Text>}
         {list.map((d, i) => (
           <Text wrap="truncate-end">
             <Text color="#ff5ca8" bold>{`#${list.length - i} `.padStart(5)}</Text>
@@ -121,7 +118,7 @@ export const register: Register = on => {
             <Text>{d.text}</Text>
           </Text>
         ))}
-        <Text dimColor>/jrdecisions export writes docs/decisions.md</Text>
+        <Text dimColor>/jr-decisions export writes docs/decisions.md</Text>
       </Box>
     )
   })
