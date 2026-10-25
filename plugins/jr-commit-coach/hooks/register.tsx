@@ -12,7 +12,7 @@ const band = { isLoaded: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrcommit', description: 'Show or hide the uncommitted-work band: /jrcommit toggles, /jrcommit on or off' })
+  await $.command.register({ name: 'jr-commit-coach', description: 'Show or hide the uncommitted-work band: /jr-commit-coach toggles, /jr-commit-coach on or off' })
 }
 
 /** True while the band is hidden: one choice for every session, read from the store once per load. */
@@ -80,13 +80,13 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrcommit' }, async ($, e) => {
+  on('command.run', { command: 'jr-commit-coach' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
     const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : arg === '' ? !(await isBandHidden($)) : null
-    if (hide === null) return { text: 'jr commit coach · usage: /jrcommit toggles the band, /jrcommit on or off' }
+    if (hide === null) return { text: 'jr commit coach · usage: /jr-commit-coach toggles the band, /jr-commit-coach on or off' }
     await $.store.set('isBandHidden', hide)
     await update($, bandHidden, () => hide)
-    return { text: hide ? 'jr commit coach · hidden (/jrcommit to bring it back)' : 'jr commit coach · shown' }
+    return { text: hide ? 'jr commit coach · hidden (/jr-commit-coach to bring it back)' : 'jr commit coach · shown' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
