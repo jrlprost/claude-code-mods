@@ -8,7 +8,7 @@ const EVERY_MS = 5 * 60_000
 const stats = atom({ plugin: 'jr-sysinfo', key: 'stats' } as const, null)
 const bandHidden = atom({ plugin: 'jr-sysinfo', key: 'isBandHidden' } as const, false)
 
-// The band can be hidden: /jrsys hide, show, or the bare command to toggle. One choice for
+// The band can be hidden: /jr-sysinfo hide, show, or the bare command to toggle. One choice for
 // every session, kept across restarts.
 const band = { isLoaded: false }
 
@@ -31,7 +31,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr sysinfo · band hidden (/jrsys to bring it back)' : 'jr sysinfo · band shown' }
+  return { text: hide ? 'jr sysinfo · band hidden (/jr-sysinfo to bring it back)' : 'jr sysinfo · band shown' }
 }
 
 // Windows is told by its SystemRoot (C:\Windows): there it runs PowerShell, never sh, which
@@ -62,7 +62,7 @@ async function refresh($: EngineInterface) {
 async function ensureStarted($: EngineInterface) {
   if (live.isStarted) return
   live.isStarted = true
-  await $.command.register({ name: 'jrsys', description: 'Show or hide the disk, RAM, CPU and swap band; /jrsys now reads them again' })
+  await $.command.register({ name: 'jr-sysinfo', description: 'Show or hide the disk, RAM, CPU and swap band; /jr-sysinfo now reads them again' })
   await refresh($)
   $.clock.every(EVERY_MS, () => {
     void refresh($)
@@ -90,7 +90,7 @@ export const register: Register = on => {
     return started
   })
 
-  on('command.run', { command: 'jrsys' }, async ($, e) => {
+  on('command.run', { command: 'jr-sysinfo' }, async ($, e) => {
     await ensureStarted($)
     if (e.args.trim().toLowerCase() === 'now') {
       await refresh($)
@@ -98,7 +98,7 @@ export const register: Register = on => {
     }
     const verb = bandVerb(e.args)
     if (verb) return setBand($, verb)
-    return { text: 'jr sysinfo · /jrsys toggles the band, /jrsys hide, show, or now to read again' }
+    return { text: 'jr sysinfo · /jr-sysinfo toggles the band, /jr-sysinfo hide, show, or now to read again' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {

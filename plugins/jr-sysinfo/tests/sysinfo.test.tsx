@@ -59,7 +59,7 @@ test('Windows: PowerShell by its full path, never sh', async ($, on) => {
   expect(await band.find({ text: /off/ } as never)).toBeDefined()
 })
 
-test('/jrsys toggles the band', async ($, on) => {
+test('/jr-sysinfo toggles the band', async ($, on) => {
   machine(on, { '/bin/sh': MAC })
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const shows = async () => {
@@ -69,8 +69,8 @@ test('/jrsys toggles the band', async ($, on) => {
     return seen
   }
   expect(await shows()).toBe(true)
-  expect(JSON.stringify(await $.command.run({ command: 'jrsys', args: '' } as never))).toContain('hidden')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-sysinfo', args: '' } as never))).toContain('hidden')
   expect(await shows()).toBe(false)
-  await $.command.run({ command: 'jrsys', args: 'show' } as never)
+  await $.command.run({ command: 'jr-sysinfo', args: 'show' } as never)
   expect(await shows()).toBe(true)
 })

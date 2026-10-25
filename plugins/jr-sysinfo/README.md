@@ -14,8 +14,8 @@ disk 116G/926G free · ram 5.5G/32G free · cpu 32% · swap 21.2G/22G used
 
 | Command | |
 | --- | --- |
-| `/jrsys` | Hide or show the band (it toggles); `/jrsys hide` and `show` set it |
-| `/jrsys now` | Read the machine again now |
+| `/jr-sysinfo` | Hide or show the band (it toggles); `/jr-sysinfo hide` and `show` set it |
+| `/jr-sysinfo now` | Read the machine again now |
 
 ## Install
 
