@@ -1,7 +1,7 @@
 {
   "name": "jr-cache-clock",
-  "version": "0.3.3",
-  "description": "A toast 30 seconds before the prompt cache goes cold, and on /jrcache a quiet countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, and the last cache hit rate.",
+  "version": "0.4.0",
+  "description": "A toast 30 seconds before the prompt cache goes cold, and on /jr-cache-clock a quiet countdown above the prompt: how long the cache stays warm after Claude's last reply, going green to red, and the last cache hit rate.",
   "author": {
     "name": "jrlprost"
   },

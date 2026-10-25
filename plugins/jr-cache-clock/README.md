@@ -7,12 +7,12 @@ The prompt cache stays warm for a few minutes after Claude's last reply. Inside 
                                                           cache cold · hit 92%
 ```
 
-The countdown row is hidden by default: type `/jrcache` to show it. The toast before the cache goes cold comes either way.
+The countdown row is hidden by default: type `/jr-cache-clock` to show it. The toast before the cache goes cold comes either way.
 
 - Counts down every second from the end of the last main-loop reply, green to red.
 - Shows the share of the last turn's input that was read from the cache.
 - A toast 30 seconds before the cache goes cold.
-- `/jrcache` shows or hides the row, in every session and across restarts; `/jrcache on` and `/jrcache off` set it.
+- `/jr-cache-clock` shows or hides the row, in every session and across restarts; `/jr-cache-clock on` and `/jr-cache-clock off` set it.
 
 ## Settings (`/config`)
 

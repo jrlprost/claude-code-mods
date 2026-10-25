@@ -14,7 +14,7 @@ const band = { isLoaded: false }
 async function ensureCommand($: EngineInterface) {
   if (commands.isRegistered) return
   commands.isRegistered = true
-  await $.command.register({ name: 'jrcache', description: 'Show or hide the cache countdown (hidden by default): /jrcache toggles, /jrcache on or off' })
+  await $.command.register({ name: 'jr-cache-clock', description: 'Show or hide the cache countdown (hidden by default): /jr-cache-clock toggles, /jr-cache-clock on or off' })
 }
 
 /** Reads the saved choice once per load of the mod; outside a drawing, which cannot write state. */
@@ -92,14 +92,14 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrcache' }, async ($, e) => {
+  on('command.run', { command: 'jr-cache-clock' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
     await loadBand($)
     const hide = arg === 'off' || arg === 'hide' ? true : arg === 'on' || arg === 'show' ? false : arg === '' ? !(await isBandHidden($)) : null
-    if (hide === null) return { text: 'jr cache · usage: /jrcache toggles the band, /jrcache on or off' }
+    if (hide === null) return { text: 'jr cache · usage: /jr-cache-clock toggles the band, /jr-cache-clock on or off' }
     await $.store.set('isBandHidden', hide)
     await update($, bandHidden, () => hide)
-    return { text: hide ? 'jr cache · hidden (/jrcache to bring it back); the toast before it goes cold stays' : 'jr cache · shown above the prompt (/jrcache to hide it)' }
+    return { text: hide ? 'jr cache · hidden (/jr-cache-clock to bring it back); the toast before it goes cold stays' : 'jr cache · shown above the prompt (/jr-cache-clock to hide it)' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
