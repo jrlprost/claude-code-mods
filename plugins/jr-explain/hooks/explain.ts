@@ -65,13 +65,14 @@ export const toastFor = (e: Explanation, command: string) =>
 
 export const reasonFor = (e: Explanation, previous?: string) => `${printable(e.what, 160)}. ${mark(e)}.${previous ? ` (${previous})` : ''}`
 
-/** The command without its shell comments, which a model would read as instructions. */
-export const stripComments = (command: string) =>
-  command
-    .split('\n')
-    .map(line => line.replace(/(^|\s)#.*$/, '$1').trimEnd())
-    .filter(Boolean)
-    .join('\n')
+/**
+ * The command as the model reads it: whole, between markers, as data. Nothing is cut out, so no
+ * part of it can be hidden from the model (cutting "comments" with a pattern also cuts a # inside
+ * quotes, and whatever follows it). Instructions planted in it are handled after the answer: the
+ * risk is never below medium, and an answer that echoes the command is refused.
+ */
+export const commandPrompt = (command: string) =>
+  `<command>\n${command.slice(0, 2000).replaceAll('</command>', '<\\/command>')}\n</command>`
 
 /** True when the answer repeats four words in a row from the command: text the command planted. */
 export const echoesCommand = (answer: string, command: string) => {
