@@ -3,12 +3,12 @@
 Watches your sites while you work. Nothing shows while everything is up; the moment one goes down, a red band appears above the prompt.
 
 ```
-▲ api.example.com down 4 min · /jruptime details
+▲ api.example.com down 4 min · /jr-uptime details
 ```
 
 One row on the left, only while there is something to act on.
 
-`/jruptime details` shows every site:
+`/jr-uptime details` shows every site:
 
 ```
 jr uptime
@@ -26,8 +26,8 @@ jr uptime
 
 | Command | |
 | --- | --- |
-| `/jruptime` | Hide or show the band (it toggles); `/jruptime hide` and `show` set it |
-| `/jruptime details` | Check every site now and open the list |
+| `/jr-uptime` | Hide or show the band (it toggles); `/jr-uptime hide` and `show` set it |
+| `/jr-uptime details` | Check every site now and open the list |
 
 ## Settings (`/config`)
 

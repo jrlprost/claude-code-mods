@@ -1,7 +1,7 @@
 {
   "name": "jr-uptime",
-  "version": "0.3.2",
-  "description": "Pings your sites every 2 minutes; a red band above the prompt the moment one goes down, and /jruptime with latency sparklines and the last incident.",
+  "version": "0.4.0",
+  "description": "Pings your sites every 2 minutes; a red band above the prompt the moment one goes down, and /jr-uptime with latency sparklines and the last incident.",
   "author": {
     "name": "jrlprost"
   },

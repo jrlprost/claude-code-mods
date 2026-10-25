@@ -53,7 +53,7 @@ test('a site down raises a red band; the pane lists both', { options: { urls: 'o
     expect(await band.find({ text: /broken\.dev/ } as never)).toBeDefined()
     await band.unmount()
   }
-  await $.command.run({ command: 'jruptime', args: 'details' } as never)
+  await $.command.run({ command: 'jr-uptime', args: 'details' } as never)
   const pane = await $.ui.mount({ plugin: 'jr-uptime', surface: 'terminal', component: 'Pane', requestId: 'jr-uptime', props: {} } as never)
   expect(await pane.find({ text: /ok\.dev/ } as never)).toBeDefined()
   expect(await pane.find({ text: /200 · \d+ ms/ } as never)).toBeDefined()
@@ -73,7 +73,7 @@ test('all up with the option on: a green line', { options: { urls: 'ok.dev', sho
   expect(await band.find({ text: /1\/1 up/ } as never)).toBeDefined()
 })
 
-test('/jruptime hide takes the band away, the bare command toggles it, on brings it back', { options: { urls: 'ok.dev, broken.dev' } }, async ($, on) => {
+test('/jr-uptime hide takes the band away, the bare command toggles it, on brings it back', { options: { urls: 'ok.dev, broken.dev' } }, async ($, on) => {
   machine(on, { 'https://broken.dev': 503 })
   await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
   const shows = async () => {
@@ -84,13 +84,13 @@ test('/jruptime hide takes the band away, the bare command toggles it, on brings
     return seen
   }
   expect(await shows()).toBe(true)
-  expect(JSON.stringify(await $.command.run({ command: 'jruptime', args: 'hide' } as never))).toContain('hidden')
+  expect(JSON.stringify(await $.command.run({ command: 'jr-uptime', args: 'hide' } as never))).toContain('hidden')
   expect(await shows()).toBe(false)
-  await $.command.run({ command: 'jruptime', args: '' } as never)
+  await $.command.run({ command: 'jr-uptime', args: '' } as never)
   expect(await shows()).toBe(true)
-  await $.command.run({ command: 'jruptime', args: '' } as never)
+  await $.command.run({ command: 'jr-uptime', args: '' } as never)
   expect(await shows()).toBe(false)
-  await $.command.run({ command: 'jruptime', args: 'on' } as never)
+  await $.command.run({ command: 'jr-uptime', args: 'on' } as never)
   expect(await shows()).toBe(true)
 })
 

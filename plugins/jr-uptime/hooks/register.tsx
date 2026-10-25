@@ -12,7 +12,7 @@ const TIMEOUT_MS = 10_000
 const sites = atom({ plugin: 'jr-uptime', key: 'sites' } as const, [])
 const bandHidden = atom({ plugin: 'jr-uptime', key: 'isBandHidden' } as const, false)
 
-// The band can be hidden: /jruptime hide, show, or the bare command to toggle. One choice for
+// The band can be hidden: /jr-uptime hide, show, or the bare command to toggle. One choice for
 // every session, kept across restarts.
 const band = { isLoaded: false }
 
@@ -35,7 +35,7 @@ async function setBand($: EngineInterface, verb: 'hide' | 'show' | 'toggle') {
   const hide = verb === 'toggle' ? !(await isBandHidden($)) : verb === 'hide'
   await $.store.set('isBandHidden', hide)
   await update($, bandHidden, () => hide)
-  return { text: hide ? 'jr uptime · band hidden (/jruptime to bring it back)' : 'jr uptime · band shown' }
+  return { text: hide ? 'jr uptime · band hidden (/jr-uptime to bring it back)' : 'jr uptime · band shown' }
 }
 const live = { isStarted: false, urls: [] as string[] }
 
@@ -70,7 +70,7 @@ async function checkAll($: EngineInterface) {
 async function ensureStarted($: EngineInterface) {
   if (live.isStarted) return
   live.isStarted = true
-  await $.command.register({ name: 'jruptime', description: 'Show or hide the uptime band; /jruptime details opens your sites with latency and last incident' })
+  await $.command.register({ name: 'jr-uptime', description: 'Show or hide the uptime band; /jr-uptime details opens your sites with latency and last incident' })
   if (live.urls.length === 0) return
   await checkAll($)
   $.clock.every(EVERY_MS, () => {
@@ -106,7 +106,7 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'jruptime' }, async ($, e) => {
+  on('command.run', { command: 'jr-uptime' }, async ($, e) => {
     await ensureStarted($)
     const verb = bandVerb(e.args)
     // Not set up yet: the bare command says how, instead of toggling a band that cannot show.
@@ -169,7 +169,7 @@ export const register: Register = (on, options) => {
                 <Text>{s.downSince === null ? ' down' : ` down ${duration(now - s.downSince)}`}</Text>
               </Text>
             ))}
-            <Text dimColor>{' · /jruptime details'}</Text>
+            <Text dimColor>{' · /jr-uptime details'}</Text>
           </Text>
         ) : (
           <Box justifyContent="flex-end">
