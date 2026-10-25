@@ -1,6 +1,6 @@
 {
   "name": "jr-awake",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Keeps the Mac awake while Claude works, shared by every session on the machine, and warns before the next sleep.",
   "author": {
     "name": "jrlprost"
@@ -20,7 +20,7 @@
     "mode": {
       "type": "string",
       "title": "Default mode",
-      "description": "working: awake while Claude works in any session. session: awake while any session is open. off. /jrawake changes it for every session.",
+      "description": "working: awake while Claude works in any session. session: awake while any session is open. off. /jr-awake changes it for every session.",
       "options": [
         "working",
         "session",
@@ -43,7 +43,7 @@
     "showBand": {
       "type": "boolean",
       "title": "Show the band",
-      "description": "The warning above the prompt when the Mac is about to sleep, and the mode line once /jrawake show turns it on.",
+      "description": "The warning above the prompt when the Mac is about to sleep, and the mode line once /jr-awake show turns it on.",
       "default": true
     }
   }

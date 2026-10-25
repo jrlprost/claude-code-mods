@@ -101,7 +101,7 @@ async function tick($: EngineInterface, fallbackMode: JrAwakeMode, keepDisplay: 
   const now = await $.clock.now()
   if (sleepIn !== null && sleepIn <= warnAt && now - live.warnedAt > 5 * 60_000) {
     live.warnedAt = now
-    $.ui.toast(`jr awake · your Mac sleeps in ${formatCountdown(sleepIn)} · /jrawake session keeps it awake`)
+    $.ui.toast(`jr awake · your Mac sleeps in ${formatCountdown(sleepIn)} · /jr-awake session keeps it awake`)
   }
 }
 
@@ -128,7 +128,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const started = await next(e)
-    await $.command.register({ name: 'jrawake', description: 'Keep the Mac awake: /jrawake working | session | off | status | show | hide (the line is hidden by default)' })
+    await $.command.register({ name: 'jr-awake', description: 'Keep the Mac awake: /jr-awake working | session | off | status | show | hide (the line is hidden by default)' })
     await loadBand($)
     await ensureStarted($, fallbackMode, keepDisplay, warnAt)
     return started
@@ -167,12 +167,12 @@ export const register: Register = (on, options) => {
     return done
   })
 
-  on('command.run', { command: 'jrawake' }, async ($, e) => {
+  on('command.run', { command: 'jr-awake' }, async ($, e) => {
     await ensureStarted($, fallbackMode, keepDisplay, warnAt)
     const word = e.args.trim().toLowerCase()
     if (word === 'hide' || word === 'show') {
       await loadBand($)
-      const answer = await setBand($, word === 'hide', 'jr awake line', '/jrawake show')
+      const answer = await setBand($, word === 'hide', 'jr awake line', '/jr-awake show')
       return word === 'hide' ? { text: `${answer.text}; the Mac is still kept awake, and the warning before sleep still shows` } : answer
     }
     const arg = e.args.trim() as JrAwakeMode | 'on' | 'status' | ''
@@ -203,7 +203,7 @@ export const register: Register = (on, options) => {
           <Text wrap="truncate-end">
             <Text color="#ef4565">{'▲ '}</Text>
             <Text>{`Mac sleeps in ${formatCountdown(v.sleepIn)}`}</Text>
-            <Text dimColor>{' · /jrawake on'}</Text>
+            <Text dimColor>{' · /jr-awake on'}</Text>
           </Text>
           {below}
         </Box>

@@ -100,7 +100,7 @@ test('about to sleep: one alert row on the left, even while hidden', async ($, o
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'jr-awake', surface, ...BAND } as never)
     expect(await ui.find({ text: /^Mac sleeps in 0:40$/ } as never)).toBeDefined()
-    expect(await ui.find({ text: /\/jrawake on/ } as never)).toBeDefined()
+    expect(await ui.find({ text: /\/jr-awake on/ } as never)).toBeDefined()
     expect(await ui.find({ text: /below/ } as never)).toBeDefined()
     expect(rowsAbove(await ui.drawn())).toBe(1)
     await ui.unmount()
@@ -110,28 +110,28 @@ test('about to sleep: one alert row on the left, even while hidden', async ($, o
 test('shown: one quiet row with the shared mode', async ($, on) => {
   machine(on, PMSET_FREE, [])
   await $.session.start(start)
-  await $.command.run({ command: 'jrawake', args: 'show' } as never)
+  await $.command.run({ command: 'jr-awake', args: 'show' } as never)
   const ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
   expect(await ui.find({ text: /^awake · $/ } as never)).toBeDefined()
   expect(await ui.find({ text: /^working$/ } as never)).toBeDefined()
   expect(rowsAbove(await ui.drawn())).toBe(1)
 })
 
-test('/jrawake session is shared: the mode is stored for every session', async ($, on) => {
+test('/jr-awake session is shared: the mode is stored for every session', async ($, on) => {
   machine(on, PMSET_FREE, [])
   await $.session.start(start)
-  const answer = await $.command.run({ command: 'jrawake', args: 'session' } as never)
+  const answer = await $.command.run({ command: 'jr-awake', args: 'session' } as never)
   expect(JSON.stringify(answer)).toContain('mode session (all sessions)')
 })
 
-test('/jrawake show brings the line, hide takes it away and keeps what is below', async ($, on) => {
+test('/jr-awake show brings the line, hide takes it away and keeps what is below', async ($, on) => {
   machine(on, PMSET_FREE, [])
   await $.session.start(start)
-  await $.command.run({ command: 'jrawake', args: 'show' } as never)
+  await $.command.run({ command: 'jr-awake', args: 'show' } as never)
   let ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
   expect(await ui.find({ text: /^working$/ } as never)).toBeDefined()
   await ui.unmount()
-  const answer = await $.command.run({ command: 'jrawake', args: 'hide' } as never)
+  const answer = await $.command.run({ command: 'jr-awake', args: 'hide' } as never)
   expect(JSON.stringify(answer)).toContain('still kept awake')
   ui = await $.ui.mount({ plugin: 'jr-awake', surface: 'terminal', ...BAND } as never)
   expect(await ui.find({ text: /^working$/ } as never)).toBeUndefined()
