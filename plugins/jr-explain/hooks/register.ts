@@ -1,7 +1,7 @@
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Explanation } from './explain'
-import { explainCommand, parseModelAnswer, reasonFor } from './explain'
+import { explainCommand, parseModelAnswer, reasonFor, toastFor } from './explain'
 
 const cache = new Map<string, Explanation | null>()
 
@@ -25,12 +25,14 @@ export const register: Register = (on, options) => {
   const model = String(options.model ?? 'claude-haiku-5-5')
 
   // When a Bash call is about to be put to you, the question carries a plain-English explanation.
+  // The terminal's dialog does not show an ask's reason, so a toast beside it says it too.
   on('tool.check', { tool: 'Bash' }, async ($, e, next) => {
     const verdict = await next(e)
     if (verdict.decision !== 'ask') return verdict
     const command = (e.input as { command?: string }).command ?? ''
     const explanation = explainCommand(command) ?? (useModel ? await askModel($, model, command) : null)
     if (!explanation) return verdict
+    if (e.tool_use_id) $.ui.toast(toastFor(explanation), { timeoutMs: 15_000 })
     return { ...verdict, reason: reasonFor(explanation, verdict.reason) }
   })
 }

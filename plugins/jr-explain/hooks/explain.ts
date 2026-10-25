@@ -55,6 +55,9 @@ export const explainCommand = (command: string): Explanation | null => {
 
 export const RISK_MARK: Record<Risk, string> = { low: '🟢 low risk', medium: '🟡 medium risk', high: '🔴 high risk' }
 
+/** The toast shown beside the permission dialog. */
+export const toastFor = (e: Explanation) => `${RISK_MARK[e.risk]} · ${e.what}`
+
 export const reasonFor = (e: Explanation, previous?: string) => `${e.what}. ${RISK_MARK[e.risk]}.${previous ? ` (${previous})` : ''}`
 
 /** Reads the model's one-line answer: "<explanation> | <low|medium|high>". */

@@ -47,3 +47,18 @@ test('with the model on, an unknown command is explained by it', { options: { us
   const asked = await $.tool.check({ tool: 'Bash', input: { command: 'ffmpeg-batch ./videos' } } as never)
   expect(asked.reason).toBe('Re-encodes every video in the folder. 🟡 medium risk.')
 })
+
+test('a call put to the person also gets the explanation as a toast; a query does not', async ($, on) => {
+  const toasts: string[] = []
+  on('ui.toast', (_$, e) => {
+    toasts.push((e as unknown as { text: string }).text)
+    return { value: undefined } as never
+  })
+  on('tool.check', () => ({ decision: 'ask' }) as never)
+  on('tool.call', () => ({ result: { text: 'done' } }) as never)
+  await $.tool.check({ tool: 'Bash', input: { command: 'rm -rf build' } } as never)
+  expect(toasts).toEqual([])
+  await $.tool.call({ tool: 'Bash', command: 'git push --force origin main' } as never)
+  expect(toasts.length).toBe(1)
+  expect(toasts[0]).toContain('🔴 high risk')
+})

@@ -12,7 +12,13 @@ Runs a project script from package.json, then uploads your commits to the remote
 - The engine's own reason for asking (the rule that matched) stays at the end, in brackets.
 - Commands the table does not know get no line, unless you turn on the small-model option: a one-line explanation is then asked of a small model (a few tokens per new command, cached for the session).
 
-Only commands that are put to you are explained; commands that run without asking are left alone.
+The terminal's permission dialog does not print the reason of a question, so the explanation also shows as a toast beside the dialog, for 15 seconds:
+
+```
+🔴 high risk · Deletes files and folders, including everything inside them
+```
+
+Only commands that are put to you are explained; commands that run without asking are left alone. In auto mode, where the classifier answers most questions, the toast still shows when a question is raised.
 
 ## Settings (`/config`)
 
